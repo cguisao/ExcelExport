@@ -1,0 +1,13 @@
+D:\GTI Solutions\ShopifyExcel\ExcelExport\ShopifyExcel\ShopifyExcel
+--output-path=obj\Any CPU\Release\netcoreapp2.0\
+--application-name=ShopifyExcel
+--content-root=D:\GTI Solutions\ShopifyExcel\ExcelExport\ShopifyExcel\ShopifyExcel
+--file=D:\GTI Solutions\ShopifyExcel\ExcelExport\ShopifyExcel\ShopifyExcel\Pages\About.cshtml
+--file=D:\GTI Solutions\ShopifyExcel\ExcelExport\ShopifyExcel\ShopifyExcel\Pages\Contact.cshtml
+--file=D:\GTI Solutions\ShopifyExcel\ExcelExport\ShopifyExcel\ShopifyExcel\Pages\Error.cshtml
+--file=D:\GTI Solutions\ShopifyExcel\ExcelExport\ShopifyExcel\ShopifyExcel\Pages\Index.cshtml
+--file=D:\GTI Solutions\ShopifyExcel\ExcelExport\ShopifyExcel\ShopifyExcel\Pages\Tools.cshtml
+--file=D:\GTI Solutions\ShopifyExcel\ExcelExport\ShopifyExcel\ShopifyExcel\Pages\_Layout.cshtml
+--file=D:\GTI Solutions\ShopifyExcel\ExcelExport\ShopifyExcel\ShopifyExcel\Pages\_ValidationScriptsPartial.cshtml
+--file=D:\GTI Solutions\ShopifyExcel\ExcelExport\ShopifyExcel\ShopifyExcel\Pages\_ViewImports.cshtml
+--file=D:\GTI Solutions\ShopifyExcel\ExcelExport\ShopifyExcel\ShopifyExcel\Pages\_ViewStart.cshtml
