@@ -93,10 +93,8 @@ namespace ShopifyExcel.Pages.Controllers
         [HttpGet]
         public string Import(string sWebRootFolder)
         {
-            //string sWebRootFolder = _hostingEnvironment.WebRootPath;
-            //string sFileName = @"demo.xlsx";
-            //FileInfo file = new FileInfo(Path.Combine(sWebRootFolder, sFileName));
             FileInfo file = new FileInfo(sWebRootFolder);
+            Dictionary<string, long> dic = new Dictionary<string, long>();
             try
             {
                 using (ExcelPackage package = new ExcelPackage(file))
@@ -106,14 +104,27 @@ namespace ShopifyExcel.Pages.Controllers
                     int rowCount = worksheet.Dimension.Rows;
                     int ColCount = worksheet.Dimension.Columns;
                     bool bHeaderRow = true;
-                    
+                    dic = Helper.UPCLoadDic();
+                    string SKU = "";
                     for (int row = 1; row <= rowCount; row++)
                     {
                         for (int col = 1; col <= ColCount; col++)
                         {
+                            
                             if (col == 3 && row != 1)
                             {
-                                worksheet.Cells[row, col].Value = Helper.BuildHTML(worksheet, row);
+                                worksheet.Cells[row, col].Value = Helper.BuildHTML(worksheet, row, file.Name);
+                            }
+                            else if (col == 13 && row != 1)
+                            {
+                                SKU = worksheet.Cells[row, col].Value.ToString();
+                            }
+                            else if (col == 23 && row != 1)
+                            {
+                                long value;
+                                if(dic.TryGetValue(SKU, out value))
+                                    if (dic[SKU] != 0)
+                                        worksheet.Cells[row, col].Value = dic[SKU];
                             }
                             else if (col == 24 && row != 1)
                             {
@@ -122,10 +133,7 @@ namespace ShopifyExcel.Pages.Controllers
                                         .Replace("http://img.fragrancex.com/images/products/SKU/small/"
                                         , "https://img.fragrancex.com/images/products/SKU/large/");
                             }
-                            else if (col == 28 && row != 1)
-                            {
-                                worksheet.Cells[row, col].Value = Helper.UPCFinder();
-                            }
+                            
                             if (bHeaderRow)
                             {
                                 if(string.IsNullOrEmpty(sb.Append(worksheet.Cells[row, col].Value).ToString()))
@@ -152,58 +160,10 @@ namespace ShopifyExcel.Pages.Controllers
                 return "Some error occurred while importing." + ex.Message;
             }
         }
-        
-        [HttpGet]
-        public string ExportToExcel2()
-        {
-            string sWebRootFolder = _hostingEnvironment.WebRootPath;
-            string sFileName = @"demo.xlsx";
-            string URL = string.Format("{0}://{1}/{2}", Request.Scheme, Request.Host, sFileName);
-            FileInfo file = new FileInfo(Path.Combine(sWebRootFolder, sFileName));
-            if (file.Exists)
-            {
-                file.Delete();
-                file = new FileInfo(Path.Combine(sWebRootFolder, sFileName));
-            }
-            using (ExcelPackage package = new ExcelPackage(file))
-            {
-                // add a new worksheet to the empty workbook
-                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Employee");
-                //First add the headers
-                worksheet.Cells[1, 1].Value = "ID";
-                worksheet.Cells[1, 2].Value = "Name";
-                worksheet.Cells[1, 3].Value = "Gender";
-                worksheet.Cells[1, 4].Value = "Salary (in $)";
-
-                //Add values
-                worksheet.Cells["A2"].Value = 1000;
-                worksheet.Cells["B2"].Value = "Jon";
-                worksheet.Cells["C2"].Value = "M";
-                worksheet.Cells["D2"].Value = 5000;
-
-                worksheet.Cells["A3"].Value = 1001;
-                worksheet.Cells["B3"].Value = "Graham";
-                worksheet.Cells["C3"].Value = "M";
-                worksheet.Cells["D3"].Value = 10000;
-
-                worksheet.Cells["A4"].Value = 1002;
-                worksheet.Cells["B4"].Value = "Jenny";
-                worksheet.Cells["C4"].Value = "F";
-                worksheet.Cells["D4"].Value = 5000;
-
-                package.Save(); //Save the workbook.
-            }
-            return URL;
-        }
 
         [HttpPost]
         public async Task<IActionResult> ExportToExcel(IFormFile file)
         {
-            //List<Technology> technologies = StaticData.Technologies;
-            //string[] columns = { "Name", "Project", "Developer" };
-            //byte[] filecontent = ExcelExportHelper.ExportExcel(technologies, "Technology", true, columns);
-            //return File(filecontent, ExcelExportHelper.ExcelContentType, "Technologies.xlsx");
-
             if (file == null || file.Length == 0)
                 return null;
 
@@ -218,22 +178,15 @@ namespace ShopifyExcel.Pages.Controllers
 
             string path2 = Import(path);
 
-            //if (filename == null)
-            //    return Content("filename not present");
-
-            //var path = Path.Combine(
-            //               Directory.GetCurrentDirectory(),
-            //               "wwwroot", filename);
-
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))
             {
                 await stream.CopyToAsync(memory);
             }
             memory.Position = 0;
-            return File(memory, GetContentType(path), Path.GetFileName(path));
-
-            //return Download(filename);
+            
+            return File(memory, GetContentType(path), Path.GetFileNameWithoutExtension(path) 
+                + "Converted" + Path.GetExtension(path).ToLowerInvariant());
         }
     }
 }
