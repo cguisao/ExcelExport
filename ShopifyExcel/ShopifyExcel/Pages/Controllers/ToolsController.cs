@@ -111,6 +111,8 @@ namespace ShopifyExcel.Pages.Controllers
 
                     int count = 0;
                     string title = "";
+                    
+                    
                     for (int row = 1; row <= rowCount; row++)
                     {
 
@@ -158,7 +160,18 @@ namespace ShopifyExcel.Pages.Controllers
                                            .Replace("http://img.fragrancex.com/images/products/SKU/small/"
                                            , "https://img.fragrancex.com/images/products/SKU/large/");
                     }
-                       
+
+                    for (int row = 1; row <= rowCount; row++)
+                    {
+                        title = worksheet.Cells[row, 1].Value.ToString();
+                        if (title.ToLower().Contains("tester") || title.ToLower().Contains("unboxed"))
+                        {
+                            worksheet.DeleteRow(row, 1, true);
+                            row--;
+                            rowCount--;
+                        }
+                    }
+
                     package.Save();
                     return sb.ToString();
                 }
