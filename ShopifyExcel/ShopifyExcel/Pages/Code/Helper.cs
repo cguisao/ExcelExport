@@ -222,8 +222,8 @@ namespace ShopifyExcel.Pages.Code
                 }
             }
 
-            if (string.IsNullOrEmpty(ans))
-                ans = cur;
+            
+            ans = ans + cur;
 
             return ans.TrimEnd('/');
         }
