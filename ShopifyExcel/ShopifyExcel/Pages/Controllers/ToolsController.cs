@@ -116,7 +116,8 @@ namespace ShopifyExcel.Pages.Controllers
 
                         if (row != 1)
                         {
-                            title = Helper.BuildTitle(dicTitle, worksheet.Cells[row, 2].Value.ToString());
+                            title = Helper.BuildTitle(dicTitle, worksheet.Cells[row, 2].Value.ToString() 
+                                + " " + worksheet.Cells[row, 27].Value.ToString());
                             worksheet.Cells[row, 2].Value = title;
                             if (title.Length > 80)
                                 count++;

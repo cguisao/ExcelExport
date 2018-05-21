@@ -262,7 +262,8 @@ namespace ShopifyExcel.Pages.Code
 
                 if (row != 1 && cur == null)
                 {
-                    cur = worksheet.Cells[row, 2].Value.ToString();
+                    cur = worksheet.Cells[row, 2].Value.ToString() 
+                        + " " + worksheet.Cells[row, 27].Value.ToString();
                     result = getSize(worksheet.Cells[row, 8].Value.ToString());
                     if(row == rowCount)
                         dic.Add(cur, result);
@@ -271,7 +272,8 @@ namespace ShopifyExcel.Pages.Code
 
                 else if (row != 1 && prev == null)
                 {
-                    prev = worksheet.Cells[row, 2].Value.ToString();
+                    prev = worksheet.Cells[row, 2].Value.ToString()
+                        + " " + worksheet.Cells[row, 27].Value.ToString();
                     if (string.Compare(prev, cur) == 0)
                         result = result + "/" + getSize(worksheet.Cells[row, 8].Value.ToString());
                     else
@@ -285,7 +287,8 @@ namespace ShopifyExcel.Pages.Code
 
                 else if (row != 1 && (cur != null && prev != null))
                 {
-                    prev = worksheet.Cells[row, 2].Value.ToString();
+                    prev = worksheet.Cells[row, 2].Value.ToString()
+                        + " " + worksheet.Cells[row, 27].Value.ToString();
                     if (string.Compare(prev, cur) == 0)
                     {
                         result = result + "/" + getSize(worksheet.Cells[row, 8].Value.ToString());
