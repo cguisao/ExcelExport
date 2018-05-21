@@ -94,7 +94,9 @@ namespace ShopifyExcel.Pages.Controllers
         public string Import(string sWebRootFolder)
         {
             FileInfo file = new FileInfo(sWebRootFolder);
-            Dictionary<string, long> dic = new Dictionary<string, long>();
+            Dictionary<string, long> dicSKU = new Dictionary<string, long>();
+            Dictionary<string, string> dicTitle = new Dictionary<string, string>();
+
             try
             {
                 using (ExcelPackage package = new ExcelPackage(file))
@@ -103,54 +105,59 @@ namespace ShopifyExcel.Pages.Controllers
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
                     int rowCount = worksheet.Dimension.Rows;
                     int ColCount = worksheet.Dimension.Columns;
-                    bool bHeaderRow = true;
-                    dic = Helper.UPCLoadDic();
+                    dicSKU = Helper.UPCLoadDic();
+                    dicTitle = Helper.titleDic(worksheet);
                     string SKU = "";
+
+                    int count = 0;
+                    string title = "";
                     for (int row = 1; row <= rowCount; row++)
                     {
-                        for (int col = 1; col <= ColCount; col++)
+
+                        if (row != 1)
                         {
-                            
-                            if (col == 3 && row != 1)
-                            {
-                                worksheet.Cells[row, col].Value = Helper.BuildHTML(worksheet, row, file.Name);
-                            }
-                            else if (col == 13 && row != 1)
-                            {
-                                SKU = worksheet.Cells[row, col].Value.ToString();
-                            }
-                            else if (col == 23 && row != 1)
-                            {
-                                long value;
-                                if(dic.TryGetValue(SKU, out value))
-                                    if (dic[SKU] != 0)
-                                        worksheet.Cells[row, col].Value = dic[SKU];
-                            }
-                            else if (col == 24 && row != 1)
-                            {
-                                worksheet.Cells[row, col].Value =
-                                    worksheet.Cells[row, col].Value.ToString()
-                                        .Replace("http://img.fragrancex.com/images/products/SKU/small/"
-                                        , "https://img.fragrancex.com/images/products/SKU/large/");
-                            }
-                            
-                            if (bHeaderRow)
-                            {
-                                if(string.IsNullOrEmpty(sb.Append(worksheet.Cells[row, col].Value).ToString()))
-                                {
-                                    sb.Append(worksheet.Cells[row, col].Value.ToString() + "\t");
-                                }
-                            }
-                            else
-                            {
-                                if (string.IsNullOrEmpty(sb.Append(worksheet.Cells[row, col].Value).ToString()))
-                                {
-                                    sb.Append(worksheet.Cells[row, col].Value.ToString() + "\t");
-                                }
-                            }
+                            title = Helper.BuildTitle(dicTitle, worksheet.Cells[row, 2].Value.ToString());
+                            worksheet.Cells[row, 2].Value = title;
+                            if (title.Length > 80)
+                                count++;
                         }
-                        sb.Append(Environment.NewLine);
                     }
+
+                    for (int row = 1; row <= rowCount; row++)
+                    {
+                        if (row != 1)
+                        {
+                            worksheet.Cells[row, 3].Value = Helper.BuildHTML(worksheet, row, file.Name);
+                        }
+                    }
+
+                    for (int row = 1; row <= rowCount; row++)
+                    {
+                        if (row != 1)
+                        {
+                            SKU = worksheet.Cells[row, 13].Value.ToString();
+                        }
+                    }
+
+                    for (int row = 1; row <= rowCount; row++)
+                    {
+                        if (row != 1)
+                        {
+                            long value;
+                            if (dicSKU.TryGetValue(SKU, out value))
+                                if (dicSKU[SKU] != 0)
+                                    worksheet.Cells[row, 23].Value = dicSKU[SKU];
+                        }
+                    }
+
+                    for (int row = 1; row <= rowCount; row++)
+                    {
+                        worksheet.Cells[row, 24].Value =
+                                       worksheet.Cells[row, 24].Value.ToString()
+                                           .Replace("http://img.fragrancex.com/images/products/SKU/small/"
+                                           , "https://img.fragrancex.com/images/products/SKU/large/");
+                    }
+                       
                     package.Save();
                     return sb.ToString();
                 }
@@ -186,7 +193,7 @@ namespace ShopifyExcel.Pages.Controllers
             memory.Position = 0;
             
             return File(memory, GetContentType(path), Path.GetFileNameWithoutExtension(path) 
-                + "Converted" + Path.GetExtension(path).ToLowerInvariant());
+                + "_Converted" + Path.GetExtension(path).ToLowerInvariant());
         }
     }
 }

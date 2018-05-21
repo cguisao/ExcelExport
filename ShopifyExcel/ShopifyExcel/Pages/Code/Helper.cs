@@ -124,5 +124,214 @@ namespace ShopifyExcel.Pages.Code
             }
             return dic;
         }
+
+        internal static string BuildTitle(Dictionary<string, string> dicTitle, string title)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(shortTitle(title));
+            
+            string value;
+
+            dicTitle.TryGetValue(title, out value);
+
+            value = removeRepeats(value);
+
+            if ((sb.Length + value.Length + 3) > 80)
+                return sb.ToString();
+
+            sb.Append(" ");
+            
+            sb.Append(value);
+            
+            if(value != null)
+                sb.Append("Oz");
+
+            if (string.IsNullOrEmpty(sb.ToString()) || sb.ToString().Contains("EDT"))
+            {
+                if(sb.Length < 65)
+                    sb.Insert(0, value: "100% Authentic ");
+                else if (sb.Length < 67)
+                    sb.Insert(0, value: "100% Genuine ");
+                else if (sb.Length < 70)
+                    sb.Insert(0, value: "Authentic ");
+                else if (sb.Length < 72)
+                    sb.Insert(0, value: "Genuine ");
+                else if(sb.Length < 76)
+                    sb.Insert(0, value: "New ");
+            }
+            else if(string.IsNullOrEmpty(sb.ToString()) || sb.ToString()?.Contains("EDC") != null)
+            {
+                if (sb.Length < 67)
+                    sb.Insert(0, value: "100% Genuine ");
+                else if (sb.Length < 70)
+                    sb.Insert(0, value: "Authentic ");
+                else if (sb.Length < 72)
+                    sb.Insert(0, value: "Genuine ");
+                else if (sb.Length < 76)
+                    sb.Insert(0, value: "New ");
+            }
+
+            else if (string.IsNullOrEmpty(sb.ToString()) || sb.ToString()?.Contains("EDP") != null)
+            {
+                if (sb.Length < 70)
+                    sb.Insert(0, value: "Authentic ");
+                else if (sb.Length < 72)
+                    sb.Insert(0, value: "Genuine ");
+                else if (sb.Length < 76)
+                    sb.Insert(0, value: "New ");
+            }
+            else
+            {
+                if (sb.Length < 81)
+                    sb.Insert(0, value: "Genuine ");
+                else if (sb.Length < 76)
+                    sb.Insert(0, value: "New ");
+            }
+
+            int count = 0;
+
+            if (sb.Length > 80)
+                count++;
+
+            return sb.ToString();
+        }
+
+        private static string removeRepeats(string v)
+        {
+            char[] subString = v.ToArray();
+            string ans = "";
+            string cur = "";
+
+            foreach (char c in subString)
+            {
+                if (char.ToLower(c).Equals('/'))
+                {
+                    if (!ans.Contains(cur))
+                    {
+                        ans = ans + cur + "/";
+                        cur = "";
+                    }
+
+                    cur = "";
+                }
+                
+                else
+                {
+                    cur = cur + c.ToString();
+                }
+            }
+
+            if (string.IsNullOrEmpty(ans))
+                ans = cur;
+
+            return ans.TrimEnd('/');
+        }
+
+        private static string shortTitle(string title)
+        {
+            string ans = "";
+            if (title.Contains("Eau De Toilette"))
+                ans = title.Replace("Eau De Toilette", "EDT");
+
+            else if (title.Contains("Eau De Cologne"))
+                ans = title.Replace("Eau De Cologne", "EDC");
+
+            else if (title.Contains("Eau De Fraiche"))
+                ans = title.Replace("Eau De Fraiche", "EDF");
+
+            else if (title.Contains("Eau De Parfum"))
+                ans = title.Replace("Eau De Parfum", "EDP");
+            else
+                ans = title;
+            
+            return ans;
+        }
+
+        internal static Dictionary<string, string> titleDic(ExcelWorksheet worksheet)
+        {
+            int rowCount = worksheet.Dimension.Rows;
+            int ColCount = worksheet.Dimension.Columns;
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            string prev = null;
+            string cur = null;
+            string result = null;
+            
+            for (int row = 1; row <= rowCount; row++)
+            {
+
+                if (row != 1 && cur == null)
+                {
+                    cur = worksheet.Cells[row, 2].Value.ToString();
+                    result = getSize(worksheet.Cells[row, 8].Value.ToString());
+                    if(row == rowCount)
+                        dic.Add(cur, result);
+                    continue;
+                }
+
+                else if (row != 1 && prev == null)
+                {
+                    prev = worksheet.Cells[row, 2].Value.ToString();
+                    if (string.Compare(prev, cur) == 0)
+                        result = result + "/" + getSize(worksheet.Cells[row, 8].Value.ToString());
+                    else
+                    {
+                        dic.Add(cur, result);
+                        cur = null;
+                        prev = null;
+                        row--;
+                    }
+                }
+
+                else if (row != 1 && (cur != null && prev != null))
+                {
+                    prev = worksheet.Cells[row, 2].Value.ToString();
+                    if (string.Compare(prev, cur) == 0)
+                    {
+                        result = result + "/" + getSize(worksheet.Cells[row, 8].Value.ToString());
+                        if (row == rowCount)
+                            dic.Add(cur, result);
+                    }
+                        
+                    else
+                    {
+                        dic.Add(cur, result);
+                        cur = null;
+                        prev = null;
+                        row--;
+                    }
+                }
+                
+                else if (row == 1)
+                    continue;
+                else
+                {
+                    cur = null;
+                    prev = null;
+                    dic.Add(cur, result);
+                    row = row - 2;
+                }
+            }
+
+            return dic;
+        }
+
+        private static string getSize(string v)
+        {
+            char[] subString = v.ToArray();
+            string ans = "";
+
+            if (!v.ToLower().Contains("oz"))
+                return ans;
+
+            foreach(char c in subString)
+            {
+                if (char.ToLower(c).Equals('o'))
+                    break;
+                ans = ans + c;
+            }
+            
+            return ans;
+        }
     }
 }
