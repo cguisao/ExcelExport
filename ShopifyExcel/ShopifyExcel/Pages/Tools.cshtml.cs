@@ -10,14 +10,6 @@ namespace ShopifyExcel
 {
     public class ToolsModel : PageModel
     {
-        public List<Technology> Technologies
-        {
-            get
-            {
-                return StaticData.Technologies;
-            }
-        }
-
         public string Message { get; set; }
 
         public void OnGet()
