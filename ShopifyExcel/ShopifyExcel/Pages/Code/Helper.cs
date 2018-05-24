@@ -10,6 +10,107 @@ namespace ShopifyExcel.Pages.Code
 {
     public class Helper
     {
+        public static void ExcelGenerator(string sWebRootFolder)
+        {
+            FileInfo file = new FileInfo(sWebRootFolder);
+            Dictionary<string, long> dicSKU = new Dictionary<string, long>();
+            Dictionary<string, string> dicTitle = new Dictionary<string, string>();
+
+            try
+            {
+                using (ExcelPackage package = new ExcelPackage(file))
+                {
+                    StringBuilder sb = new StringBuilder();
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
+
+                    // Prepare the excel and remove whatever it needs to be removed.
+
+                    Helper.PrepareExcel(worksheet, Helper.filenameFinder(file.Name));
+
+                    int rowCount = worksheet.Dimension.Rows;
+                    int ColCount = worksheet.Dimension.Columns;
+                    dicSKU = Helper.UPCLoadDic();
+                    dicTitle = Helper.titleDic(worksheet);
+                    string SKU = "";
+
+                    int count = 0;
+                    string title = "";
+
+
+                    for (int row = 1; row <= rowCount; row++)
+                    {
+
+                        if (row != 1)
+                        {
+                            // Logic for the title
+                            title = Helper.BuildTitle(dicTitle, worksheet.Cells[row, 2].Value.ToString()
+                                + " " + worksheet.Cells[row, 27].Value.ToString());
+                            worksheet.Cells[row, 2].Value = title;
+                            if (title.Length > 80)
+                                count++;
+
+                            //Logic for the HTML Body
+
+                            worksheet.Cells[row, 3].Value = Helper.BuildHTML(worksheet, row, file.Name);
+
+                            // SKU creator
+
+                            SKU = worksheet.Cells[row, 13].Value.ToString();
+
+                            long value;
+                            if (dicSKU.TryGetValue(SKU, out value))
+                                if (dicSKU[SKU] != 0)
+                                    worksheet.Cells[row, 23].Value = dicSKU[SKU];
+
+                            // This logic fixes the picture in some cases
+
+                            worksheet.Cells[row, 24].Value =
+                                      worksheet.Cells[row, 24].Value.ToString()
+                                          .Replace("http://img.fragrancex.com/images/products/SKU/small/"
+                                          , "http://img.fragrancex.com/images/products/SKU/large/")
+                                          .Replace("http", "https");
+
+                        }
+                    }
+
+
+                    //Dictionary<string, string> dicSingle = new Dictionary<string, string>();
+                    //dicSingle = Helper.titleDic(worksheet);
+
+                    package.Save();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Some error occurred while importing." + ex.Message);
+            }
+        }
+
+        public static string GetContentType(string path)
+        {
+            var types = GetMimeTypes();
+            var ext = Path.GetExtension(path).ToLowerInvariant();
+            return types[ext];
+        }
+
+        private static Dictionary<string, string> GetMimeTypes()
+        {
+            return new Dictionary<string, string>
+            {
+                {".txt", "text/plain"},
+                {".pdf", "application/pdf"},
+                {".doc", "application/vnd.ms-word"},
+                {".docx", "application/vnd.ms-word"},
+                {".xls", "application/vnd.ms-excel"},
+                {".xlsx", "application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet"},
+                {".png", "image/png"},
+                {".jpg", "image/jpeg"},
+                {".jpeg", "image/jpeg"},
+                {".gif", "image/gif"},
+                {".csv", "text/csv"}
+            };
+        }
+
         internal static StringBuilder BuildHTML(ExcelWorksheet worksheet, int row, string fileName)
         {
             int ColCount = worksheet.Dimension.Columns;
@@ -40,7 +141,7 @@ namespace ShopifyExcel.Pages.Code
             return HTMLBuilder(filenameFinder(fileName), variable);
         }
 
-        private static string filenameFinder(string fileName)
+        public static string filenameFinder(string fileName)
         {
             if (fileName.ToLower().Contains("phil"))
                 return "Phil.html";
@@ -125,6 +226,38 @@ namespace ShopifyExcel.Pages.Code
             return dic;
         }
 
+        internal static void PrepareExcel(ExcelWorksheet worksheet, string fileName)
+        {
+            int rowCount = worksheet.Dimension.Rows;
+            string title = "";
+            for (int row = 1; row <= rowCount; row++)
+            {
+                // Remove testers and unboxed items
+                title = worksheet.Cells[row, 1].Value.ToString();
+                if (title.ToLower().Contains("tester") || title.ToLower().Contains("unboxed"))
+                {
+                    worksheet.DeleteRow(row, 1, true);
+                    row--;
+                    rowCount--;
+                    continue;
+                }
+
+                // Remove for phil only
+
+                if(row != 1 && fileName.ToLower().Contains("phil"))
+                {
+                    long price = Convert.ToInt64(worksheet.Cells[row, 19].Value);
+                    if (price < 49 || price > 61)
+                    {
+                        worksheet.DeleteRow(row, 1, true);
+                        row--;
+                        rowCount--;
+                        continue;
+                    }
+                }
+            }
+        }
+
         internal static string BuildTitle(Dictionary<string, string> dicTitle, string title)
         {
             StringBuilder sb = new StringBuilder();
@@ -135,7 +268,8 @@ namespace ShopifyExcel.Pages.Code
 
             dicTitle.TryGetValue(title, out value);
 
-            value = removeRepeats(value);
+            if(value != null)
+                value = removeRepeats(value);
 
             if ((sb.Length + value.Length + 3) > 80)
                 return sb.ToString();
@@ -259,6 +393,21 @@ namespace ShopifyExcel.Pages.Code
             
             for (int row = 1; row <= rowCount; row++)
             {
+
+                // for Phil only
+                // TODO: Create some logic so this happens on its own
+
+                //if (row != 1)
+                //{
+                //    long price = Convert.ToInt64(worksheet.Cells[row, 19].Value);
+                //    if (price < 49 || price > 61)
+                //    {
+                //        //worksheet.DeleteRow(row, 1, true);
+                //        //row--;
+                //        //rowCount--;
+                //        continue;
+                //    }
+                //}
 
                 if (row != 1 && cur == null)
                 {
