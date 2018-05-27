@@ -4,3 +4,25 @@ ShopifyExcel/.vs/ShopifyExcel/v15/Server/sqlite3/storage.ide-shm
 ShopifyExcel/.vs/ShopifyExcel/v15/Server/sqlite3/storage.ide
 ShopifyExcel/.vs/ShopifyExcel/v15/Server/sqlite3/db.lock
 ShopifyExcel/ShopifyExcel/obj/Release/
+GTI Solutions Tools.sln
+.vs/config/applicationhost.config
+.vs/GTI Solutions Tools/v15/Server/sqlite3/storage.ide-wal
+.vs/GTI Solutions Tools/v15/Server/sqlite3/storage.ide-shm
+.vs/GTI Solutions Tools/v15/Server/sqlite3/storage.ide
+.vs/GTI Solutions Tools/v15/Server/sqlite3/db.lock
+DBTester/appsettings.Development.json
+DBTester/appsettings.json
+DBTester/bundleconfig.json
+DBTester/GTI Solutions.csproj
+DBTester/bin/Debug/netcoreapp2.0/GTI Solutions.runtimeconfig.json
+DBTester/bin/Debug/netcoreapp2.0/GTI Solutions.runtimeconfig.dev.json
+DBTester/bin/Debug/netcoreapp2.0/GTI Solutions.deps.json
+DBTester/bin/Debug/netcoreapp2.0/DBTester.runtimeconfig.json
+DBTester/bin/Debug/netcoreapp2.0/DBTester.runtimeconfig.dev.json
+DBTester/bin/Debug/netcoreapp2.0/DBTester.deps.json
+DBTester/Code/Helper.cs
+DBTester/obj/
+FrgxPublicApiSDK/obj/
+packages/
+DBTester/wwwroot/favicon.ico
+DBTester/Properties/
