@@ -26,3 +26,15 @@ FrgxPublicApiSDK/obj/
 packages/
 DBTester/wwwroot/favicon.ico
 DBTester/Properties/
+DBTester/bin/Release/netcoreapp2.0/win8-x64/GTI Solutions.runtimeconfig.dev.json
+DBTester/bin/Release/netcoreapp2.0/GTI Solutions.runtimeconfig.json
+DBTester/bin/Release/netcoreapp2.0/GTI Solutions.runtimeconfig.dev.json
+DBTester/bin/Release/netcoreapp2.0/GTI Solutions.deps.json
+DBTester/bin/Any CPU/Release/netcoreapp2.0/GTI Solutions.runtimeconfig.dev.json
+DBTester/bin/Any CPU/Release/netcoreapp2.0/GTI Solutions.deps.json
+DBTester/bin/Any CPU/Release/netcoreapp2.0/GTI Solutions.runtimeconfig.json
+DBTester/bin/Release/netcoreapp2.0/win8-x64/GTI Solutions.deps.json
+FrgxPublicApiSDK/bin/Release/Newtonsoft.Json.xml
+DBTester/bin/Release/netcoreapp2.0/win8-x64/GTI Solutions.runtimeconfig.json
+DBTester/Migrations/
+DBTester/bin/
