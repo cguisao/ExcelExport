@@ -1,0 +1,44 @@
+﻿@{
+    ViewBag.Title = "UpcViewer";
+}
+
+@using X.PagedList.Mvc.Core;
+@using X.PagedList;
+
+<link href="/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+<h2>Upc Viewer</h2>
+<br />
+<div class="table-responsive">
+    <table id="myTable" class="display table" width="80%">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Url</th>
+            </tr>
+        </thead>
+
+        @foreach (var product in ViewBag.onePageOfUpcs)
+        {
+            <tbody>
+                <tr>
+                    <td>
+                        @product.ItemID
+                    </td>
+                    <td>
+                        @product.Upc
+                    </td>
+                </tr>
+            </tbody>
+        }
+
+    </table>
+</div>
+
+@Html.PagedListPager((IPagedList)ViewBag.onePageOfUpcs, page => Url.Action("UpcViewer", new { page }))
+
+<script>
+    $(document).ready(function () {
+        $('#myTable').dataTable();
+    });
+</script>

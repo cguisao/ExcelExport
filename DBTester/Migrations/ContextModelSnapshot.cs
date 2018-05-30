@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
 
-namespace DBTester.Migrations
+namespace GTISolutions.Migrations
 {
     [DbContext(typeof(Context))]
     partial class ContextModelSnapshot : ModelSnapshot
@@ -17,7 +17,7 @@ namespace DBTester.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.1-rtm-125")
+                .HasAnnotation("ProductVersion", "2.0.0-rtm-26452")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("DBTester.Models.Blog", b =>
@@ -32,15 +32,83 @@ namespace DBTester.Migrations
                     b.ToTable("Blogs");
                 });
 
+            modelBuilder.Entity("DBTester.Models.Fragrancex", b =>
+                {
+                    b.Property<int>("ItemID");
+
+                    b.Property<string>("BrandName");
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("Gender");
+
+                    b.Property<bool>("Instock");
+
+                    b.Property<string>("LargeImageUrl");
+
+                    b.Property<string>("MetricSize");
+
+                    b.Property<string>("ParentCode");
+
+                    b.Property<string>("ProductName");
+
+                    b.Property<double>("RetailPriceUSD");
+
+                    b.Property<string>("Size");
+
+                    b.Property<string>("SmallImageURL");
+
+                    b.Property<string>("Type");
+
+                    b.Property<long?>("Upc");
+
+                    b.Property<double>("WholePriceAUD");
+
+                    b.Property<double>("WholePriceCAD");
+
+                    b.Property<double>("WholePriceEUR");
+
+                    b.Property<double>("WholePriceGBP");
+
+                    b.Property<double>("WholePriceUSD");
+
+                    b.Property<int?>("upcItemID");
+
+                    b.HasKey("ItemID");
+
+                    b.HasIndex("upcItemID");
+
+                    b.ToTable("Fragrancex");
+                });
+
+            modelBuilder.Entity("DBTester.Models.ServiceTimeStamp", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("TimeStamp");
+
+                    b.HasKey("id");
+
+                    b.ToTable("ServiceTimeStamp");
+                });
+
             modelBuilder.Entity("DBTester.Models.UPC", b =>
                 {
-                    b.Property<int>("UpcID");
+                    b.Property<int>("ItemID");
 
-                    b.Property<long>("Upc");
+                    b.Property<long?>("Upc");
 
-                    b.HasKey("UpcID");
+                    b.HasKey("ItemID");
 
                     b.ToTable("UPC");
+                });
+
+            modelBuilder.Entity("DBTester.Models.Fragrancex", b =>
+                {
+                    b.HasOne("DBTester.Models.UPC", "upc")
+                        .WithMany("fragrancex")
+                        .HasForeignKey("upcItemID");
                 });
 #pragma warning restore 612, 618
         }

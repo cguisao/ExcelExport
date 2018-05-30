@@ -1,0 +1,50 @@
+﻿@model IEnumerable<DBTester.Models.ServiceTimeStamp>
+@{
+    ViewBag.Title = "Update";
+}
+
+<h2>Shopify Tools</h2>
+
+<h3>Fragrancex's database update</h3>
+
+<p>
+    This application is intended to update the
+    GTI Solution's Fragrancex database. Such
+    update includes item price and availability
+    once a day.
+</p>
+
+<form asp-controller="Tools" asp-action="Updatefragrancex" method="post"
+      enctype="multipart/form-data">
+    <button class="btn btn-primary" type="submit">Update</button>
+</form>
+<br />
+
+<p>
+    The list can only be updated once a day, so the list below shows the last time that
+    the list was updated. If you press the button and the list has not been updated
+    today, the database will be updated. Otherwise, nothing will happen.
+</p>
+
+<br />
+
+<div class="table-responsive">
+    <table id="myTable" class="display table" width="80%">
+        <tr>
+            <th>Id</th>
+            <th>Last Updated Date</th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeStamp)
+                </td>
+            </tr>
+        }
+    </table>
+</div>

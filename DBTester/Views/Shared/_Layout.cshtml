@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DBTester</title>
+    <title>@ViewData["Title"] - GTI Solutions</title>
 
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -31,7 +31,27 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Tools" asp-action="Tools">Tools</a></li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            Fragrancex
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a asp-area="" asp-controller="Tools" asp-action="Tools">Excel Tools</a></li>
+                            <li><a asp-area="" asp-controller="Tools" asp-action="Update">Update</a></li>
+                            <li><a asp-area="" asp-controller="Tools" asp-action="ProductDownload">Product Download</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            UPC
+                        <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a asp-area="" asp-controller="Tools" asp-action="Upcs">Upload</a></li>
+                            <li><a asp-area="" asp-controller="Tools" asp-action="UpcViewer">View</a></li>
+                        </ul>
+                    </li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Create">DB Inserter</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Blogs">DB Reader</a></li>
                 </ul>
@@ -42,7 +62,7 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; 2018 - DBTester</p>
+            <p>&copy; 2018 - GTI Solutions</p>
         </footer>
     </div>
 

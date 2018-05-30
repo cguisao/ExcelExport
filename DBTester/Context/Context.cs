@@ -11,7 +11,9 @@ namespace DBTester.Models
         public Context(DbContextOptions<Context> options)
             : base(options)
         { }
-
+        
+        public DbSet<ServiceTimeStamp> ServiceTimeStamp { get; set; }
+        public DbSet<Fragrancex> Fragrancex { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<UPC> UPC { get; set; }
     }
