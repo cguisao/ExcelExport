@@ -150,14 +150,6 @@ namespace DBTester.Controllers
         [HttpPost]
         public async Task<IActionResult> ExportToExcel(IFormFile file)
         {
-            // UPC Uploader
-
-            //Fragrancex fragrancex = new Fragrancex();
-
-            //fragrancex.Upc = _context.UPC.Find(540250).Upc;
-            //fragrancex.ItemID = 540250;
-            //_context.Fragrancex.Update(fragrancex);
-            
             if (file == null || file.Length == 0)
             {
                 return null;
@@ -172,9 +164,12 @@ namespace DBTester.Controllers
                 await file.CopyToAsync(stream);
             }
 
-            //Helper.ExcelGenerator(path);
-            
+            var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
 
+            var price = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
+            
+            Helper.ExcelGenerator(path, price, upc);
+            
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))
             {
@@ -195,6 +190,7 @@ namespace DBTester.Controllers
         [HttpPost]
         public async Task<IActionResult> Updatefragrancex()
         {
+            /*
             ServiceTimeStamp service = new ServiceTimeStamp();
 
             DataTable uploadFragrancex = Helper.MakeFragrancexTable();
@@ -206,55 +202,65 @@ namespace DBTester.Controllers
             long? value;
             
             int bulkSize = 0;
+            
+            Fragrancex fragrancex = new Fragrancex();
+
+            //SDK Test and it works
+
+            var listingApiClient = new FrgxListingApiClient("346c055aaefd", "a5574c546cbbc9c10509e3c277dd7c7039b24324");
+
+            var product = listingApiClient.GetProductById("482296");
+
+            DataRow insideRow = uploadFragrancex.NewRow();
+
+            insideRow["ItemID"] = Convert.ToInt32(product.ItemId);
+            insideRow["BrandName"] = product.BrandName;
+            insideRow["Description"] = product.Description;
+            insideRow["Gender"] = product.Gender;
+            insideRow["Instock"] = product.Instock;
+            insideRow["LargeImageUrl"] = product.LargeImageUrl;
+            insideRow["MetricSize"] = product.MetricSize;
+            insideRow["ParentCode"] = product.ParentCode;
+            insideRow["ProductName"] = product.ProductName;
+            insideRow["RetailPriceUSD"] = product.RetailPriceUSD;
+            insideRow["Size"] = product.Size;
+            insideRow["SmallImageURL"] = product.SmallImageUrl;
+            insideRow["Type"] = product.Type;
+            insideRow["WholePriceAUD"] = product.WholesalePriceAUD;
+            insideRow["WholePriceCAD"] = product.WholesalePriceCAD;
+            insideRow["WholePriceEUR"] = product.WholesalePriceEUR;
+            insideRow["WholePriceGBP"] = product.WholesalePriceGBP;
+            insideRow["WholePriceUSD"] = product.WholesalePriceUSD;
+
+            if (upc.TryGetValue(Convert.ToInt32(product.ItemId), out value))
+            {
+                insideRow["Upc"] = value;
+            }
+                
+            insideRow["UpcItemID"] = Convert.ToInt32(product.ItemId);
+
+            uploadFragrancex.Rows.Add(insideRow);
+            uploadFragrancex.AcceptChanges();
+            bulkSize++;
+
+            Helper.upload(uploadFragrancex, bulkSize, "dbo.Fragrancex");
+            
+            */
+
+            ServiceTimeStamp service = new ServiceTimeStamp();
+
+            DataTable uploadFragrancex = Helper.MakeFragrancexTable();
+
+            var list = _context.Fragrancex.ToList();
+
+            var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
+
+            long? value;
+
+            int bulkSize = 0;
 
             if (_context.ServiceTimeStamp.LastOrDefault<ServiceTimeStamp>() == null)
             {
-                /*
-                Fragrancex fragrancex = new Fragrancex();
-
-                //SDK Test and it works
-
-                var listingApiClient = new FrgxListingApiClient("346c055aaefd", "a5574c546cbbc9c10509e3c277dd7c7039b24324");
-
-                var product = listingApiClient.GetProductById("482296");
-
-                DataRow insideRow = uploadFragrancex.NewRow();
-
-                insideRow["ItemID"] = Convert.ToInt32(product.ItemId);
-                insideRow["BrandName"] = product.BrandName;
-                insideRow["Description"] = product.Description;
-                insideRow["Gender"] = product.Gender;
-                insideRow["Instock"] = product.Instock;
-                insideRow["LargeImageUrl"] = product.LargeImageUrl;
-                insideRow["MetricSize"] = product.MetricSize;
-                insideRow["ParentCode"] = product.ParentCode;
-                insideRow["ProductName"] = product.ProductName;
-                insideRow["RetailPriceUSD"] = product.RetailPriceUSD;
-                insideRow["Size"] = product.Size;
-                insideRow["SmallImageURL"] = product.SmallImageUrl;
-                insideRow["Type"] = product.Type;
-                insideRow["WholePriceAUD"] = product.WholesalePriceAUD;
-                insideRow["WholePriceCAD"] = product.WholesalePriceCAD;
-                insideRow["WholePriceEUR"] = product.WholesalePriceEUR;
-                insideRow["WholePriceGBP"] = product.WholesalePriceGBP;
-                insideRow["WholePriceUSD"] = product.WholesalePriceUSD;
-
-                if (upc.TryGetValue(Convert.ToInt32(product.ItemId), out value))
-                {
-                    insideRow["Upc"] = value;
-                }
-                //if (_context.UPC.Find(fragrancex.ItemID) != null)
-                //{
-                //    insideRow["Upc"] = _context.UPC.Find(fragrancex.ItemID).Upc;
-                //}
-                insideRow["UpcItemID"] = Convert.ToInt32(product.ItemId);
-
-                uploadFragrancex.Rows.Add(insideRow);
-                uploadFragrancex.AcceptChanges();
-                bulkSize++;
-                */
-                
-
                 var listingApiClient = new FrgxListingApiClient("346c055aaefd", "a5574c546cbbc9c10509e3c277dd7c7039b24324");
                 
 
