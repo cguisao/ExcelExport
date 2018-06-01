@@ -7,16 +7,41 @@
 
 <h3>eBay Excel creator</h3>
 
-<p>
-    This application is intended to create an excel which will
-    be able to upload listings to shopify and then to eBay.
-</p>
 
 <form asp-controller="Tools" asp-action="ExportToExcel" method="post"
-      enctype="multipart/form-data">
-    <div class="form-group">
-        <input type="file" name="file" />
-        <button class="form-control-file" type="submit">Upload File</button>
+      enctype="multipart/form-data" style="width: 60%">
+
+    <p>
+        This application is intended to create an excel which will
+        be able to upload listings to shopify and then to eBay.
+    </p>
+
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="inputEmail4">Shipping</label>
+            <input type="text" class="form-control" name="shipping" placeholder="Shipping" value="$6" readonly>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="inputPassword4">Amazon/eBay Fee</label>
+            <input type="text" class="form-control" name="fee" placeholder="Password" value="15%" readonly>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="inputPassword4">Profit (Percentage)</label>
+            <input type="text" class="form-control" name="profit" placeholder="Profit" required>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="inputPassword4">Markdown (Not a percentage)</label>
+            <input type="text" class="form-control" name="markdown" placeholder="Markdown">
+        </div>
+        <div class="form-group col-md-12">
+            <label for="exampleFormControlFile1">Excel</label>
+        </div>
+        <div class="form-group col-md-12">
+            <input type="file" class="form-control-file" name="file" required>
+        </div>
+        <div class="form-group col-md-12">
+            <button class="form-control-file" type="submit">Upload File</button>
+        </div>
     </div>
 </form>
 

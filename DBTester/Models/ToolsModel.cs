@@ -6,15 +6,18 @@ using System.Threading.Tasks;
 
 namespace DBTester.Models
 {
-    public class ToolsModel : PageModel
+    public class ToolsModel 
     {
-        public ToolsModel() { }
-
         public string Message { get; set; }
 
-        public void OnGet()
-        {
-            Message = "Excel application.";
-        }
+        //public void OnGet()
+        //{
+        //    Message = "Excel application.";
+        //}
+
+        //public void OnPost()
+        //{
+        //    Message = "Test";
+        //}
     }
 }

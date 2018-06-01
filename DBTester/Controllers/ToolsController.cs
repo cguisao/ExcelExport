@@ -17,6 +17,7 @@ using System.Data.SqlClient;
 using FastMember;
 using System.Data;
 using FrgxPublicApiSDK.Models;
+using System.Text.RegularExpressions;
 
 namespace DBTester.Controllers
 {
@@ -35,7 +36,7 @@ namespace DBTester.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        public IActionResult Tools()
+        public IActionResult Tools(string test)
         {
             return View();
         }
@@ -148,7 +149,8 @@ namespace DBTester.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ExportToExcel(IFormFile file)
+        public async Task<IActionResult> ExportToExcel(IFormFile file, string shipping
+            , string fee, string profit, string markdown)
         {
             if (file == null || file.Length == 0)
             {
@@ -164,11 +166,31 @@ namespace DBTester.Controllers
                 await file.CopyToAsync(stream);
             }
 
+            Dictionary<string, double> calculation = new Dictionary<string, double>();
+
+            Match shippingMatch = Regex.Match(shipping, @"[\d]+");
+
+            calculation.Add("shipping", Double.Parse(shippingMatch.Value));
+
+            Match amazonFee = Regex.Match(fee, @"[\d]+[/.]?[\d]+");
+
+            calculation.Add("fee", Double.Parse(amazonFee.Value));
+
+            Match profitMatch = Regex.Match(profit, @"[\d]+");
+
+            calculation.Add("profit", Double.Parse(profitMatch.Value));
+
+            if (markdown != null)
+            {
+                Match markdownMatch = Regex.Match(markdown, @"[\d]+");
+                calculation.Add("markDown", Double.Parse(markdownMatch.Value));
+            }
+
             var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
 
-            var price = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
+            var prices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
             
-            Helper.ExcelGenerator(path, price, upc);
+            Helper.ExcelGenerator(path, prices, upc, calculation);
             
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))
