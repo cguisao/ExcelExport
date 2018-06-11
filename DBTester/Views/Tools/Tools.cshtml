@@ -1,12 +1,11 @@
-﻿@page
-@model DBTester.Models.ToolsModel
+﻿@model IEnumerable<DBTester.Models.ServiceTimeStamp>
 @{
-    ViewBag.Title = "Tools";
+    ViewBag.Title = "Update";
 }
+
 <h2>Shopify Tools</h2>
 
 <h3>eBay Excel creator</h3>
-
 
 <form asp-controller="Tools" asp-action="ExportToExcel" method="post"
       enctype="multipart/form-data" style="width: 60%">
@@ -22,8 +21,16 @@
             <input type="text" class="form-control" name="shipping" placeholder="Shipping" value="$6" readonly>
         </div>
         <div class="form-group col-md-6">
-            <label for="inputPassword4">eBay Fee + 3% Promoting Lising</label>
+            <label for="inputEmail4">Items</label>
+            <input type="number" class="form-control" name="items" placeholder="Items">
+        </div>
+        <div class="form-group col-md-6">
+            <label for="inputPassword4">eBay Fee</label>
             <input type="text" class="form-control" name="fee" value="20%" readonly>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="inputPassword4">Promoting Listing (Percentage)</label>
+            <input type="text" class="form-control" name="promoting" placeholder="Promoting Listing" value="10%" readonly>
         </div>
         <div class="form-group col-md-6">
             <label for="inputPassword4">Profit (Percentage)</label>
@@ -43,5 +50,8 @@
             <button class="form-control-file" type="submit">Upload File</button>
         </div>
     </div>
+    <p>
+        Last Fragrancex database update <b>@ViewBag.TimeStamp</b>. <br />
+    </p>
 </form>
 
