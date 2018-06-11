@@ -18,6 +18,7 @@ using FastMember;
 using System.Data;
 using FrgxPublicApiSDK.Models;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace DBTester.Controllers
 {
@@ -26,18 +27,17 @@ namespace DBTester.Controllers
         private readonly IHostingEnvironment _hostingEnvironment;
 
         public Context _context;
-
-        public Context _context2;
  
         public ToolsController(Context context, Context context2, IHostingEnvironment hostingEnvironment)
         {
             _context = context;
-            _context2 = context2;
             _hostingEnvironment = hostingEnvironment;
         }
 
-        public IActionResult Tools(string test)
+        public IActionResult Tools()
         {
+            ViewBag.TimeStamp = _context.ServiceTimeStamp.LastOrDefault().TimeStamp.ToShortDateString();
+
             return View();
         }
 
@@ -150,7 +150,7 @@ namespace DBTester.Controllers
 
         [HttpPost]
         public async Task<IActionResult> ExportToExcel(IFormFile file, string shipping
-            , string fee, string profit, string markdown)
+            , string fee, string profit, string markdown, int items)
         {
             if (file == null || file.Length == 0)
             {
@@ -165,6 +165,9 @@ namespace DBTester.Controllers
             {
                 await file.CopyToAsync(stream);
             }
+
+            // Update the database once a day
+            updateFragrancex();
 
             Dictionary<string, double> calculation = new Dictionary<string, double>();
 
@@ -185,12 +188,12 @@ namespace DBTester.Controllers
                 Match markdownMatch = Regex.Match(markdown, @"[\d]+");
                 calculation.Add("markDown", Double.Parse(markdownMatch.Value));
             }
-
+            
             var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
 
             var prices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
             
-            Helper.ExcelGenerator(path, prices, upc, calculation);
+            Helper.ExcelGenerator(path, prices, upc, calculation, items);
             
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))
@@ -269,103 +272,91 @@ namespace DBTester.Controllers
             
             */
 
+            updateFragrancex();
+
+            return RedirectToAction("Update");
+        }
+
+        private void updateFragrancex()
+        {
             ServiceTimeStamp service = new ServiceTimeStamp();
 
             DataTable uploadFragrancex = Helper.MakeFragrancexTable();
 
-            var list = _context.Fragrancex.ToList();
-
-            var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
-
-            long? value;
-
-            int bulkSize = 0;
-
             if (_context.ServiceTimeStamp.LastOrDefault<ServiceTimeStamp>() == null)
             {
-                var listingApiClient = new FrgxListingApiClient("346c055aaefd", "a5574c546cbbc9c10509e3c277dd7c7039b24324");
-                
-
-                Fragrancex fragrancex = new Fragrancex();
-                
-                var allProducts = listingApiClient.GetAllProducts();
-                
-                foreach (var product in allProducts)
-                {
-                    if (product != null)
-                    {
-                        DataRow insideRow = uploadFragrancex.NewRow();
-
-                        insideRow["ItemID"] = Convert.ToInt32(product.ItemId);
-                        insideRow["BrandName"] = product.BrandName;
-                        insideRow["Description"] = product.Description;
-                        insideRow["Gender"] = product.Gender;
-                        insideRow["Instock"] = product.Instock;
-                        insideRow["LargeImageUrl"] = product.LargeImageUrl;
-                        insideRow["MetricSize"] = product.MetricSize;
-                        insideRow["ParentCode"] = product.ParentCode;
-                        insideRow["ProductName"] = product.ProductName;
-                        insideRow["RetailPriceUSD"] = product.RetailPriceUSD;
-                        insideRow["Size"] = product.Size;
-                        insideRow["SmallImageURL"] = product.SmallImageUrl;
-                        insideRow["Type"] = product.Type;
-                        insideRow["WholePriceAUD"] = product.WholesalePriceAUD;
-                        insideRow["WholePriceCAD"] = product.WholesalePriceCAD;
-                        insideRow["WholePriceEUR"] = product.WholesalePriceEUR;
-                        insideRow["WholePriceGBP"] = product.WholesalePriceGBP;
-                        insideRow["WholePriceUSD"] = product.WholesalePriceUSD;
-                        
-                        if (upc.TryGetValue(Convert.ToInt32(product.ItemId), out value))
-                        {
-                            insideRow["Upc"] = value;
-                        }
-
-                        insideRow["UpcItemID"] = Convert.ToInt32(product.ItemId);
-
-                        uploadFragrancex.Rows.Add(insideRow);
-                        uploadFragrancex.AcceptChanges();
-                        bulkSize++;
-                    }
-                }
-                
-                Helper.upload(uploadFragrancex, bulkSize, "dbo.Fragrancex");
-
-                service.TimeStamp = DateTime.Today;
-                _context.ServiceTimeStamp.Add(service);
-                _context.SaveChanges();
+                FragancexSQLPreparer(service, uploadFragrancex);
             }
             else if (_context.ServiceTimeStamp.LastOrDefault<ServiceTimeStamp>().TimeStamp != DateTime.Today)
             {
-                //SDK Test and it works 
-                //var listingApiClient = new FrgxListingApiClient("346c055aaefd", "a5574c546cbbc9c10509e3c277dd7c7039b24324");
-
-                //var allProducts = listingApiClient.GetAllProducts();
-
-                //foreach (var product in allProducts)
-                //{
-                //    if (product != null)
-                //    {
-                //        Fragrancex fragrancex = NewMethod(product);
-
-                //        try
-                //        {
-                //            _context.Fragrancex.Add(fragrancex);
-                //            _context.SaveChanges();
-                //        }
-                //        catch (Exception e)
-                //        {
-                //            _context.Fragrancex.Update(fragrancex);
-                //            await _context.SaveChangesAsync();
-                //            continue;
-                //        }
-                //    }
-                //}
-                //service.TimeStamp = DateTime.Today;
-                //_context.ServiceTimeStamp.Add(service);
-                //_context.SaveChanges();
+                _context.Database.ExecuteSqlCommand("delete from Fragrancex");
+                FragancexSQLPreparer(service, uploadFragrancex);
             }
-            
-            return RedirectToAction("Update");
+        }
+
+        private void FragancexSQLPreparer(ServiceTimeStamp service, DataTable uploadFragrancex)
+        {
+            var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
+
+            int bulkSize = 0;
+
+            dbPreparer(uploadFragrancex, upc, ref bulkSize);
+
+            Helper.upload(uploadFragrancex, bulkSize, "dbo.Fragrancex");
+
+            service.TimeStamp = DateTime.Today;
+
+            _context.ServiceTimeStamp.Add(service);
+
+            _context.SaveChanges();
+        }
+
+        private static void dbPreparer(DataTable uploadFragrancex, Dictionary<int, long?> upc, ref int bulkSize)
+        {
+            long? value = 0;
+            var listingApiClient = new FrgxListingApiClient("346c055aaefd", "a5574c546cbbc9c10509e3c277dd7c7039b24324");
+
+            Fragrancex fragrancex = new Fragrancex();
+
+            var allProducts = listingApiClient.GetAllProducts();
+
+            foreach (var product in allProducts)
+            {
+                if (product != null)
+                {
+                    DataRow insideRow = uploadFragrancex.NewRow();
+
+                    insideRow["ItemID"] = Convert.ToInt32(product.ItemId);
+                    insideRow["BrandName"] = product.BrandName;
+                    insideRow["Description"] = product.Description;
+                    insideRow["Gender"] = product.Gender;
+                    insideRow["Instock"] = product.Instock;
+                    insideRow["LargeImageUrl"] = product.LargeImageUrl;
+                    insideRow["MetricSize"] = product.MetricSize;
+                    insideRow["ParentCode"] = product.ParentCode;
+                    insideRow["ProductName"] = product.ProductName;
+                    insideRow["RetailPriceUSD"] = product.RetailPriceUSD;
+                    insideRow["Size"] = product.Size;
+                    insideRow["SmallImageURL"] = product.SmallImageUrl;
+                    insideRow["Type"] = product.Type;
+                    insideRow["WholePriceAUD"] = product.WholesalePriceAUD;
+                    insideRow["WholePriceCAD"] = product.WholesalePriceCAD;
+                    insideRow["WholePriceEUR"] = product.WholesalePriceEUR;
+                    insideRow["WholePriceGBP"] = product.WholesalePriceGBP;
+                    insideRow["WholePriceUSD"] = product.WholesalePriceUSD;
+
+                    if (upc.TryGetValue(Convert.ToInt32(product.ItemId), out value))
+                    {
+                        insideRow["Upc"] = value;
+                    }
+
+                    insideRow["UpcItemID"] = Convert.ToInt32(product.ItemId);
+
+                    uploadFragrancex.Rows.Add(insideRow);
+                    uploadFragrancex.AcceptChanges();
+                    bulkSize++;
+                }
+            }
         }
     }
 }
