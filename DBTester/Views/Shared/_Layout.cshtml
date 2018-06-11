@@ -26,7 +26,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">DBTester</a>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">GTI Solutionx</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -37,23 +37,31 @@
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a asp-area="" asp-controller="Tools" asp-action="Tools">Excel Tools</a></li>
-                            <li><a asp-area="" asp-controller="Tools" asp-action="Update">Update</a></li>
+                            <li><a asp-area="" asp-controller="Tools" asp-action="Update">Database Update</a></li>
                             <li><a asp-area="" asp-controller="Tools" asp-action="ProductDownload">Product Download</a></li>
                         </ul>
                     </li>
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                             UPC
-                        <span class="caret"></span>
+                            <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a asp-area="" asp-controller="Tools" asp-action="Upcs">Upload</a></li>
                             <li><a asp-area="" asp-controller="Tools" asp-action="UpcViewer">View</a></li>
                         </ul>
                     </li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Create">DB Inserter</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Blogs">DB Reader</a></li>
+
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            Shopify
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a asp-area="" asp-controller="Tools" asp-action="Tools">Excel Creator</a></li>
+                        </ul>
+                    </li>
+
                 </ul>
             </div>
         </div>
@@ -63,7 +71,7 @@
         <hr />
         <footer>
             <div class="col-sm-12">
-                <p>&copy; 2018 - GTI Solutions</p>
+                <p>&copy;@DateTime.Today.Year - GTI Solutionx</p>
             </div>
         </footer>
     </div>
