@@ -12,11 +12,22 @@
     be able to update the prices and available products.
 </p>
 
-<form asp-controller="PriceController" asp-action="ProductImport" method="post"
-      enctype="multipart/form-data">
-    <div class="form-group">
-        <input type="file" name="file" />
-        <button class="form-control-file" type="submit">Upload File</button>
+<form asp-controller="Price" asp-action="ProductImport" method="post"
+      enctype="multipart/form-data" style="width: 60%">
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="inputEmail4">Items</label>
+            <input type="number" class="form-control" name="items" placeholder="Items" required>
+        </div>
+        <div class="form-group col-md-12">
+            <label for="exampleFormControlFile1">Excel</label>
+        </div>
+        <div class="form-group col-md-12">
+            <input type="file" class="form-control-file" name="file" required>
+        </div>
+        <div class="form-group col-md-12">
+            <button class="form-control-file" type="submit">Upload File</button>
+        </div>
     </div>
     <p>
         Last Fragrancex database update <b>@ViewBag.TimeStamp</b>. <br />

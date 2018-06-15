@@ -147,7 +147,7 @@ namespace DBTester.Controllers
 
             var prices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
             
-            Helper.ExcelGenerator(path, prices, upc, calculation, items);
+            ExcelHelper.ExcelGenerator(path, prices, upc, calculation, items);
             
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))
