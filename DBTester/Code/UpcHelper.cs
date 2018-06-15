@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DBTester.wwwroot.Code
+namespace DBTester.Code
 {
     public class UpcHelper
     {
@@ -22,7 +22,7 @@ namespace DBTester.wwwroot.Code
 
             FileInfo file = new FileInfo(path);
 
-            DataTable uploadUpc = Helper.MakeUPCTable();
+            DataTable uploadUpc = DatabaseHelper.MakeUPCTable();
 
             int bulkSize = 0;
 
@@ -60,7 +60,7 @@ namespace DBTester.wwwroot.Code
                 throw (ex);
             }
 
-            Helper.upload(uploadUpc, bulkSize, "dbo.UPC");
+            DatabaseHelper.upload(uploadUpc, bulkSize, "dbo.UPC");
         }
     }
 }
