@@ -1,0 +1,24 @@
+﻿@page
+@model DBTester.Models.ToolsModel
+@{
+    ViewBag.Title = "Update";
+}
+<h2>Shopify Update</h2>
+
+<h3>eBay Excel creator</h3>
+
+<p>
+    This application is intended to create an excel which will
+    be able to update the prices and available products.
+</p>
+
+<form asp-controller="Tools" asp-action="ProductExport" method="post"
+      enctype="multipart/form-data">
+    <div class="form-group">
+        <input type="file" name="file" />
+        <button class="form-control-file" type="submit">Upload File</button>
+    </div>
+    <p>
+        Last Fragrancex database update <b>@ViewBag.TimeStamp</b>. <br />
+    </p>
+</form>
