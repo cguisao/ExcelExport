@@ -40,58 +40,10 @@ namespace DBTester.Controllers
 
             return View();
         }
-
-        public IActionResult Upcs()
-        {
-            return View();
-        }
-
+        
         public IActionResult Update()
         {
             return View(_context.ServiceTimeStamp.ToList());
-        }
-        
-        //public IActionResult PriceUpdater()
-        //{
-        //    ViewBag.TimeStamp = _context.ServiceTimeStamp.LastOrDefault().TimeStamp.ToShortDateString();
-
-        //    return View();
-        //}
-
-        public IActionResult UpcViewer(int? page, string Search_Data)
-        {
-            var upcs = _context.UPC.ToList();
-
-            var pageNumber = page ?? 1;
-
-            var onePageOfUpcs = upcs.ToPagedList(pageNumber, 10);
-            
-            ViewBag.onePageOfUpcs = onePageOfUpcs;
-
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> UPCImporter(IFormFile file)
-        {
-            if (file == null || file.Length == 0)
-            {
-                return null;
-            }
-
-            var path = Path.Combine(
-                        Directory.GetCurrentDirectory(), "wwwroot",
-                        file.FileName);
-
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            // Update the DB with the new UPCs
-            Helper.UPCLoadDic(path);
-            
-            return RedirectToAction("UpcViewer");
         }
         
         [HttpPost]

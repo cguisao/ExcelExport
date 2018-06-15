@@ -1,5 +1,5 @@
 ﻿@page
-@model DBTester.Models.ToolsModel
+@model DBTester.Controllers.ToolsController
 @{
     ViewBag.Title = "New Blog";
 }
@@ -13,7 +13,7 @@
     using an excel file onto the GTI Solutions' Database.
 </p>
 
-<form asp-controller="Tools" asp-action="UPCImporter" method="post"
+<form asp-controller="Upc" asp-action="UPCImporter" method="post"
       enctype="multipart/form-data">
 
     <input type="file" name="file" />
