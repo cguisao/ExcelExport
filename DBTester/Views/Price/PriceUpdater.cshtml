@@ -1,5 +1,5 @@
 ﻿@page
-@model DBTester.Models.ToolsModel
+@model DBTester.Controllers.PriceController
 @{
     ViewBag.Title = "Update";
 }
@@ -12,7 +12,7 @@
     be able to update the prices and available products.
 </p>
 
-<form asp-controller="Tools" asp-action="ProductExport" method="post"
+<form asp-controller="PriceController" asp-action="ProductImport" method="post"
       enctype="multipart/form-data">
     <div class="form-group">
         <input type="file" name="file" />

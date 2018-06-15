@@ -51,12 +51,12 @@ namespace DBTester.Controllers
             return View(_context.ServiceTimeStamp.ToList());
         }
         
-        public IActionResult PriceUpdater()
-        {
-            ViewBag.TimeStamp = _context.ServiceTimeStamp.LastOrDefault().TimeStamp.ToShortDateString();
+        //public IActionResult PriceUpdater()
+        //{
+        //    ViewBag.TimeStamp = _context.ServiceTimeStamp.LastOrDefault().TimeStamp.ToShortDateString();
 
-            return View();
-        }
+        //    return View();
+        //}
 
         public IActionResult UpcViewer(int? page, string Search_Data)
         {
