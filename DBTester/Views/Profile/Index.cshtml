@@ -1,0 +1,29 @@
+﻿@model IEnumerable<DBTester.Models.ServiceTimeStamp>
+@{
+    ViewBag.Title = "Update";
+}
+
+<h2>Profile</h2>
+
+<h3>GTI Solutionx Profile</h3>
+
+<form asp-controller="Profile" asp-action="ProfileCreator" method="post"
+      enctype="multipart/form-data" style="width: 60%">
+
+    <p>
+        This form creates a new profile on the database
+        which will be used while creating the shopify excel creator.
+    </p>
+
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="ProfileUser">User ID:</label>
+            <input type="text" class="form-control" name="userID" placeholder="User ID">
+        </div>
+        <div class="form-group col-md-12">
+            <label for="inputPassword4">HTML</label>
+            <textarea class="form-control" rows="10" name="html" value="20%"></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </div>
+</form>

@@ -168,16 +168,16 @@ namespace DBTester.Controllers
                 File(memory, Helper.GetContentType(path), Path.GetFileNameWithoutExtension(path)
                 + "_Converted" + Path.GetExtension(path).ToLowerInvariant());
 
-            Profile profile = new Profile();
+            //Profile profile = new Profile();
 
-            using (var stream = new MemoryStream())
-            {
-                await file.CopyToAsync(stream);
-                profile.formFile = stream.ToArray();
-            }
+            //using (var stream = new MemoryStream())
+            //{
+            //    await file.CopyToAsync(stream);
+            //    profile.formFile = stream.ToArray();
+            //}
 
-            _context.Profile.Add(profile);
-            _context.SaveChanges();
+            //_context.Profile.Add(profile);
+            //_context.SaveChanges();
             System.IO.File.Delete(path);
 
             return returnFile;
