@@ -14,25 +14,18 @@
     once a day.
 </p>
 
-<form asp-controller="Tools" asp-action="Updatefragrancex" method="post"
+<form asp-controller="Tools" asp-action="UpdateFragrancexExcel" method="post"
       enctype="multipart/form-data">
-    <button class="btn btn-primary" type="submit">Update</button>
+
+    <input type="file" name="file" />
+    <button type="submit">Upload File</button>
 </form>
-<br />
-
-<p>
-    The list can only be updated once a day, so the list below shows the last time that
-    the list was updated. If you press the button and the list has not been updated
-    today, the database will be updated. Otherwise, nothing will happen.
-</p>
-
-<br />
 
 <div class="table-responsive">
     <table id="myTable" class="display table" width="80%">
         <tr>
             <th>Last Updated Date</th>
-            <th>DB Update Type</th>
+            <th>Database Update Type</th>
         </tr>
 
         @foreach (var item in Model)

@@ -18,8 +18,6 @@ namespace DBTester.Code
 
             List<UPC> list = new List<UPC>();
 
-            StringBuilder sb = new StringBuilder();
-
             FileInfo file = new FileInfo(path);
 
             DataTable uploadUpc = DatabaseHelper.MakeUPCTable();

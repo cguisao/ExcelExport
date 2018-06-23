@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DBTester.Models;
 using FrgxPublicApiSDK;
+using FrgxPublicApiSDK.Models;
 using Microsoft.Extensions.Configuration;
 using OfficeOpenXml;
 
@@ -80,9 +81,7 @@ namespace DBTester.Code
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
             string connectionstring = Configuration.GetConnectionString("BloggingDatabase");
-
-
-
+            
             using (SqlConnection sourceConnection =
                    new SqlConnection(connectionstring))
             {
@@ -108,16 +107,10 @@ namespace DBTester.Code
             }
         }
 
-        public static void dbPreparer(DataTable uploadFragrancex, Dictionary<int, long?> upc, ref int bulkSize)
+        public static void dbPreparer(DataTable uploadFragrancex, Dictionary<int, long?> upc, ref int bulkSize, List<Product> allProducts)
         {
             long? value = 0;
-            var listingApiClient = new FrgxListingApiClient("346c055aaefd", "a5574c546cbbc9c10509e3c277dd7c7039b24324");
-
-            Fragrancex fragrancex = new Fragrancex();
-
-            var allProducts = listingApiClient.GetAllProducts();
-
-
+            
             Dictionary<string, string> dic = new Dictionary<string, string>();
 
             foreach (var product in allProducts)
@@ -165,6 +158,77 @@ namespace DBTester.Code
                     continue;
                 }
             }
+        }
+
+        public static void FragrancexLoadDic(string path, Dictionary<int, long?> upc)
+        {
+            List<UPC> list = new List<UPC>();
+
+            FileInfo file = new FileInfo(path);
+
+            DataTable uploadFragrancex = DatabaseHelper.MakeFragrancexTable();
+
+            int bulkSize = 0;
+
+            try
+            {
+                using (ExcelPackage package = new ExcelPackage(file))
+                {
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
+                    int rowCount = worksheet.Dimension.Rows;
+                    int ColCount = worksheet.Dimension.Columns;
+                    long? value = 0;
+
+                    for (int row = 1; row <= rowCount; row++)
+                    {
+                        if (row != 1)
+                        {
+                            //upc.ItemID = Convert.ToInt32(worksheet.Cells[row, 1].Value?.ToString());
+                            //upc.Upc = Convert.ToInt64(worksheet.Cells[row, 2].Value?.ToString());
+
+                            DataRow insideRow = uploadFragrancex.NewRow();
+
+                            insideRow["ItemID"] = Convert.ToInt32(worksheet.Cells[row, 1].Value?.ToString());
+                            insideRow["BrandName"] = null;
+                            insideRow["Description"] = null;
+                            insideRow["Gender"] = null;
+                            insideRow["Instock"] = true;
+                            insideRow["LargeImageUrl"] = null;
+                            insideRow["MetricSize"] = null;
+                            insideRow["ParentCode"] = null;
+                            insideRow["ProductName"] = null;
+                            insideRow["RetailPriceUSD"] = 0.0;
+                            insideRow["Size"] = null;
+                            insideRow["SmallImageURL"] = null;
+                            insideRow["Type"] = null;
+                            insideRow["WholePriceAUD"] = 0.0;
+                            insideRow["WholePriceCAD"] = 0.0;
+                            insideRow["WholePriceEUR"] = 0.0;
+                            insideRow["WholePriceGBP"] = 0.0;
+                            insideRow["WholePriceUSD"] = Convert.ToDouble(worksheet.Cells[row, 6].Value?.ToString());
+
+                            if (upc.TryGetValue(Convert.ToInt32(Convert.ToInt32(worksheet.Cells[row, 1].Value?.ToString())), out value))
+                            {
+                                insideRow["Upc"] = value;
+                            }
+
+                            //insideRow["UpcItemID"] = Convert.ToInt32(product.ItemId);
+
+                            uploadFragrancex.Rows.Add(insideRow);
+                            uploadFragrancex.AcceptChanges();
+
+                            bulkSize++;
+                        }
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+            DatabaseHelper.upload(uploadFragrancex, bulkSize, "dbo.Fragrancex");
         }
     }
 }

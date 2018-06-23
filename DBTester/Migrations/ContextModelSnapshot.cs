@@ -81,12 +81,40 @@ namespace GTISolutions.Migrations
                     b.ToTable("Fragrancex");
                 });
 
+            modelBuilder.Entity("DBTester.Models.Profile", b =>
+                {
+                    b.Property<int>("ProfileId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ProfileUser");
+
+                    b.Property<byte[]>("formFile");
+
+                    b.Property<string>("html");
+
+                    b.Property<int>("items");
+
+                    b.Property<int>("markdown");
+
+                    b.Property<int>("max");
+
+                    b.Property<int>("min");
+
+                    b.Property<int>("profit");
+
+                    b.HasKey("ProfileId");
+
+                    b.ToTable("Profile");
+                });
+
             modelBuilder.Entity("DBTester.Models.ServiceTimeStamp", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("TimeStamp");
+
+                    b.Property<string>("type");
 
                     b.HasKey("id");
 

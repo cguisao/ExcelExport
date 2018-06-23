@@ -11,7 +11,8 @@ namespace DBTester.Code
     public class ExcelHelper
     {
         public static void ExcelGenerator(string sWebRootFolder, Dictionary<int, double> prices,
-            Dictionary<int, long?> upcs, Dictionary<string, double> calculations, int items)
+            Dictionary<int, long?> upcs, Dictionary<string, double> calculations, int items
+            , int min, int max)
         {
             FileInfo file = new FileInfo(sWebRootFolder);
             Dictionary<string, long> dicSKU = new Dictionary<string, long>();
@@ -33,7 +34,7 @@ namespace DBTester.Code
 
                     // Prepare the excel and remove whatever it needs to be removed.
 
-                    Helper.PrepareExcel(worksheet, Helper.filenameFinder(file.Name));
+                    Helper.PrepareExcel(worksheet, Helper.filenameFinder(file.Name), min, max);
 
                     dicTitle = Helper.titleDic(worksheet);
 

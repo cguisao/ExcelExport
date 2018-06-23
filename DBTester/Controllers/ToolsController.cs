@@ -38,14 +38,21 @@ namespace DBTester.Controllers
         {
             ViewBag.TimeStamp = _context.ServiceTimeStamp.LastOrDefault().TimeStamp.ToShortDateString();
 
+            ViewBag.type = _context.ServiceTimeStamp.LastOrDefault().type;
+
             return View();
         }
         
         public IActionResult Update()
         {
-            return View(_context.ServiceTimeStamp.ToList());
+            return View(_context.ServiceTimeStamp.OrderByDescending(x => x.TimeStamp).ToList());
         }
         
+        public IActionResult UpdateExcel()
+        {
+            return View(_context.ServiceTimeStamp.OrderByDescending(x => x.TimeStamp).ToList());
+        }
+
         [HttpPost]
         public async Task<IActionResult> ProductExport(IFormFile file)
         {
@@ -104,7 +111,7 @@ namespace DBTester.Controllers
 
         [HttpPost]
         public async Task<IActionResult> ExportToExcel(IFormFile file, string shipping
-            , string fee, string profit, string markdown, int items)
+            , string fee, string profit, string markdown, int items, int min, int max)
         {
             if (file == null || file.Length == 0)
             {
@@ -147,7 +154,7 @@ namespace DBTester.Controllers
 
             var prices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
             
-            ExcelHelper.ExcelGenerator(path, prices, upc, calculation, items);
+            ExcelHelper.ExcelGenerator(path, prices, upc, calculation, items, min, max);
             
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))
@@ -161,6 +168,16 @@ namespace DBTester.Controllers
                 File(memory, Helper.GetContentType(path), Path.GetFileNameWithoutExtension(path)
                 + "_Converted" + Path.GetExtension(path).ToLowerInvariant());
 
+            Profile profile = new Profile();
+
+            using (var stream = new MemoryStream())
+            {
+                await file.CopyToAsync(stream);
+                profile.formFile = stream.ToArray();
+            }
+
+            _context.Profile.Add(profile);
+            _context.SaveChanges();
             System.IO.File.Delete(path);
 
             return returnFile;
@@ -243,6 +260,44 @@ namespace DBTester.Controllers
             return RedirectToAction("Update");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> UpdateFragrancexExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return null;
+            }
+
+            var path = Path.Combine(
+                        Directory.GetCurrentDirectory(), "wwwroot",
+                        file.FileName);
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            // Update the DB with the new UPCs
+
+            var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
+
+            _context.Database.ExecuteSqlCommand("delete from Fragrancex");
+
+            DatabaseHelper.FragrancexLoadDic(path, upc);
+            
+            ServiceTimeStamp service = new ServiceTimeStamp();
+
+            service.TimeStamp = DateTime.Today;
+
+            service.type = "Excel";
+
+            _context.ServiceTimeStamp.Add(service);
+
+            _context.SaveChanges();
+
+            return RedirectToAction("UpdateExcel");
+        }
+
         private void updateFragrancex()
         {
             ServiceTimeStamp service = new ServiceTimeStamp();
@@ -255,7 +310,7 @@ namespace DBTester.Controllers
             }
             else if (_context.ServiceTimeStamp.LastOrDefault<ServiceTimeStamp>().TimeStamp != DateTime.Today)
             {
-                _context.Database.ExecuteSqlCommand("delete from Fragrancex");
+                //_context.Database.ExecuteSqlCommand("delete from Fragrancex");
                 FragancexSQLPreparer(service, uploadFragrancex);
             }
         }
@@ -265,16 +320,33 @@ namespace DBTester.Controllers
             var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
 
             int bulkSize = 0;
+            
+            try
+            {
+                var listingApiClient = new FrgxListingApiClient("346c055aaefd", "a5574c546cbbc9c10509e3c277dd7c7039b24324");
 
-            DatabaseHelper.dbPreparer(uploadFragrancex, upc, ref bulkSize);
+                var product = listingApiClient.GetProductById("412492");
 
-            DatabaseHelper.upload(uploadFragrancex, bulkSize, "dbo.Fragrancex");
+                var allProducts = listingApiClient.GetAllProducts();
 
-            service.TimeStamp = DateTime.Today;
+                _context.Database.ExecuteSqlCommand("delete from Fragrancex");
 
-            _context.ServiceTimeStamp.Add(service);
+                DatabaseHelper.dbPreparer(uploadFragrancex, upc, ref bulkSize, allProducts);
 
-            _context.SaveChanges();
+                DatabaseHelper.upload(uploadFragrancex, bulkSize, "dbo.Fragrancex");
+
+                service.TimeStamp = DateTime.Today;
+
+                service.type = "API";
+
+                _context.ServiceTimeStamp.Add(service);
+
+                _context.SaveChanges();
+            }
+            catch(Exception e)
+            {
+
+            }
         }
     }
 }

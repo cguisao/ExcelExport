@@ -3,22 +3,22 @@
     ViewBag.Title = "Update";
 }
 
-<h2>Shopify Tools</h2>
+<h2>Profile</h2>
 
-<h3>eBay Excel creator</h3>
+<h3>GTI Solutionx Profile</h3>
 
 <form asp-controller="Tools" asp-action="ExportToExcel" method="post"
       enctype="multipart/form-data" style="width: 60%">
 
     <p>
-        This application is intended to create an excel which will
-        be able to upload listings to shopify and then to eBay.
+        This form creates a new profile on the database
+        which will be used while creating the shopify excel creator.
     </p>
 
     <div class="form-row">
         <div class="form-group col-md-6">
-            <label for="inputEmail4">Shipping</label>
-            <input type="text" class="form-control" name="shipping" placeholder="Shipping" value="$6" readonly>
+            <label for="ProfileUser">User ID:</label>
+            <input type="text" class="form-control" name="userID" placeholder="User ID" >
         </div>
         <div class="form-group col-md-6">
             <label for="inputEmail4">Items</label>
@@ -41,28 +41,7 @@
             <input type="text" class="form-control" name="markdown" placeholder="Markdown">
         </div>
         <div class="form-group col-md-12">
-            <label for="inputPassword4">Price Range</label>
-        </div>
-        <div class="form-group col-md-6">
-            <label for="inputPassword4">Min</label>
-            <input type="number" class="form-control" name="min" placeholder="Min">
-        </div>
-        <div class="form-group col-md-6">
-            <label for="inputPassword4">Max</label>
-            <input type="number" class="form-control" name="max" placeholder="Max">
-        </div>
-        <div class="form-group col-md-12">
             <label for="exampleFormControlFile1">Excel</label>
         </div>
-        <div class="form-group col-md-12">
-            <input type="file" class="form-control-file" name="file" required>
-        </div>
-        <div class="form-group col-md-12">
-            <button class="form-control-file" type="submit">Upload File</button>
-        </div>
     </div>
-    <p>
-        Last Fragrancex database update <b>@ViewBag.TimeStamp Updated via  @ViewBag.type</b> <br />
-    </p>
 </form>
-

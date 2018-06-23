@@ -9,5 +9,7 @@ namespace DBTester.Models
     {
         public int id { get; set; }
         public DateTime TimeStamp { get; set; }
+
+        public string type { get; set; }
     }
 }
