@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DBTester.Models;
 using Microsoft.AspNetCore.Mvc;
+using X.PagedList;
 
 namespace GTI_Solutions.Controllers
 {
@@ -18,6 +19,19 @@ namespace GTI_Solutions.Controllers
 
         public IActionResult Index()
         {
+            return View();
+        }
+
+        public IActionResult Profile(int? page)
+        {
+            var profiles = _context.Profile.ToList();
+
+            var pageNumber = page ?? 1;
+
+            var onePageOfProfiles = profiles.ToPagedList(pageNumber, 10);
+
+            ViewBag.onePageOfProfiles = onePageOfProfiles;
+
             return View();
         }
 

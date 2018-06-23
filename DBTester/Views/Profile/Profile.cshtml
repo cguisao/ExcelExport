@@ -1,0 +1,59 @@
+﻿@{
+    ViewBag.Title = "UpcViewer";
+}
+
+@using X.PagedList.Mvc.Core;
+@using X.PagedList;
+
+<link href="/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+<h2>Upc Viewer</h2>
+<br />
+<div class="table-responsive">
+    <table id="myTable" class="display table" width="80%">
+        <thead>
+            <tr>
+                <th>Profile User</th>
+                <th>Items</th>
+                <th>Profit</th>
+                <th>Markdown</th>
+                <th>Min</th>
+                <th>Max</th>
+            </tr>
+        </thead>
+        @foreach (var profile in ViewBag.onePageOfProfiles)
+        {
+        <tbody>
+            <tr>
+                <td>
+                    @profile.ProfileUser
+                </td>
+                <td>
+                    @profile.items
+                </td>
+                <td>
+                    @profile.profit
+                </td>
+                <td>
+                    @profile.markdown
+                </td>
+                <td>
+                    @profile.min
+                </td>
+                <td>
+                    @profile.max
+                </td>
+            </tr>
+        </tbody>
+        }
+
+    </table>
+</div>
+
+@Html.PagedListPager((IPagedList)ViewBag.onePageOfProfiles, page => Url.Action("Profile", new { page }))
+
+<script>
+    $(document).ready(function () {
+        $('#myTable').dataTable();
+    });
+</script>
