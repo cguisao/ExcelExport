@@ -40,7 +40,9 @@ namespace DBTester.Controllers
 
             ViewBag.type = _context.ServiceTimeStamp.LastOrDefault().type;
 
-            return View();
+            var profile = new Profile();
+
+            return View(_context.Profile.ToList());
         }
         
         public IActionResult Update()
@@ -111,7 +113,7 @@ namespace DBTester.Controllers
 
         [HttpPost]
         public async Task<IActionResult> ExportToExcel(IFormFile file, string shipping
-            , string fee, string profit, string markdown, int items, int min, int max)
+            , string fee, string profit, string markdown, int items, int min, int max, string User)
         {
             if (file == null || file.Length == 0)
             {

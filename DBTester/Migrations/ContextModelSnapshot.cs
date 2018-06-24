@@ -20,16 +20,14 @@ namespace GTISolutions.Migrations
                 .HasAnnotation("ProductVersion", "2.0.0-rtm-26452")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("DBTester.Models.Blog", b =>
+            modelBuilder.Entity("DBTester.Models.ErrorViewModel", b =>
                 {
-                    b.Property<int>("BlogId")
+                    b.Property<string>("RequestId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Url");
+                    b.HasKey("RequestId");
 
-                    b.HasKey("BlogId");
-
-                    b.ToTable("Blogs");
+                    b.ToTable("ErrorViewModel");
                 });
 
             modelBuilder.Entity("DBTester.Models.Fragrancex", b =>
@@ -83,10 +81,9 @@ namespace GTISolutions.Migrations
 
             modelBuilder.Entity("DBTester.Models.Profile", b =>
                 {
-                    b.Property<int>("ProfileId")
-                        .ValueGeneratedOnAdd();
-
                     b.Property<string>("ProfileUser");
+
+                    b.Property<int>("fee");
 
                     b.Property<byte[]>("formFile");
 
@@ -102,7 +99,11 @@ namespace GTISolutions.Migrations
 
                     b.Property<int>("profit");
 
-                    b.HasKey("ProfileId");
+                    b.Property<int>("promoting");
+
+                    b.Property<int>("shipping");
+
+                    b.HasKey("ProfileUser");
 
                     b.ToTable("Profile");
                 });

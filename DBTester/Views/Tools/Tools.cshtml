@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DBTester.Models.ServiceTimeStamp>
+﻿@model IEnumerable<DBTester.Models.Profile>
 @{
     ViewBag.Title = "Update";
 }
@@ -17,42 +17,52 @@
 
     <div class="form-row">
         <div class="form-group col-md-6">
-            <label for="inputEmail4">Shipping</label>
+            <label for="inputUser">User</label>
+            @Html.DropDownList("User",
+                Model.Select(m => new SelectListItem() { Text = m.ProfileUser }).ToList()
+                , "", new { @class = "form-control" })
+        </div>
+        <div class="form-group col-md-6 invisible">
+            <label for="Empty">.</label>
+            <input type="text" class="form-control" name="invisible" readonly>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="inputshipping">Shipping</label>
             <input type="text" class="form-control" name="shipping" placeholder="Shipping" value="$6" readonly>
         </div>
         <div class="form-group col-md-6">
-            <label for="inputEmail4">Items</label>
+            <label for="inputItems">Items</label>
             <input type="number" class="form-control" name="items" placeholder="Items" required>
         </div>
         <div class="form-group col-md-6">
-            <label for="inputPassword4">eBay Fee</label>
+            <label for="inputFee">eBay Fee</label>
             <input type="text" class="form-control" name="fee" value="20%" readonly>
         </div>
         <div class="form-group col-md-6">
-            <label for="inputPassword4">Promoting Listing (Percentage)</label>
+            <label for="inputPromoting">Promoting Listing (Percentage)</label>
             <input type="text" class="form-control" name="promoting" placeholder="Promoting Listing" value="10%" readonly>
         </div>
         <div class="form-group col-md-6">
-            <label for="inputPassword4">Profit (Percentage)</label>
+            <label for="inputProfit">Profit (Percentage)</label>
             <input type="text" class="form-control" name="profit" placeholder="Profit" required>
         </div>
         <div class="form-group col-md-6">
-            <label for="inputPassword4">Markdown (Not a percentage)</label>
+            <label for="inputMarkdown">Markdown (Not a percentage)</label>
             <input type="text" class="form-control" name="markdown" placeholder="Markdown">
         </div>
         <div class="form-group col-md-12">
-            <label for="inputPassword4">Price Range</label>
+            <label for="inputPriceRange">Price Range</label>
         </div>
         <div class="form-group col-md-6">
-            <label for="inputPassword4">Min</label>
+            <label for="inputMin">Min</label>
             <input type="number" class="form-control" name="min" placeholder="Min">
         </div>
         <div class="form-group col-md-6">
-            <label for="inputPassword4">Max</label>
+            <label for="inputMax">Max</label>
             <input type="number" class="form-control" name="max" placeholder="Max">
         </div>
         <div class="form-group col-md-12">
-            <label for="exampleFormControlFile1">Excel</label>
+            <label for="ExcelTitle">Excel</label>
         </div>
         <div class="form-group col-md-12">
             <input type="file" class="form-control-file" name="file" required>
@@ -61,8 +71,8 @@
             <button class="form-control-file" type="submit">Upload File</button>
         </div>
     </div>
-    <p>
-        Last Fragrancex database update <b>@ViewBag.TimeStamp Updated via  @ViewBag.type</b> <br />
-    </p>
+            <p>
+                Last Fragrancex database update <b>@ViewBag.TimeStamp Updated via  @ViewBag.type</b> <br />
+            </p>
 </form>
 
