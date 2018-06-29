@@ -18,15 +18,15 @@ namespace DBTester.Models
 
         public string html { get; set; }
 
-        public int profit { get; set; }
+        public double profit { get; set; }
 
-        public int markdown { get; set; }
+        public double markdown { get; set; }
 
-        public int shipping { get; set; }
+        public double shipping { get; set; }
 
-        public int fee { get; set; }
+        public double fee { get; set; }
 
-        public int promoting { get; set; }
+        public double promoting { get; set; }
 
         public int min { get; set; }
 

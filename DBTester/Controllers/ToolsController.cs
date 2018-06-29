@@ -113,7 +113,7 @@ namespace DBTester.Controllers
 
         [HttpPost]
         public async Task<IActionResult> ExportToExcel(IFormFile file, string shipping
-            , string fee, string profit, string markdown, int items, int min, int max, string User)
+            , string fee, string profit, string promoting, string markdown, int items, int min, int max, string User)
         {
             if (file == null || file.Length == 0)
             {
@@ -132,31 +132,48 @@ namespace DBTester.Controllers
             // Update the database once a day
             updateFragrancex();
 
-            Dictionary<string, double> calculation = new Dictionary<string, double>();
-
             Match shippingMatch = Regex.Match(shipping, @"[\d]+");
-
-            calculation.Add("shipping", Double.Parse(shippingMatch.Value));
 
             Match amazonFee = Regex.Match(fee, @"[\d]+[/.]?[\d]+");
 
-            calculation.Add("fee", Double.Parse(amazonFee.Value));
+            Match promotingFee = Regex.Match(promoting, @"[\d]+[/.]?[\d]+");
 
             Match profitMatch = Regex.Match(profit, @"[\d]+");
 
-            calculation.Add("profit", Double.Parse(profitMatch.Value));
+            Profile oldProfile = _context.Profile.AsNoTracking().Where<Profile>(x => x.ProfileUser == User).FirstOrDefault(); ;
+            
+            Profile profile = new Profile
+            {
+                shipping = Double.Parse(shippingMatch.Value),
 
+                fee = Double.Parse(amazonFee.Value),
+
+                profit = Double.Parse(profitMatch.Value),
+
+                promoting = Double.Parse(promotingFee.Value),
+
+                ProfileUser = User,
+
+                items = items,
+
+                min = min,
+
+                max = max,
+
+                html = oldProfile.html
+            };
+            
             if (markdown != null)
             {
                 Match markdownMatch = Regex.Match(markdown, @"[\d]+");
-                calculation.Add("markDown", Double.Parse(markdownMatch.Value));
+                profile.markdown = Double.Parse(markdownMatch.Value);
             }
             
             var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
 
             var prices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
             
-            ExcelHelper.ExcelGenerator(path, prices, upc, calculation, items, min, max);
+            ExcelHelper.ExcelGenerator(path, prices, upc, profile, items, min, max);
             
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))
@@ -170,23 +187,17 @@ namespace DBTester.Controllers
                 File(memory, Helper.GetContentType(path), Path.GetFileNameWithoutExtension(path)
                 + "_Converted" + Path.GetExtension(path).ToLowerInvariant());
 
-            //Profile profile = new Profile();
+            _context.Profile.Update(profile);
 
-            //using (var stream = new MemoryStream())
-            //{
-            //    await file.CopyToAsync(stream);
-            //    profile.formFile = stream.ToArray();
-            //}
+            _context.SaveChanges();
 
-            //_context.Profile.Add(profile);
-            //_context.SaveChanges();
             System.IO.File.Delete(path);
 
             return returnFile;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Updatefragrancex()
+        public IActionResult Updatefragrancex()
         {
             /*
             ServiceTimeStamp service = new ServiceTimeStamp();

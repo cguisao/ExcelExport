@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using DBTester.Models;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +12,7 @@ namespace DBTester.Code
     public class ExcelHelper
     {
         public static void ExcelGenerator(string sWebRootFolder, Dictionary<int, double> prices,
-            Dictionary<int, long?> upcs, Dictionary<string, double> calculations, int items
+            Dictionary<int, long?> upcs, Profile profile, int items
             , int min, int max)
         {
             FileInfo file = new FileInfo(sWebRootFolder);
@@ -110,7 +111,7 @@ namespace DBTester.Code
 
                             // prices
 
-                            string price = Helper.PricePreparer(itemID, prices, calculations);
+                            string price = Helper.PricePreparer(itemID, prices, profile);
 
                             if (double.Parse(price) != 0.0)
                             {

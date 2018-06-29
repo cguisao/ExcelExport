@@ -83,7 +83,7 @@ namespace GTISolutions.Migrations
                 {
                     b.Property<string>("ProfileUser");
 
-                    b.Property<int>("fee");
+                    b.Property<double>("fee");
 
                     b.Property<byte[]>("formFile");
 
@@ -91,17 +91,17 @@ namespace GTISolutions.Migrations
 
                     b.Property<int>("items");
 
-                    b.Property<int>("markdown");
+                    b.Property<double>("markdown");
 
                     b.Property<int>("max");
 
                     b.Property<int>("min");
 
-                    b.Property<int>("profit");
+                    b.Property<double>("profit");
 
-                    b.Property<int>("promoting");
+                    b.Property<double>("promoting");
 
-                    b.Property<int>("shipping");
+                    b.Property<double>("shipping");
 
                     b.HasKey("ProfileUser");
 
