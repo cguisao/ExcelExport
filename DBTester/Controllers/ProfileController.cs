@@ -77,21 +77,23 @@ namespace GTI_Solutions.Controllers
         public IActionResult ProfileCreator(string userID, string html, string longTitle
             , string MidTitle, string shortTitle, string sizeDivider, string endTitle)
         {
-            Profile profile = new Profile();
+            Profile profile = new Profile
+            {
+                ProfileUser = userID,
 
-            profile.ProfileUser = userID;
+                html = html,
 
-            profile.html = html;
+                LongstartTitle = longTitle,
 
-            profile.LongstartTitle = longTitle;
+                MidtartTitle = MidTitle,
 
-            profile.MidtartTitle = MidTitle;
+                ShortstartTitle = shortTitle,
 
-            profile.ShortstartTitle = shortTitle;
+                sizeDivider = sizeDivider,
 
-            profile.sizeDivider = sizeDivider;
-            
-            profile.endTtile = items.Where(x => x.Value == endTitle).Select(x => x.Text).FirstOrDefault(); 
+                endTtile = items.Where(x => x.Value == endTitle).Select(x => x.Text).FirstOrDefault()
+            };
+
 
             _context.Profile.Add(profile);
 
