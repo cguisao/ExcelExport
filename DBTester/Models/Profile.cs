@@ -31,7 +31,17 @@ namespace DBTester.Models
         public int min { get; set; }
 
         public int max { get; set; }
+        
+        public string LongstartTitle { get; set; }
 
-        public byte[] formFile  { get; set; }
+        public string MidtartTitle { get; set; }
+
+        public string ShortstartTitle { get; set; }
+
+        public string endTtile { get; set; }
+
+        public string sizeDivider { get; set; }
+
+        public byte[] formFile { get; set; }
     }
 }

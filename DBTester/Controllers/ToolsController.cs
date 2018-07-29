@@ -140,7 +140,7 @@ namespace DBTester.Controllers
 
             Match profitMatch = Regex.Match(profit, @"[\d]+");
 
-            Profile oldProfile = _context.Profile.AsNoTracking().Where<Profile>(x => x.ProfileUser == User).FirstOrDefault(); ;
+            Profile oldProfile = _context.Profile.AsNoTracking().Where<Profile>(x => x.ProfileUser == User).FirstOrDefault();
             
             Profile profile = new Profile
             {
@@ -160,7 +160,18 @@ namespace DBTester.Controllers
 
                 max = max,
 
-                html = oldProfile.html
+                html = oldProfile.html,
+
+                LongstartTitle = oldProfile.LongstartTitle,
+
+                MidtartTitle = oldProfile.MidtartTitle,
+
+                ShortstartTitle = oldProfile.ShortstartTitle,
+
+                endTtile = oldProfile.endTtile,
+
+                sizeDivider = oldProfile.sizeDivider
+
             };
             
             if (markdown != null)
@@ -184,8 +195,9 @@ namespace DBTester.Controllers
             memory.Position = 0;
 
             FileStreamResult returnFile =
-                File(memory, Helper.GetContentType(path), Path.GetFileNameWithoutExtension(path)
-                + "_Converted" + Path.GetExtension(path).ToLowerInvariant());
+                File(memory, Helper.GetContentType(path), profile.ProfileUser
+                + "_Converted_" + DateTime.Today.GetDateTimeFormats()[10]
+                + Path.GetExtension(path).ToLowerInvariant());
 
             _context.Profile.Update(profile);
 
@@ -323,7 +335,6 @@ namespace DBTester.Controllers
             }
             else if (_context.ServiceTimeStamp.LastOrDefault<ServiceTimeStamp>().TimeStamp != DateTime.Today)
             {
-                //_context.Database.ExecuteSqlCommand("delete from Fragrancex");
                 FragancexSQLPreparer(service, uploadFragrancex);
             }
         }

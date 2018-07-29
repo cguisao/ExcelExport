@@ -1,4 +1,5 @@
-﻿@{
+﻿@model IEnumerable<DBTester.Models.Profile>
+@{
     ViewBag.Title = "Profile Viewer";
 }
 
@@ -25,34 +26,34 @@
         </thead>
         @foreach (var profile in ViewBag.onePageOfProfiles)
         {
-        <tbody>
-            <tr>
-                <td>
-                    @profile.ProfileUser
-                </td>
-                <td>
-                    @profile.items
-                </td>
-                <td>
-                    @profile.profit
-                </td>
-                <td>
-                    @profile.markdown
-                </td>
-                <td>
-                    @profile.shipping
-                </td>
-                <td>
-                    @profile.fee
-                </td>
-                <td>
-                    @profile.min
-                </td>
-                <td>
-                    @profile.max
-                </td>
-            </tr>
-        </tbody>
+            <tbody>
+                <tr>
+                    <td>
+                        @profile.ProfileUser
+                    </td>
+                    <td>
+                        @profile.items
+                    </td>
+                    <td>
+                        @profile.profit
+                    </td>
+                    <td>
+                        @profile.markdown
+                    </td>
+                    <td>
+                        @profile.shipping
+                    </td>
+                    <td>
+                        @profile.fee
+                    </td>
+                    <td>
+                        @profile.min
+                    </td>
+                    <td>
+                        @profile.max
+                    </td>
+                </tr>
+            </tbody>
         }
     </table>
 </div>
@@ -64,3 +65,41 @@
         $('#myTable').dataTable();
     });
 </script>
+
+<h2>Title Viewer</h2>
+<div class="table-responsive">
+    <table id="myTable" class="display table" width="80%">
+        <tr>
+            <th>User</th>
+            <th>Long Title Start</th>
+            <th>Mid Title Start</th>
+            <th>Short Title Start</th>
+            <th>Title End</th>
+            <th>Size Divider</th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProfileUser)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LongstartTitle)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MidtartTitle)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ShortstartTitle)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.endTtile)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.sizeDivider)
+                </td>
+            </tr>
+        }
+    </table>
+</div>

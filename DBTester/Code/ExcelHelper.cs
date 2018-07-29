@@ -35,9 +35,9 @@ namespace DBTester.Code
 
                     // Prepare the excel and remove whatever it needs to be removed.
 
-                    Helper.PrepareExcel(worksheet, Helper.filenameFinder(file.Name), min, max);
+                    Helper.PrepareExcel(worksheet, min, max);
 
-                    dicTitle = Helper.titleDic(worksheet);
+                    dicTitle = Helper.titleDic(worksheet, profile);
 
                     int rowCount = worksheet.Dimension.Rows;
                     int ColCount = worksheet.Dimension.Columns;
@@ -85,19 +85,15 @@ namespace DBTester.Code
                         {
                             // Logic for the title
                             title = Helper.BuildTitle(dicTitle, worksheet.Cells[row, 2].Value.ToString()
-                                + " " + worksheet.Cells[row, 27].Value.ToString(), file.Name);
+                                + " " + worksheet.Cells[row, 27].Value.ToString(), worksheet.Cells[row, 27].Value.ToString(), profile);
                             worksheet.Cells[row, 2].Value = title;
                             if (title.Length > 80)
                                 count++;
 
                             //Logic for the HTML Body
-                            // Logic for Phil and Lauren so far
-                            if (file.Name.ToLower().Contains("melody") || file.Name.ToLower().Contains("lauren")
-                                || file.Name.ToLower().Contains("phil") || file.Name.ToLower().Contains("cooper"))
-                            {
-                                worksheet.Cells[row, 3].Value = Helper.BuildHTML(worksheet, row, file.Name);
-                            }
-
+                            
+                            worksheet.Cells[row, 3].Value = Helper.BuildHTML(worksheet, row, profile.html);
+                            
                             // SKU creator
 
                             itemID = Convert.ToInt64(worksheet.Cells[row, 13].Value);

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DBTester.Models.ServiceTimeStamp>
+﻿@model IEnumerable<DBTester.Models.Profile>
 @{
     ViewBag.Title = "Update";
 }
@@ -8,22 +8,148 @@
 <h3>GTI Solutionx Profile</h3>
 
 <form asp-controller="Profile" asp-action="ProfileCreator" method="post"
-      enctype="multipart/form-data" style="width: 60%">
-
+      enctype="multipart/form-data" style="width: 80%" name="main" onchange="fillTestTitle()" onKeyUp="fillTestTitle()">
     <p>
         This form creates a new profile on the database
         which will be used while creating the shopify excel creator.
     </p>
 
     <div class="form-row">
-        <div class="form-group col-md-12">
+        <div class="form-group col-md-6">
             <label for="ProfileUser">User ID:</label>
             <input type="text" class="form-control" name="userID" placeholder="User ID">
+        </div>
+        <h3>Title Builder</h3>
+        <div class="form-group col-md-12">
+            <label>Title Options</label>
+        </div>
+        <div class="form-group col-md-4">
+            <input type="text" class="form-control" name="longTitle" placeholder="Long Title">
+        </div>
+        <div class="form-group col-md-4">
+            <input type="text" class="form-control" name="MidTitle" placeholder="Mid Title">
+        </div>
+        <div class="form-group col-md-4">
+            <input type="text" class="form-control" name="shortTitle" placeholder="Short Title">
+        </div>
+        <div class="form-group col-md-6">
+            <label>Bottle Size Divider</label>
+            <input type="text" class="form-control" name="sizeDivider" placeholder="Title Divider">
+        </div>
+        <div class="form-group col-md-6">
+            <label>Title Ending</label>
+            @Html.DropDownList("endTitle", (IEnumerable<SelectListItem>)ViewBag.CategoryType
+                , new { @class = "form-control" })
+        </div>
+        <div class="form-group col-md-12">
+            <h2>Sample Long Title</h2>
+            <input type="text" class="form-control" name="sampleLong" readonly>
+            <input type="text" class="form-control" name="sampleMid" readonly>
+            <input type="text" class="form-control" name="sampleShort" readonly>
+        </div>
+        <div class="form-group col-md-12">
+            <h2>Other User's Title Viewer</h2>
+            <table id="myTable" class="display table">
+                <tr>
+                    <th>User</th>
+                    <th>Long Title Start</th>
+                    <th>Mid Title Start</th>
+                    <th>Short Title Start</th>
+                    <th>Title End</th>
+                    <th>Size Divider</th>
+                </tr>
+
+                @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProfileUser)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LongstartTitle)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MidtartTitle)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ShortstartTitle)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.endTtile)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.sizeDivider)
+                    </td>
+                </tr>
+        }
+            </table>
         </div>
         <div class="form-group col-md-12">
             <label for="inputPassword4">HTML</label>
             <textarea class="form-control" rows="10" name="html" value="20%"></textarea>
         </div>
-        <button class="btn btn-primary" type="submit">Submit</button>
+        <div class="form-group col-md-12">
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </div>
     </div>
 </form>
+
+
+
+<form name="SampleForm">
+   
+</form>
+
+<script>
+    function fillTestTitle() {
+        var fieldOneValue = document.forms["main"].longTitle.value;
+        var fieldTowValue = document.forms["main"].MidTitle.value;
+        var fieldThreeValue = document.forms["main"].shortTitle.value;
+        var FieldFourValue = document.forms["main"].sizeDivider.value;
+        var FieldFiveValue = document.forms["main"].endTitle.value;
+
+        if (FieldFiveValue == 1) {
+            document.forms["main"].sampleLong.value = fieldOneValue + " 007 EDT Spray By James Bond "
+                + "5 " + FieldFourValue + " 3 Oz " + "For Women";
+            document.forms["main"].sampleMid.value = fieldTowValue + " 007 EDT Spray By James Bond "
+                + "5 " + FieldFourValue + " 3 Oz " + "For Men";
+            document.forms["main"].sampleShort.value = fieldThreeValue + " 007 EDT Spray By James Bond "
+                + "5 " + FieldFourValue + " 3 Oz " + "For Women";
+        }
+        else if (FieldFiveValue == 2) {
+            document.forms["main"].sampleLong.value = fieldOneValue + " 007 EDT Spray By James Bond "
+                + "5 " + FieldFourValue + " 3 Oz " + "Cologne";
+            document.forms["main"].sampleMid.value = fieldTowValue + " 007 EDT Spray By James Bond "
+                + "5 " + FieldFourValue + " 3 Oz " + "Perfume";
+            document.forms["main"].sampleShort.value = fieldThreeValue + " 007 EDT Spray By James Bond "
+                + "5 " + FieldFourValue + " 3 Oz " + "Cologne";
+        }
+        else if (FieldFiveValue == 0 || FieldFiveValue == 3 || FieldFiveValue == null){
+            document.forms["main"].sampleLong.value = fieldOneValue + " 007 EDT Spray By James Bond "
+                + "5 " + FieldFourValue + " 3 Oz ";
+            document.forms["main"].sampleMid.value = fieldTowValue + " 007 EDT Spray By James Bond "
+                + "5 " + FieldFourValue + " 3 Oz ";
+            document.forms["main"].sampleShort.value = fieldThreeValue + " 007 EDT Spray By James Bond "
+                + "5 " + FieldFourValue + " 3 Oz ";
+        }
+        
+
+        //if (!!fieldOneValue) {
+        //    document.forms["main"].sampleLong.value = fieldOneValue;
+        //} else {
+        //    document.forms["main"].sampleLong.value = fieldOneValue;
+        //}
+        //if (!!fieldTowValue) {
+        //    document.forms["main"].sampleMid.value = fieldTowValue;
+        //}
+        //else {
+        //    document.forms["main"].sampleMid.value = fieldTowValue;
+        //}
+        //if (!!fieldThreeValue) {
+        //    document.forms["main"].sampleShort.value = fieldThreeValue;
+        //}
+        //else {
+        //    document.forms["main"].sampleShort.value = fieldThreeValue;
+        //}
+    }
+</script>

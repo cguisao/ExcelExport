@@ -83,6 +83,14 @@ namespace GTISolutions.Migrations
                 {
                     b.Property<string>("ProfileUser");
 
+                    b.Property<string>("LongstartTitle");
+
+                    b.Property<string>("MidtartTitle");
+
+                    b.Property<string>("ShortstartTitle");
+
+                    b.Property<string>("endTtile");
+
                     b.Property<double>("fee");
 
                     b.Property<byte[]>("formFile");
@@ -102,6 +110,8 @@ namespace GTISolutions.Migrations
                     b.Property<double>("promoting");
 
                     b.Property<double>("shipping");
+
+                    b.Property<string>("sizeDivider");
 
                     b.HasKey("ProfileUser");
 
