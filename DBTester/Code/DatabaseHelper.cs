@@ -16,51 +16,51 @@ namespace DBTester.Code
 {
     public class DatabaseHelper
     {
-        public static IConfiguration Configuration;
-
         public static DataTable MakeUPCTable()
         {
             DataTable upcTable = new DataTable("UPC");
 
-            DataColumn item = new DataColumn();
-            item.DataType = System.Type.GetType("System.Int32");
-            item.ColumnName = "Item";
-            upcTable.Columns.Add(item);
+            ColumnMaker(upcTable, "Item", "System.Int32");
+            ColumnMaker(upcTable, "Upc", "System.Int64");
+            //DataColumn item = new DataColumn();
+            //item.DataType = System.Type.GetType("System.Int32");
+            //item.ColumnName = "Item";
+            //upcTable.Columns.Add(item);
 
-            DataColumn upc = new DataColumn();
-            upc.DataType = System.Type.GetType("System.Int64");
-            upc.ColumnName = "Upc";
-            upcTable.Columns.Add(upc);
+            //DataColumn upc = new DataColumn();
+            //upc.DataType = System.Type.GetType("System.Int64");
+            //upc.ColumnName = "Upc";
+            //upcTable.Columns.Add(upc);
 
             return upcTable;
         }
 
         public static DataTable MakeFragrancexTable()
         {
-            DataTable upcTable = new DataTable("Fragrancex");
+            DataTable fragrancexTable = new DataTable("Fragrancex");
 
-            ColumnMaker(upcTable, "ItemID", "System.Int32");
-            ColumnMaker(upcTable, "BrandName", "System.String");
-            ColumnMaker(upcTable, "Description", "System.String");
-            ColumnMaker(upcTable, "Gender", "System.String");
-            ColumnMaker(upcTable, "Instock", "System.Boolean");
-            ColumnMaker(upcTable, "LargeImageUrl", "System.String");
-            ColumnMaker(upcTable, "MetricSize", "System.String");
-            ColumnMaker(upcTable, "ParentCode", "System.String");
-            ColumnMaker(upcTable, "ProductName", "System.String");
-            ColumnMaker(upcTable, "RetailPriceUSD", "System.Int32");
-            ColumnMaker(upcTable, "Size", "System.String");
-            ColumnMaker(upcTable, "SmallImageURL", "System.String");
-            ColumnMaker(upcTable, "Type", "System.String");
-            ColumnMaker(upcTable, "Upc", "System.Int64");
-            ColumnMaker(upcTable, "WholePriceAUD", "System.Double");
-            ColumnMaker(upcTable, "WholePriceCAD", "System.Double");
-            ColumnMaker(upcTable, "WholePriceEUR", "System.Double");
-            ColumnMaker(upcTable, "WholePriceGBP", "System.Double");
-            ColumnMaker(upcTable, "WholePriceUSD", "System.Double");
-            ColumnMaker(upcTable, "UpcItemID", "System.Double");
+            ColumnMaker(fragrancexTable, "ItemID", "System.Int32");
+            ColumnMaker(fragrancexTable, "BrandName", "System.String");
+            ColumnMaker(fragrancexTable, "Description", "System.String");
+            ColumnMaker(fragrancexTable, "Gender", "System.String");
+            ColumnMaker(fragrancexTable, "Instock", "System.Boolean");
+            ColumnMaker(fragrancexTable, "LargeImageUrl", "System.String");
+            ColumnMaker(fragrancexTable, "MetricSize", "System.String");
+            ColumnMaker(fragrancexTable, "ParentCode", "System.String");
+            ColumnMaker(fragrancexTable, "ProductName", "System.String");
+            ColumnMaker(fragrancexTable, "RetailPriceUSD", "System.Int32");
+            ColumnMaker(fragrancexTable, "Size", "System.String");
+            ColumnMaker(fragrancexTable, "SmallImageURL", "System.String");
+            ColumnMaker(fragrancexTable, "Type", "System.String");
+            ColumnMaker(fragrancexTable, "Upc", "System.Int64");
+            ColumnMaker(fragrancexTable, "WholePriceAUD", "System.Double");
+            ColumnMaker(fragrancexTable, "WholePriceCAD", "System.Double");
+            ColumnMaker(fragrancexTable, "WholePriceEUR", "System.Double");
+            ColumnMaker(fragrancexTable, "WholePriceGBP", "System.Double");
+            ColumnMaker(fragrancexTable, "WholePriceUSD", "System.Double");
+            ColumnMaker(fragrancexTable, "UpcItemID", "System.Double");
 
-            return upcTable;
+            return fragrancexTable;
         }
 
         private static void ColumnMaker(DataTable upcTable, string columnName, string type)
@@ -78,6 +78,7 @@ namespace DBTester.Code
                          .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                          .AddEnvironmentVariables();
 
+            IConfiguration Configuration;
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
             string connectionstring = Configuration.GetConnectionString("BloggingDatabase");

@@ -19,6 +19,7 @@ using System.Data;
 using FrgxPublicApiSDK.Models;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
+using DatabaseModifier;
 
 namespace GTI_Solutions.Controllers
 {
@@ -69,7 +70,10 @@ namespace GTI_Solutions.Controllers
             }
 
             // Update the DB with the new UPCs
-            UpcHelper.UPCLoadDic(path);
+
+            DBModifierUPC databaseUPC = new DBModifierUPC(path);
+
+            databaseUPC.TableExecutor();
 
             return RedirectToAction("UpcViewer");
         }

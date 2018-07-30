@@ -1,26 +1,33 @@
-﻿using DBTester.Models;
+﻿using DBTester.Code;
+using DBTester.Models;
+using FrgxPublicApiSDK.Models;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace DBTester.Code
+namespace DatabaseModifier
 {
-    public class UpcHelper
+    public class DBModifierUPC : Database, IDatabaseModifier
     {
-        public static void UPCLoadDic(string path)
+        public DBModifierUPC(string path)
+        {
+            this.path = path;
+        }
+
+        private string path { get; set; }
+
+        public void TableExecutor()
+
         {
             UPC upc = new UPC();
 
-            List<UPC> list = new List<UPC>();
-
             FileInfo file = new FileInfo(path);
 
-            DataTable uploadUpc = DatabaseHelper.MakeUPCTable();
+            DataTable uploadUpc = CreateTable();
 
             int bulkSize = 0;
 
@@ -58,7 +65,17 @@ namespace DBTester.Code
                 throw (ex);
             }
 
-            DatabaseHelper.upload(uploadUpc, bulkSize, "dbo.UPC");
+            upload(uploadUpc, bulkSize, "dbo.UPC");
+        }
+
+        public DataTable CreateTable()
+        {
+            DataTable upcTable = new DataTable("UPC");
+
+            ColumnMaker(upcTable, "Item", "System.Int32");
+            ColumnMaker(upcTable, "Upc", "System.Int64");
+
+            return upcTable;
         }
     }
 }

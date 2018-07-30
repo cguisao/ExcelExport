@@ -20,6 +20,7 @@ using FrgxPublicApiSDK.Models;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using ExcelModifier;
+using DatabaseModifier;
 
 namespace DBTester.Controllers
 {
@@ -315,8 +316,10 @@ namespace DBTester.Controllers
 
             _context.Database.ExecuteSqlCommand("delete from Fragrancex");
 
-            DatabaseHelper.FragrancexLoadDic(path, upc);
-            
+            DBModifierFragrancexExcel dBModifierFragrancexExcel = new DBModifierFragrancexExcel(path, upc);
+
+            dBModifierFragrancexExcel.TableExecutor();
+
             ServiceTimeStamp service = new ServiceTimeStamp();
 
             service.TimeStamp = DateTime.Today;
@@ -334,37 +337,44 @@ namespace DBTester.Controllers
         {
             ServiceTimeStamp service = new ServiceTimeStamp();
 
-            DataTable uploadFragrancex = DatabaseHelper.MakeFragrancexTable();
-
             if (_context.ServiceTimeStamp.LastOrDefault<ServiceTimeStamp>() == null)
             {
-                FragancexSQLPreparer(service, uploadFragrancex);
+                FragancexSQLPreparer(service);
             }
             else if (_context.ServiceTimeStamp.LastOrDefault<ServiceTimeStamp>().TimeStamp != DateTime.Today)
             {
-                FragancexSQLPreparer(service, uploadFragrancex);
+                FragancexSQLPreparer(service);
             }
         }
 
-        private void FragancexSQLPreparer(ServiceTimeStamp service, DataTable uploadFragrancex)
+        private void FragancexSQLPreparer(ServiceTimeStamp service)
         {
             var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
 
-            int bulkSize = 0;
-            
+            // TODO: Test this functionality once Alex is done with his development!!
+
             try
             {
                 var listingApiClient = new FrgxListingApiClient("346c055aaefd", "a5574c546cbbc9c10509e3c277dd7c7039b24324");
 
-                var product = listingApiClient.GetProductById("412492");
+                // For testing purposes
+
+                //List<Product> allProducts = new List<Product>();
+
+                //var product = listingApiClient.GetProductById("412492");
+
+                //allProducts.Add(product);
 
                 var allProducts = listingApiClient.GetAllProducts();
 
                 _context.Database.ExecuteSqlCommand("delete from Fragrancex");
 
-                DatabaseHelper.dbPreparer(uploadFragrancex, upc, ref bulkSize, allProducts);
+                DBModifierFragrancexAPI dBModifierFragrancexAPI = new DBModifierFragrancexAPI("", upc)
+                {
+                    allProducts = allProducts
+                };
 
-                DatabaseHelper.upload(uploadFragrancex, bulkSize, "dbo.Fragrancex");
+                dBModifierFragrancexAPI.TableExecutor();
 
                 service.TimeStamp = DateTime.Today;
 
