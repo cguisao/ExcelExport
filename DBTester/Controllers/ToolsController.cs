@@ -19,6 +19,7 @@ using System.Data;
 using FrgxPublicApiSDK.Models;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
+using ExcelModifier;
 
 namespace DBTester.Controllers
 {
@@ -183,8 +184,15 @@ namespace DBTester.Controllers
             var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
 
             var prices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
-            
-            ExcelHelper.ExcelGenerator(path, prices, upc, profile, items, min, max);
+
+            IExcelExtension shopifyModifier = new ShopifyExcelCreator(upc)
+            {
+                sWebRootFolder = path,
+                prices = prices,
+                profile = profile
+            };
+
+            shopifyModifier.ExcelGenerator();
             
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))

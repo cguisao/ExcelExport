@@ -12,8 +12,7 @@ namespace DBTester.Code
     public class ExcelHelper
     {
         public static void ExcelGenerator(string sWebRootFolder, Dictionary<int, double> prices,
-            Dictionary<int, long?> upcs, Profile profile, int items
-            , int min, int max)
+            Dictionary<int, long?> upcs, Profile profile)
         {
             FileInfo file = new FileInfo(sWebRootFolder);
             Dictionary<string, long> dicSKU = new Dictionary<string, long>();
@@ -35,7 +34,7 @@ namespace DBTester.Code
 
                     // Prepare the excel and remove whatever it needs to be removed.
 
-                    Helper.PrepareExcel(worksheet, min, max);
+                    Helper.PrepareExcel(worksheet, profile.min, profile.max);
 
                     dicTitle = Helper.titleDic(worksheet, profile);
 
@@ -112,7 +111,7 @@ namespace DBTester.Code
                             if (double.Parse(price) != 0.0)
                             {
                                 worksheet.Cells[row, 19].Value = double.Parse(price);
-                                worksheet.Cells[row, 16].Value = items;
+                                worksheet.Cells[row, 16].Value = profile.items;
                             }
                             else
                             {
