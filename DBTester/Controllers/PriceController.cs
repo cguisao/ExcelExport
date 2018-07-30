@@ -87,11 +87,10 @@ namespace DBTester.Controllers
 
             Profile profile = new Profile();
 
-            IExcelExtension excelExtension = new ShopifyExcelUpdator()
+            IExcelExtension excelExtension = new ShopifyExcelUpdator(profile)
             {
                 sWebRootFolder = path,
-                prices = prices,
-                profile = profile
+                prices = prices
             };
 
             //ExcelHelper.ExcelGenerator(path, prices, items);

@@ -185,11 +185,10 @@ namespace DBTester.Controllers
 
             var prices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
 
-            IExcelExtension shopifyModifier = new ShopifyExcelCreator(upc)
+            IExcelExtension shopifyModifier = new ShopifyExcelCreator(upc, profile)
             {
                 sWebRootFolder = path,
-                prices = prices,
-                profile = profile
+                prices = prices
             };
 
             shopifyModifier.ExcelGenerator();

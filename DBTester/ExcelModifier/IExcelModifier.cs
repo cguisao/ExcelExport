@@ -12,8 +12,6 @@ namespace ExcelModifier
 
         Dictionary<int, double> prices { get; set; }
 
-        Profile profile { get; set; }
-
         void ExcelGenerator();
     }
 }

@@ -11,9 +11,10 @@ namespace ExcelModifier
 {
     public class ShopifyExcelCreator : IExcelExtension
     {
-        public ShopifyExcelCreator(Dictionary<int, long?> upcs)
+        public ShopifyExcelCreator(Dictionary<int, long?> upcs, Profile profile)
         {
             this.upcs = upcs;
+            this.profile = profile;
         }
 
         private Dictionary<int, long?> upcs { get; set; }
@@ -22,7 +23,7 @@ namespace ExcelModifier
 
         public Dictionary<int, double> prices { get; set; }
 
-        public Profile profile { get; set; }
+        private Profile profile { get; set; }
 
         public void ExcelGenerator()
         {

@@ -11,9 +11,13 @@ namespace ExcelModifier
 {
     public class ShopifyExcelUpdator : IExcelExtension
     {
+        public ShopifyExcelUpdator(Profile profile)
+        {
+            this.profile = profile;
+        }
         public string sWebRootFolder { get; set; }
         public Dictionary<int, double> prices { get; set; }
-        public Profile profile { get; set; }
+        private Profile profile { get; set; }
 
         public void ExcelGenerator()
 
