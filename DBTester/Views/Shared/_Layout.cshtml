@@ -65,13 +65,24 @@
 
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            Amazon
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a asp-area="" asp-controller="Amazon" asp-action="Index">Price Update</a></li>
+                            @*<li><a asp-area="" asp-controller="Price" asp-action="PriceUpdater">Price Updater</a></li>*@
+                        </ul>
+                    </li>
+
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                             Profile
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a asp-area="" asp-controller="Profile" asp-action="Index">Profile Creator</a></li>
                             <li><a asp-area="" asp-controller="Profile" asp-action="Profile">Profile Viewer</a></li>
-                            <li><a asp-area="" asp-controller="Profile" asp-action="Title">Title Update</a></li>
+                            <li><a asp-area="" asp-controller="Profile" asp-action="Title">eBay Title Creator</a></li>
                         </ul>
                     </li>
 

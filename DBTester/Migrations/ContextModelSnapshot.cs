@@ -20,6 +20,49 @@ namespace GTISolutions.Migrations
                 .HasAnnotation("ProductVersion", "2.0.0-rtm-26452")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("DBTester.Models.AzImporter", b =>
+                {
+                    b.Property<int>("ItemID");
+
+                    b.Property<string>("Category");
+
+                    b.Property<string>("HTMLDescription");
+
+                    b.Property<string>("Image1");
+
+                    b.Property<string>("Image2");
+
+                    b.Property<string>("Image3");
+
+                    b.Property<string>("Image4");
+
+                    b.Property<string>("Image5");
+
+                    b.Property<string>("Image6");
+
+                    b.Property<string>("Image7");
+
+                    b.Property<string>("Image8");
+
+                    b.Property<string>("ItemName");
+
+                    b.Property<string>("MainImage");
+
+                    b.Property<int>("Quantity");
+
+                    b.Property<string>("ShortDescription");
+
+                    b.Property<string>("Sku");
+
+                    b.Property<int>("Weight");
+
+                    b.Property<double>("WholeSale");
+
+                    b.HasKey("ItemID");
+
+                    b.ToTable("AzImporter");
+                });
+
             modelBuilder.Entity("DBTester.Models.ErrorViewModel", b =>
                 {
                     b.Property<string>("RequestId")

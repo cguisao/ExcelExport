@@ -30,7 +30,7 @@ namespace DBTester.Controllers
 
         public Context _context;
  
-        public ToolsController(Context context, Context context2, IHostingEnvironment hostingEnvironment)
+        public ToolsController(Context context, IHostingEnvironment hostingEnvironment)
         {
             _context = context;
             _hostingEnvironment = hostingEnvironment;

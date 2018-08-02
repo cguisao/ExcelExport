@@ -13,5 +13,7 @@ namespace ExcelModifier
         Dictionary<int, double> prices { get; set; }
 
         void ExcelGenerator();
+
+        string getSellingPrice(long? itemID);
     }
 }

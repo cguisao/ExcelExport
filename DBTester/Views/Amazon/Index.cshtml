@@ -1,0 +1,60 @@
+﻿@model IEnumerable<DBTester.Models.Profile>
+@{
+    ViewBag.Title = "Update";
+}
+
+<h2>Amazon Tools</h2>
+
+<h3>Amazon Excel creator</h3>
+
+<form asp-controller="Amazon" asp-action="UpdateAmazonList" method="post"
+      enctype="multipart/form-data" style="width: 60%">
+
+    <p>
+        This application is intended to create an excel which will
+        be able to take an excel from an Amazon report and return
+        the items that are available in a spreadsheet.
+    </p>
+
+    <div class="form-row">
+        @*<div class="form-group col-md-6">
+            <label for="inputUser">User</label>
+            @Html.DropDownList("User",
+            Model.Select(m => new SelectListItem() { Text = m.ProfileUser }).ToList()
+            , "", new { @class = "form-control", required = "required" })
+        </div>*@
+        @*<div class="form-group col-md-6 invisible">
+            <label for="Empty">.</label>
+            <input type="text" class="form-control" name="invisible" readonly>
+        </div>*@
+        @*<div class="form-group col-md-6">
+            <label for="inputshipping">Shipping</label>
+            <input type="text" class="form-control" name="shipping" placeholder="Shipping" value="$6" readonly>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="inputFee">Amazon Fee</label>
+            <input type="text" class="form-control" name="fee" value="20%" readonly>
+        </div>*@
+        @*<div class="form-group col-md-6">
+            <label for="inputProfit">Profit (Percentage)</label>
+            <input type="text" class="form-control" name="profit" placeholder="Profit" required>
+        </div>*@
+        @*<div class="form-group col-md-6 invisible">
+            <label for="Empty">.</label>
+            <input type="text" class="form-control" name="invisible" readonly>
+        </div>*@
+        <div class="form-group col-md-12">
+            <label for="ExcelTitle">Excel</label>
+        </div>
+        <div class="form-group col-md-12">
+            <input type="file" class="form-control-file" name="file" required>
+        </div>
+        <div class="form-group col-md-12">
+            <button class="form-control-file" type="submit">Upload File</button>
+        </div>
+    </div>
+    <p>
+        Last Fragrancex database update <b>@ViewBag.TimeStamp Updated via  @ViewBag.type</b> <br />
+    </p>
+</form>
+

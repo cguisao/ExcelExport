@@ -15,8 +15,11 @@ namespace ExcelModifier
         {
             this.profile = profile;
         }
+
         public string sWebRootFolder { get; set; }
+
         public Dictionary<int, double> prices { get; set; }
+
         private Profile profile { get; set; }
 
         public void ExcelGenerator()
@@ -87,6 +90,11 @@ namespace ExcelModifier
             {
                 Console.WriteLine("Some error occurred while importing." + ex.Message);
             }
+        }
+
+        public string getSellingPrice(long? itemID)
+        {
+            throw new NotImplementedException();
         }
     }
 }

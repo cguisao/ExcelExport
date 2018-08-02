@@ -27,137 +27,135 @@ namespace ExcelModifier
 
         public void ExcelGenerator()
         {
+            FileInfo file = new FileInfo(sWebRootFolder);
+            Dictionary<string, long> dicSKU = new Dictionary<string, long>();
+            Dictionary<string, string> dicTitle = new Dictionary<string, string>();
+            int count = 1;
+            int execption = 0;
+            try
             {
-                FileInfo file = new FileInfo(sWebRootFolder);
-                Dictionary<string, long> dicSKU = new Dictionary<string, long>();
-                Dictionary<string, string> dicTitle = new Dictionary<string, string>();
-                int count = 1;
-                int execption = 0;
-                try
+                using (ExcelPackage package = new ExcelPackage(file))
                 {
-                    using (ExcelPackage package = new ExcelPackage(file))
+                    StringBuilder sb = new StringBuilder();
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
+
+                    worksheet.DeleteRow(1);
+
+                    worksheet.Cells["A:AA"].Sort();
+
+                    worksheet.InsertRow(1, 1);
+
+                    // Prepare the excel and remove whatever it needs to be removed.
+
+                    PrepareExcel(worksheet, profile.min, profile.max);
+
+                    dicTitle = titleDic(worksheet);
+
+                    int rowCount = worksheet.Dimension.Rows;
+                    int ColCount = worksheet.Dimension.Columns;
+
+                    long? itemID;
+
+                    string title = "";
+
+                    for (int row = 1; row <= rowCount + 1; row++)
                     {
-                        StringBuilder sb = new StringBuilder();
-                        ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
+                        execption++;
 
-                        worksheet.DeleteRow(1);
-
-                        worksheet.Cells["A:AA"].Sort();
-
-                        worksheet.InsertRow(1, 1);
-
-                        // Prepare the excel and remove whatever it needs to be removed.
-
-                        PrepareExcel(worksheet, profile.min, profile.max);
-
-                        dicTitle = titleDic(worksheet);
-
-                        int rowCount = worksheet.Dimension.Rows;
-                        int ColCount = worksheet.Dimension.Columns;
-
-                        long? itemID;
-
-                        string title = "";
-
-                        for (int row = 1; row <= rowCount + 1; row++)
+                        if (row == 1)
                         {
-                            execption++;
+                            worksheet.Cells[row, 1].Value = "Handle";
+                            worksheet.Cells[row, 2].Value = "Title";
+                            worksheet.Cells[row, 3].Value = "Body (HTML)";
+                            worksheet.Cells[row, 4].Value = "Vendor";
+                            worksheet.Cells[row, 5].Value = "Type";
+                            worksheet.Cells[row, 6].Value = "Published";
+                            worksheet.Cells[row, 7].Value = "Option1 Name";
+                            worksheet.Cells[row, 8].Value = "Option1 Value";
+                            worksheet.Cells[row, 9].Value = "OPtion2 Name";
+                            worksheet.Cells[row, 10].Value = "Option2 Value";
+                            worksheet.Cells[row, 11].Value = "Option3 Name";
+                            worksheet.Cells[row, 12].Value = "Option3 Value";
+                            worksheet.Cells[row, 13].Value = "Variant SKU";
+                            worksheet.Cells[row, 14].Value = "Variant Grams";
+                            worksheet.Cells[row, 15].Value = "Variant Inventory Tracker";
+                            worksheet.Cells[row, 16].Value = "Variant Inventory Qty";
+                            worksheet.Cells[row, 17].Value = "Variant Inventory Policy";
+                            worksheet.Cells[row, 18].Value = "Variant Fulfillment Service";
+                            worksheet.Cells[row, 19].Value = "Variant Price";
+                            worksheet.Cells[row, 20].Value = "Variant Compare At Price";
+                            worksheet.Cells[row, 21].Value = "Variant Requires Shipping";
+                            worksheet.Cells[row, 22].Value = "Variant Taxable";
+                            worksheet.Cells[row, 23].Value = "Variant Barcode";
+                            worksheet.Cells[row, 24].Value = "Image Src";
+                            worksheet.Cells[row, 25].Value = "Image Alt Text";
+                            worksheet.Cells[row, 26].Value = "Tags";
+                            worksheet.Cells[row, 27].Value = "Collection";
+                            worksheet.Cells[row, 28].Value = "Price from Database (DELETE THE COLUMN!)";
+                        }
+                        else
+                        {
+                            // Logic for the title
+                            title = BuildTitle(dicTitle, worksheet.Cells[row, 2].Value.ToString()
+                                + " " + worksheet.Cells[row, 27].Value.ToString(), worksheet.Cells[row, 27].Value.ToString());
+                            worksheet.Cells[row, 2].Value = title;
+                            if (title.Length > 80)
+                                count++;
 
-                            if (row == 1)
+                            //Logic for the HTML Body
+
+                            worksheet.Cells[row, 3].Value = BuildHTML(worksheet, row, profile.html);
+
+                            // SKU creator
+
+                            itemID = Convert.ToInt64(worksheet.Cells[row, 13].Value);
+
+                            long? value;
+
+                            if (upcs.TryGetValue(Convert.ToInt32(itemID), out value))
                             {
-                                worksheet.Cells[row, 1].Value = "Handle";
-                                worksheet.Cells[row, 2].Value = "Title";
-                                worksheet.Cells[row, 3].Value = "Body (HTML)";
-                                worksheet.Cells[row, 4].Value = "Vendor";
-                                worksheet.Cells[row, 5].Value = "Type";
-                                worksheet.Cells[row, 6].Value = "Published";
-                                worksheet.Cells[row, 7].Value = "Option1 Name";
-                                worksheet.Cells[row, 8].Value = "Option1 Value";
-                                worksheet.Cells[row, 9].Value = "OPtion2 Name";
-                                worksheet.Cells[row, 10].Value = "Option2 Value";
-                                worksheet.Cells[row, 11].Value = "Option3 Name";
-                                worksheet.Cells[row, 12].Value = "Option3 Value";
-                                worksheet.Cells[row, 13].Value = "Variant SKU";
-                                worksheet.Cells[row, 14].Value = "Variant Grams";
-                                worksheet.Cells[row, 15].Value = "Variant Inventory Tracker";
-                                worksheet.Cells[row, 16].Value = "Variant Inventory Qty";
-                                worksheet.Cells[row, 17].Value = "Variant Inventory Policy";
-                                worksheet.Cells[row, 18].Value = "Variant Fulfillment Service";
-                                worksheet.Cells[row, 19].Value = "Variant Price";
-                                worksheet.Cells[row, 20].Value = "Variant Compare At Price";
-                                worksheet.Cells[row, 21].Value = "Variant Requires Shipping";
-                                worksheet.Cells[row, 22].Value = "Variant Taxable";
-                                worksheet.Cells[row, 23].Value = "Variant Barcode";
-                                worksheet.Cells[row, 24].Value = "Image Src";
-                                worksheet.Cells[row, 25].Value = "Image Alt Text";
-                                worksheet.Cells[row, 26].Value = "Tags";
-                                worksheet.Cells[row, 27].Value = "Collection";
-                                worksheet.Cells[row, 28].Value = "Price from Database (DELETE THE COLUMN!)";
+                                worksheet.Cells[row, 23].Value = value;
+                            }
+
+                            // prices
+
+                            string price = getSellingPrice(itemID);
+
+                            if (double.Parse(price) != 0.0)
+                            {
+                                worksheet.Cells[row, 19].Value = double.Parse(price);
+                                worksheet.Cells[row, 16].Value = profile.items;
                             }
                             else
                             {
-                                // Logic for the title
-                                title = BuildTitle(dicTitle, worksheet.Cells[row, 2].Value.ToString()
-                                    + " " + worksheet.Cells[row, 27].Value.ToString(), worksheet.Cells[row, 27].Value.ToString());
-                                worksheet.Cells[row, 2].Value = title;
-                                if (title.Length > 80)
-                                    count++;
-
-                                //Logic for the HTML Body
-
-                                worksheet.Cells[row, 3].Value = BuildHTML(worksheet, row, profile.html);
-
-                                // SKU creator
-
-                                itemID = Convert.ToInt64(worksheet.Cells[row, 13].Value);
-
-                                long? value;
-
-                                if (upcs.TryGetValue(Convert.ToInt32(itemID), out value))
-                                {
-                                    worksheet.Cells[row, 23].Value = value;
-                                }
-
-                                // prices
-
-                                string price = PricePreparer(itemID);
-
-                                if (double.Parse(price) != 0.0)
-                                {
-                                    worksheet.Cells[row, 19].Value = double.Parse(price);
-                                    worksheet.Cells[row, 16].Value = profile.items;
-                                }
-                                else
-                                {
-                                    worksheet.Cells[row, 19].Value = 100.0;
-                                    worksheet.Cells[row, 16].Value = 0;
-                                }
-
-                                // This logic fixes the picture in some cases
-
-                                worksheet.Cells[row, 24].Value =
-                                          worksheet.Cells[row, 24].Value.ToString()
-                                              .Replace("http://img.fragrancex.com/images/products/SKU/small/"
-                                              , "http://img.fragrancex.com/images/products/SKU/large/")
-                                              .Replace("http", "https");
-
-                                double actualPrice = 0.0;
-                                prices.TryGetValue(Convert.ToInt32(itemID), out actualPrice);
-                                worksheet.Cells[row, 28].Value = actualPrice;
+                                worksheet.Cells[row, 19].Value = 100.0;
+                                worksheet.Cells[row, 16].Value = 0;
                             }
-                        }
 
-                        package.Save();
+                            // This logic fixes the picture in some cases
+
+                            worksheet.Cells[row, 24].Value =
+                                        worksheet.Cells[row, 24].Value.ToString()
+                                            .Replace("http://img.fragrancex.com/images/products/SKU/small/"
+                                            , "http://img.fragrancex.com/images/products/SKU/large/")
+                                            .Replace("http", "https");
+
+                            double actualPrice = 0.0;
+                            prices.TryGetValue(Convert.ToInt32(itemID), out actualPrice);
+                            worksheet.Cells[row, 28].Value = actualPrice;
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Some error occurred while importing." + ex.Message);
+
+                    package.Save();
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Some error occurred while importing." + ex.Message);
+            }
         }
-
-        private string PricePreparer(long? itemID)
+        
+        public string getSellingPrice(long? itemID)
         {
             double shipping = profile.shipping;
             double fee = profile.fee;
