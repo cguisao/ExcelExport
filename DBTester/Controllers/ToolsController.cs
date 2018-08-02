@@ -38,9 +38,17 @@ namespace DBTester.Controllers
 
         public IActionResult Tools()
         {
-            ViewBag.TimeStamp = _context.ServiceTimeStamp.LastOrDefault().TimeStamp.ToShortDateString();
+            ViewBag.TimeStamp = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .LastOrDefault().TimeStamp.ToShortDateString();
 
-            ViewBag.type = _context.ServiceTimeStamp.LastOrDefault().type;
+            ViewBag.type = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .LastOrDefault().type;
+
+            ViewBag.Wholesalers = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .LastOrDefault().Wholesalers;
 
             var profile = new Profile();
 
@@ -49,12 +57,15 @@ namespace DBTester.Controllers
         
         public IActionResult Update()
         {
-            return View(_context.ServiceTimeStamp.OrderByDescending(x => x.TimeStamp).ToList());
+            return View(_context.ServiceTimeStamp.Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .OrderByDescending(x => x.TimeStamp).ToList());
         }
         
         public IActionResult UpdateExcel()
         {
-            return View(_context.ServiceTimeStamp.OrderByDescending(x => x.TimeStamp).ToList());
+            return View(_context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .OrderByDescending(x => x.TimeStamp).ToList());
         }
 
         [HttpPost]
@@ -77,19 +88,22 @@ namespace DBTester.Controllers
 
             ServiceTimeStamp service = new ServiceTimeStamp();
 
-            if (_context.ServiceTimeStamp.LastOrDefault<ServiceTimeStamp>() == null)
+            if (_context.ServiceTimeStamp.Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .LastOrDefault<ServiceTimeStamp>() == null)
             {
                 Helper.tablePreparer(path);
 
                 service.TimeStamp = DateTime.Today;
+                service.Wholesalers = Wholesalers.Fragrancex.ToString();
                 _context.ServiceTimeStamp.Add(service);
                 _context.SaveChanges();
 
             }
-            else if(_context.ServiceTimeStamp.LastOrDefault<ServiceTimeStamp>().TimeStamp != DateTime.Today)
+            else if(_context.ServiceTimeStamp.Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .LastOrDefault<ServiceTimeStamp>().TimeStamp != DateTime.Today)
             {
                 Helper.tablePreparer(path);
-
+                service.Wholesalers = Wholesalers.Fragrancex.ToString();
                 service.TimeStamp = DateTime.Today;
                 _context.ServiceTimeStamp.Add(service);
                 _context.SaveChanges();
@@ -324,6 +338,8 @@ namespace DBTester.Controllers
 
             service.TimeStamp = DateTime.Today;
 
+            service.Wholesalers = Wholesalers.Fragrancex.ToString();
+
             service.type = "Excel";
 
             _context.ServiceTimeStamp.Add(service);
@@ -337,11 +353,13 @@ namespace DBTester.Controllers
         {
             ServiceTimeStamp service = new ServiceTimeStamp();
 
-            if (_context.ServiceTimeStamp.LastOrDefault<ServiceTimeStamp>() == null)
+            if (_context.ServiceTimeStamp.Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .LastOrDefault<ServiceTimeStamp>() == null)
             {
                 FragancexSQLPreparer(service);
             }
-            else if (_context.ServiceTimeStamp.LastOrDefault<ServiceTimeStamp>().TimeStamp != DateTime.Today)
+            else if (_context.ServiceTimeStamp.Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .LastOrDefault<ServiceTimeStamp>().TimeStamp != DateTime.Today)
             {
                 FragancexSQLPreparer(service);
             }
@@ -377,6 +395,8 @@ namespace DBTester.Controllers
                 dBModifierFragrancexAPI.TableExecutor();
 
                 service.TimeStamp = DateTime.Today;
+
+                service.Wholesalers = Wholesalers.Fragrancex.ToString();
 
                 service.type = "API";
 

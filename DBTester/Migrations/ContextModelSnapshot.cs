@@ -168,6 +168,8 @@ namespace GTISolutions.Migrations
 
                     b.Property<DateTime>("TimeStamp");
 
+                    b.Property<string>("Wholesalers");
+
                     b.Property<string>("type");
 
                     b.HasKey("id");

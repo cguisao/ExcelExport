@@ -33,6 +33,7 @@
         <tr>
             <th>Last Updated Date</th>
             <th>DB Update Type</th>
+            <th>Wholesaler</th>
         </tr>
 
         @foreach (var item in Model)
@@ -43,6 +44,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.type)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Wholesalers)
             </td>
         </tr>
         }

@@ -10,8 +10,11 @@ namespace DBTester.Models
     {
         [Key]
         public int id { get; set; }
+
         public DateTime TimeStamp { get; set; }
 
         public string type { get; set; }
+
+        public string Wholesalers { get; set; }
     }
 }
