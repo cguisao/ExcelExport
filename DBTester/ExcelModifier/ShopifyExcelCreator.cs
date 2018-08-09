@@ -23,6 +23,8 @@ namespace ExcelModifier
 
         public Dictionary<int, double> prices { get; set; }
 
+        public IDictionary<int, string> descriptions { get; set; }
+
         private Profile profile { get; set; }
 
         public void ExcelGenerator()
@@ -95,6 +97,8 @@ namespace ExcelModifier
                         }
                         else
                         {
+                            itemID = Convert.ToInt64(worksheet.Cells[row, 13].Value);
+
                             // Logic for the title
                             title = BuildTitle(dicTitle, worksheet.Cells[row, 2].Value.ToString()
                                 + " " + worksheet.Cells[row, 27].Value.ToString(), worksheet.Cells[row, 27].Value.ToString());
@@ -104,12 +108,10 @@ namespace ExcelModifier
 
                             //Logic for the HTML Body
 
-                            worksheet.Cells[row, 3].Value = BuildHTML(worksheet, row, profile.html);
+                            worksheet.Cells[row, 3].Value = BuildHTML(worksheet, row, profile.html, itemID);
 
                             // SKU creator
-
-                            itemID = Convert.ToInt64(worksheet.Cells[row, 13].Value);
-
+                            
                             long? value;
 
                             if (upcs.TryGetValue(Convert.ToInt32(itemID), out value))
@@ -138,7 +140,7 @@ namespace ExcelModifier
                                         worksheet.Cells[row, 24].Value.ToString()
                                             .Replace("http://img.fragrancex.com/images/products/SKU/small/"
                                             , "http://img.fragrancex.com/images/products/SKU/large/")
-                                            .Replace("http", "https");
+                                            .Replace("http", "https").Replace("httpss", "https");
 
                             double actualPrice = 0.0;
                             prices.TryGetValue(Convert.ToInt32(itemID), out actualPrice);
@@ -190,8 +192,11 @@ namespace ExcelModifier
             return summer.ToString();
         }
 
-        private string BuildHTML(ExcelWorksheet worksheet, int row, string HTML)
+        private string BuildHTML(ExcelWorksheet worksheet, int row, string HTML, long? itemID)
         {
+            string description = "";
+            descriptions.TryGetValue(Convert.ToInt32(itemID), out description);
+
             int ColCount = worksheet.Dimension.Columns;
 
             string[] variable = new string[6];
@@ -204,7 +209,7 @@ namespace ExcelModifier
                         HTML = HTML.Replace("HTMLTitle", worksheet.Cells[row, col].Value.ToString());
                         break;
                     case 3:
-                        HTML = HTML.Replace("HTMLBody", worksheet.Cells[row, col].Value.ToString());
+                        HTML = HTML.Replace("HTMLBody", description);
                         break;
                     case 24:
                         var pic = worksheet.Cells[row, col].Value.ToString()

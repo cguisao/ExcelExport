@@ -44,80 +44,103 @@ namespace DatabaseModifier
             ColumnMaker(fragrancexTable, "WholePriceEUR", "System.Double");
             ColumnMaker(fragrancexTable, "WholePriceGBP", "System.Double");
             ColumnMaker(fragrancexTable, "WholePriceUSD", "System.Double");
-            ColumnMaker(fragrancexTable, "UpcItemID", "System.Double");
+            ColumnMaker(fragrancexTable, "UpcItemID", "System.Double"); 
 
             return fragrancexTable;
         }
 
         public virtual void TableExecutor()
         {
+            
+            List<UPC> list = new List<UPC>();
 
+            FileInfo file = new FileInfo(path);
+
+            DataTable uploadFragrancex = CreateTable();
+
+            int bulkSize = 0;
+
+            int exception = 0;
+
+            try
             {
-                List<UPC> list = new List<UPC>();
-
-                FileInfo file = new FileInfo(path);
-
-                DataTable uploadFragrancex = CreateTable();
-
-                int bulkSize = 0;
-
-                try
+                using (ExcelPackage package = new ExcelPackage(file))
                 {
-                    using (ExcelPackage package = new ExcelPackage(file))
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
+                    int rowCount = worksheet.Dimension.Rows;
+                    long? value = 0;
+                    int itemID = 0;
+                    int description = 0;
+                    int price = 0;
+                        
+                    for (int row = 1; row <= rowCount; row++)
                     {
-                        ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
-                        int rowCount = worksheet.Dimension.Rows;
-                        int ColCount = worksheet.Dimension.Columns;
-                        long? value = 0;
-
-                        for (int row = 1; row <= rowCount; row++)
+                        // Map titles
+                            
+                        if(row == 1)
                         {
-                            if (row != 1)
+                            for (int column = 1; column <= worksheet.Dimension.Columns; column++)
                             {
-                                DataRow insideRow = uploadFragrancex.NewRow();
-
-                                insideRow["ItemID"] = Convert.ToInt32(worksheet.Cells[row, 1].Value?.ToString());
-                                insideRow["BrandName"] = null;
-                                insideRow["Description"] = null;
-                                insideRow["Gender"] = null;
-                                insideRow["Instock"] = true;
-                                insideRow["LargeImageUrl"] = null;
-                                insideRow["MetricSize"] = null;
-                                insideRow["ParentCode"] = null;
-                                insideRow["ProductName"] = null;
-                                insideRow["RetailPriceUSD"] = 0.0;
-                                insideRow["Size"] = null;
-                                insideRow["SmallImageURL"] = null;
-                                insideRow["Type"] = null;
-                                insideRow["WholePriceAUD"] = 0.0;
-                                insideRow["WholePriceCAD"] = 0.0;
-                                insideRow["WholePriceEUR"] = 0.0;
-                                insideRow["WholePriceGBP"] = 0.0;
-                                insideRow["WholePriceUSD"] = Convert.ToDouble(worksheet.Cells[row, 6].Value?.ToString());
-
-                                if (upc.TryGetValue(Convert.ToInt32(Convert.ToInt32(worksheet.Cells[row, 1].Value?.ToString())), out value))
+                                if (worksheet.Cells[row, column].Value.ToString().ToLower().Contains("sku"))
                                 {
-                                    insideRow["Upc"] = value;
+                                    itemID = column;
                                 }
+                                else if (worksheet.Cells[row, column].Value.ToString().ToLower().Contains("html"))
+                                {
+                                    description = column;
+                                }
+                                else if (worksheet.Cells[row, column].Value.ToString().ToLower().Contains("variant price"))
+                                {
+                                    price = column;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            exception++;
 
-                                //insideRow["UpcItemID"] = Convert.ToInt32(product.ItemId);
+                            DataRow insideRow = uploadFragrancex.NewRow();
 
-                                uploadFragrancex.Rows.Add(insideRow);
-                                uploadFragrancex.AcceptChanges();
+                            insideRow["ItemID"] = Convert.ToInt32(worksheet.Cells[row, itemID].Value?.ToString());
+                            insideRow["BrandName"] = null;
+                            insideRow["Description"] = worksheet.Cells[row, description].Value?.ToString();
+                            insideRow["Gender"] = null;
+                            insideRow["Instock"] = true;
+                            insideRow["LargeImageUrl"] = null;
+                            insideRow["MetricSize"] = null;
+                            insideRow["ParentCode"] = null;
+                            insideRow["ProductName"] = null;
+                            insideRow["RetailPriceUSD"] = 0.0;
+                            insideRow["Size"] = null;
+                            insideRow["SmallImageURL"] = null;
+                            insideRow["Type"] = null;
+                            insideRow["WholePriceAUD"] = 0.0;
+                            insideRow["WholePriceCAD"] = 0.0;
+                            insideRow["WholePriceEUR"] = 0.0;
+                            insideRow["WholePriceGBP"] = 0.0;
+                            insideRow["WholePriceUSD"] = Convert.ToDouble(worksheet.Cells[row, price].Value?.ToString());
 
-                                bulkSize++;
+                            if (upc.TryGetValue(Convert.ToInt32(Convert.ToInt32(worksheet.Cells[row, itemID].Value?.ToString())), out value))
+                            {
+                                insideRow["Upc"] = value;
                             }
 
+                            uploadFragrancex.Rows.Add(insideRow);
+                            uploadFragrancex.AcceptChanges();
+
+                            bulkSize++;
                         }
+
                     }
                 }
-                catch (Exception ex)
-                {
-                    throw (ex);
-                }
-
-                upload(uploadFragrancex, bulkSize, "dbo.Fragrancex");
             }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+            upload(uploadFragrancex, bulkSize, "dbo.Fragrancex");
         }
     }
+    
 }

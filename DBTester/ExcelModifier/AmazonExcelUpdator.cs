@@ -80,7 +80,7 @@ namespace ExcelModifier
                                 {
                                     skuID = DigitGetter(rowSku);
                                     
-                                    int sellingPrice = Convert.ToInt32(getSellingPrice(skuID));
+                                    double sellingPrice = Convert.ToDouble(getSellingPrice(skuID));
                                     
                                     // Price lower
                                     if (isPriceLower(rowPrice, sellingPrice) && sellingPrice != 0)
@@ -138,7 +138,7 @@ namespace ExcelModifier
             }
         }
 
-        private bool isPriceTooHigh(double rowPrice, int sellingPrice)
+        private bool isPriceTooHigh(double rowPrice, double sellingPrice)
         {
             if (sellingPrice == 0)
                 return false;
@@ -160,16 +160,16 @@ namespace ExcelModifier
         {
             double sellingPrice = 0;
 
-            int summer = 0;
+            double summer = 0.0;
 
             prices.TryGetValue(Convert.ToInt32(skuID), out sellingPrice);
             
             if(sellingPrice == 0)
             {
-                return "0";
+                return "0.0";
             }
 
-            int innerPrice = Convert.ToInt32(sellingPrice);
+            double innerPrice = Convert.ToDouble(sellingPrice);
 
             // profit 20% by default
             summer = innerPrice + (innerPrice * 20) / 100;
