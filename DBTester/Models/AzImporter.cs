@@ -46,6 +46,6 @@ namespace DBTester.Models
         public string HTMLDescription { get; set; }
 
         public string ShortDescription { get; set; }
-
+        
     }
 }
