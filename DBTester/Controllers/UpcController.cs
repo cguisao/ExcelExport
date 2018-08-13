@@ -21,7 +21,7 @@ using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using DatabaseModifier;
 
-namespace GTI_Solutions.Controllers
+namespace DBTester.Controllers
 {
     public class UpcController : Controller
     {
@@ -36,7 +36,31 @@ namespace GTI_Solutions.Controllers
         }
         public IActionResult Upcs()
         {
-            return View();
+            Guid guid = Guid.NewGuid();
+
+            ViewBag.ExcelGuid = guid.ToString();
+
+            return View(_context.UPC.ToList());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DropzoneFileUpload(IFormFile file, string fileName)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return null;
+            }
+
+            var path = Path.Combine(
+                        Directory.GetCurrentDirectory(), "wwwroot",
+                        fileName + ".xlsx");
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return Ok();
         }
 
         public IActionResult UpcViewer(int? page, string Search_Data)
@@ -53,21 +77,12 @@ namespace GTI_Solutions.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UPCImporter(IFormFile file)
+        public IActionResult UPCImporter(string file)
         {
-            if (file == null || file.Length == 0)
-            {
-                return null;
-            }
 
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
-                        file.FileName);
-
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
+                        file + ".xlsx");
 
             // Update the DB with the new UPCs
 
@@ -75,7 +90,9 @@ namespace GTI_Solutions.Controllers
 
             databaseUPC.TableExecutor();
 
-            return RedirectToAction("UpcViewer");
+            System.IO.File.Delete(path);
+
+            return RedirectToAction("Upcs");
         }
     }
 }

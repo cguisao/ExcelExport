@@ -50,6 +50,10 @@ namespace DBTester.Controllers
                 .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
                 .LastOrDefault().Wholesalers;
 
+            Guid guid = Guid.NewGuid();
+
+            ViewBag.ExcelGuid = guid.ToString();
+
             var profile = new Profile();
 
             return View(_context.Profile.ToList());
@@ -57,15 +61,20 @@ namespace DBTester.Controllers
         
         public IActionResult Update()
         {
-            return View(_context.ServiceTimeStamp.Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-                .OrderByDescending(x => x.TimeStamp).ToList());
+            return View(_context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
         }
         
         public IActionResult UpdateExcel()
         {
+            Guid guid = Guid.NewGuid();
+
+            ViewBag.ExcelGuid = guid.ToString();
+
             return View(_context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-                .OrderByDescending(x => x.TimeStamp).ToList());
+                .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
         }
 
         [HttpPost]
@@ -128,22 +137,14 @@ namespace DBTester.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ExportToExcel(IFormFile file, string shipping
-            , string fee, string profit, string promoting, string markdown, int items, int min, int max, string User)
+        public async Task<IActionResult> ExportToExcel(string file, string shipping
+            , string fee, string profit, string promoting, string markdown, int items, int min
+            , int max, string User)
         {
-            if (file == null || file.Length == 0)
-            {
-                return null;
-            }
 
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
-                        file.FileName);
-
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
+                        file + ".xlsx");
 
             // Update the database once a day
             updateFragrancex();
@@ -309,25 +310,33 @@ namespace DBTester.Controllers
 
             return RedirectToAction("Update");
         }
-
+        
         [HttpPost]
-        public async Task<IActionResult> UpdateFragrancexExcel(IFormFile file)
+        public async Task<IActionResult> DropzoneFileUpload(IFormFile file, string fileName)
         {
             if (file == null || file.Length == 0)
             {
                 return null;
             }
-
+            
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
-                        file.FileName);
+                        fileName + ".xlsx");
 
             using (var stream = new FileStream(path, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
+            
+            return Ok();
+        }
 
-            // Update the DB with the new UPCs
+        [HttpPost]
+        public IActionResult UpdateFragrancexExcel(string file)
+        {
+            var path = Path.Combine(
+                        Directory.GetCurrentDirectory(), "wwwroot",
+                        file + ".xlsx");
 
             var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
 
@@ -348,6 +357,8 @@ namespace DBTester.Controllers
             _context.ServiceTimeStamp.Add(service);
 
             _context.SaveChanges();
+
+            System.IO.File.Delete(path);
 
             return RedirectToAction("UpdateExcel");
         }

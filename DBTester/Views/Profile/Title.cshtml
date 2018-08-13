@@ -2,90 +2,114 @@
 @{
     ViewBag.Title = "Profile Update";
 }
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+        <h2>Title Update</h2>
+    </div>
+    <div class="col-md-1">
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+        <div class="card m-b-30">
+            <div class="card-body">
+                <form asp-controller="Profile" asp-action="ProfileUpdator" method="post"
+                      enctype="multipart/form-data" style="width: 80%" name="main" onchange="fillTestTitle()" onKeyUp="fillTestTitle()">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="inputUser">User</label>
+                            @Html.DropDownList("User", Model.Select(m => new SelectListItem() { Text = m.ProfileUser }).ToList()
+                                            , "", new { @class = "select2 form-control mb-3 custom-select", required = "required" })
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label>Title Options</label>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <input type="text" class="form-control" name="longTitle" placeholder="Long Title">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <input type="text" class="form-control" name="MidTitle" placeholder="Mid Title">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <input type="text" class="form-control" name="shortTitle" placeholder="Short Title">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Bottle Size Divider</label>
+                            <input type="text" class="form-control" name="sizeDivider" placeholder="Title Divider">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Title Ending</label>
+                            @Html.DropDownList("endTitle", (IEnumerable<SelectListItem>)ViewBag.CategoryType
+                                                                         , new { @class = "form-control" })
+                        </div>
+                        <div class="form-group col-md-12">
+                            <h2>Sample Title</h2>
+                            <input type="text" class="form-control" name="sampleLong" readonly>
+                            <input type="text" class="form-control" name="sampleMid" readonly>
+                            <input type="text" class="form-control" name="sampleShort" readonly>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <button class="btn btn-primary" type="submit">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1">
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card ">
+            <div class="card-body">
+                <div class="form-group col-md-12">
+                    <h2>Other User's Title Viewer</h2>
+                    <div class="table-responsive">
+                        <table id="datatable2" class="table border-0 dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                            <tr>
+                                <th>User</th>
+                                <th>Long Title Start</th>
+                                <th>Mid Title Start</th>
+                                <th>Short Title Start</th>
+                                <th>Title End</th>
+                                <th>Size Divider</th>
+                            </tr>
 
-@using X.PagedList.Mvc.Core;
-@using X.PagedList;
-
-<link href="/Content/PagedList.css" rel="stylesheet" type="text/css" />
-
-<h2>Title Update</h2>
-<br />
-<form asp-controller="Profile" asp-action="ProfileUpdator" method="post"
-      enctype="multipart/form-data" style="width: 80%" name="main" onchange="fillTestTitle()" onKeyUp="fillTestTitle()">
-    <div class="form-group col-md-6">
-        <label for="inputUser">User</label>
-        @Html.DropDownList("User", Model.Select(m => new SelectListItem() { Text = m.ProfileUser }).ToList()
-                , "", new { @class = "form-control", required = "required" })
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ProfileUser)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.LongstartTitle)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.MidtartTitle)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ShortstartTitle)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.endTtile)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.sizeDivider)
+                                    </td>
+                                </tr>
+                            }
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="form-group col-md-12">
-        <label>Title Options</label>
-    </div>
-    <div class="form-group col-md-4">
-        <input type="text" class="form-control" name="longTitle" placeholder="Long Title">
-    </div>
-    <div class="form-group col-md-4">
-        <input type="text" class="form-control" name="MidTitle" placeholder="Mid Title">
-    </div>
-    <div class="form-group col-md-4">
-        <input type="text" class="form-control" name="shortTitle" placeholder="Short Title">
-    </div>
-    <div class="form-group col-md-6">
-        <label>Bottle Size Divider</label>
-        <input type="text" class="form-control" name="sizeDivider" placeholder="Title Divider">
-    </div>
-    <div class="form-group col-md-6">
-        <label>Title Ending</label>
-        @Html.DropDownList("endTitle", (IEnumerable<SelectListItem>)ViewBag.CategoryType
-                           , new { @class = "form-control" })
-    </div>
-    <div class="form-group col-md-12">
-        <h2>Sample Title</h2>
-        <input type="text" class="form-control" name="sampleLong" readonly>
-        <input type="text" class="form-control" name="sampleMid" readonly>
-        <input type="text" class="form-control" name="sampleShort" readonly>
-    </div>
-    <div class="form-group col-md-12">
-        <button class="btn btn-primary" type="submit">Submit</button>
-    </div>
-    <div class="form-group col-md-12">
-        <h2>Other User's Title Viewer</h2>
-        <table id="myTable" class="display table">
-            <tr>
-                <th>User</th>
-                <th>Long Title Start</th>
-                <th>Mid Title Start</th>
-                <th>Short Title Start</th>
-                <th>Title End</th>
-                <th>Size Divider</th>
-            </tr>
-
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ProfileUser)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.LongstartTitle)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.MidtartTitle)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ShortstartTitle)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.endTtile)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.sizeDivider)
-                    </td>
-                </tr>
-            }
-        </table>
-    </div>
-</form>
-
+</div>
 <script>
     function fillTestTitle() {
         var fieldOneValue = document.forms["main"].longTitle.value;
@@ -110,7 +134,7 @@
             document.forms["main"].sampleShort.value = fieldThreeValue + " 007 EDT Spray By James Bond "
                 + "5 " + FieldFourValue + " 3 Oz " + "Cologne";
         }
-        else if (FieldFiveValue == 0 || FieldFiveValue == 3 || FieldFiveValue == null){
+        else if (FieldFiveValue == 0 || FieldFiveValue == 3 || FieldFiveValue == null) {
             document.forms["main"].sampleLong.value = fieldOneValue + " 007 EDT Spray By James Bond "
                 + "5 " + FieldFourValue + " 3 Oz ";
             document.forms["main"].sampleMid.value = fieldTowValue + " 007 EDT Spray By James Bond "

@@ -1,21 +1,92 @@
-﻿@page
-@model DBTester.Controllers.ToolsController
-@{
-    ViewBag.Title = "New Blog";
-}
+﻿@model IEnumerable<DBTester.Models.UPC>
 
-<h2>Shopify UPC Tool Up-loader</h2>
+<div class="wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card ">
+                    <div class="card-body">
+                        <h2>Fragrancex UPC Tool Up-loader</h2>
 
-<h3>eBay Excel uploader</h3>
+                        <p>
+                            This application is intended to upload the UPCs
+                            using an excel file onto the GTI Solutions' Database.
+                        </p>
 
-<p>
-    This application is intended to upload the UPCs
-    using an excel file onto the GTI Solutions' Database.
-</p>
+                        <div id="dropzone">
+                            <form asp-controller="Upc" asp-action="DropzoneFileUpload" asp-antiforgery="false"
+                                  class="dropzone" id="myAwesomeDropzone" enctype="multipart/form-data">
+                                <div class="text-center m-t-15 invisible">
+                                    <input type="text" class="form-control" name="fileName" value="@ViewBag.ExcelGuid">
+                                </div>
+                                <div class="fallback">
+                                    Drop files here or click to upload.<br>
+                                    <input name="file" type="file" multiple />
+                                    <input type="submit" value="Upload" />
+                                </div>
+                            </form>
+                        </div>
+                        <form asp-controller="Upc" asp-action="UPCImporter" asp-antiforgery="false"
+                              enctype="multipart/form-data">
+                            <div class="text-center m-t-15 invisible">
+                                <input type="text" class="form-control" name="file" value="@ViewBag.ExcelGuid">
+                            </div>
+                            <div class="text-center m-t-15">
+                                <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div> 
+            </div> 
+        </div> 
 
-<form asp-controller="Upc" asp-action="UPCImporter" method="post"
-      enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card m-b-30">
+                    <div class="card-body table-responsive">
+                        <h5 class="header-title">Fragrancex's UPC List</h5>
+                        <table id="datatable2" class="table border-0 dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Item ID</th>
+                                    <th>UPC</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var product in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => product.ItemID)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => product.Upc)
+                                        </td>
+                                    </tr>
+                                 }
+                            </tbody>
+                         </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+</div> 
+<script>
+    $(document).ready(function () {
+        Dropzone.options.myAwesomeDropzone = {
+            paramName: "file", // The name that will be used to transfer the file
+            maxFilesize: 20, // MB
+            accept: function (file, done) {
+                if (file.name == "justinbieber.jpg") {
+                    done("Naha, you don't.");
+                }
+                else {
+                    done("Upload Successful");
+                    location.reload();
+                }
+            }
 
-    <input type="file" name="file" />
-    <button type="submit">Upload File</button>
-</form>
+        };
+    });
+</script>

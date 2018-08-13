@@ -2,29 +2,47 @@
 @{
     ViewBag.Title = "Update";
 }
+<div class="row">
+    <div class="col-md-1">
+    </div>
+        <div class="col-md-10">
+            <h2>Profile</h2>
+        </div> 
+    <div class="col-md-1">
+    </div>
+</div> 
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+        <div class="card m-b-30">
+            <div class="card-body">
+                <h3>GTI Solutionx Profile</h3>
 
-<h2>Profile</h2>
+                <form asp-controller="Profile" asp-action="ProfileCreator" method="post"
+                      enctype="multipart/form-data" style="width: 80%" name="main" onchange="fillTestTitle()" onKeyUp="fillTestTitle()">
+                    <p>
+                        This form creates a new profile on the database
+                        which will be used while creating the shopify excel creator.
+                    </p>
 
-<h3>GTI Solutionx Profile</h3>
-
-<form asp-controller="Profile" asp-action="ProfileCreator" method="post"
-      enctype="multipart/form-data" style="width: 80%" name="main" onchange="fillTestTitle()" onKeyUp="fillTestTitle()">
-    <p>
-        This form creates a new profile on the database
-        which will be used while creating the shopify excel creator.
-    </p>
-
-    <div class="form-row">
-        <div class="form-group col-md-12">
-            <label for="ProfileUser">User ID:</label>
-            <input type="text" class="form-control" name="userID" placeholder="User ID" required>
-        </div>
-        <div class="form-group col-md-12">
-            <label for="inputPassword4">HTML</label>
-            <textarea class="form-control" rows="10" name="html" value="20%"></textarea>
-        </div>
-        <div class="form-group col-md-12">
-            <button class="btn btn-primary" type="submit">Submit</button>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="ProfileUser">User ID:</label>
+                            <input type="text" class="form-control" name="userID" placeholder="User ID" required>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="inputPassword4">HTML</label>
+                            <textarea class="form-control" rows="10" name="html" value="20%"></textarea>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <button class="btn btn-primary" type="submit">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</form>
+    <div class="col-md-1">
+    </div>
+</div>

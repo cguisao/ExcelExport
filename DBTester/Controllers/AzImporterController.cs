@@ -39,13 +39,17 @@ namespace GTI_Solutions.Controllers
                 .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
                 .LastOrDefault()?.Wholesalers;
 
-            var profile = new Profile();
+            Guid guid = Guid.NewGuid();
 
-            return View(_context.Profile.ToList());
+            ViewBag.ExcelGuid = guid.ToString();
+
+            return View(_context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateAzImportsExcel(IFormFile file)
+        public async Task<IActionResult> DropzoneFileUpload(IFormFile file, string fileName)
         {
             if (file == null || file.Length == 0)
             {
@@ -54,12 +58,22 @@ namespace GTI_Solutions.Controllers
 
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
-                        file.FileName);
+                        fileName + ".xlsx");
 
             using (var stream = new FileStream(path, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
+
+            return Ok();
+        }
+
+        [HttpPost]
+        public IActionResult UpdateAzImportsExcel(string file)
+        {
+            var path = Path.Combine(
+                        Directory.GetCurrentDirectory(), "wwwroot",
+                        file + ".xlsx");
 
             DBModifierAzImporterExcel AzImporter = new DBModifierAzImporterExcel(path);
 

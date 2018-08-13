@@ -28,12 +28,17 @@ namespace DBTester.Controllers
 
             ViewBag.type = _context.ServiceTimeStamp.LastOrDefault().type;
 
+            Guid guid = Guid.NewGuid();
+
+            ViewBag.ExcelGuid = guid.ToString();
+
             Profile profile = new Profile();
 
             return View(_context.Profile.ToList());
         }
+
         [HttpPost]
-        public async Task<IActionResult> UpdateAmazonList(IFormFile file)
+        public async Task<IActionResult> DropzoneFileUpload(IFormFile file, string fileName)
         {
             if (file == null || file.Length == 0)
             {
@@ -42,12 +47,32 @@ namespace DBTester.Controllers
 
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
-                        file.FileName);
+                        fileName + ".xlsx");
 
             using (var stream = new FileStream(path, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
+
+            return Ok();
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> UpdateAmazonList(string file)
+        {
+            //if (file == null || file.Length == 0)
+            //{
+            //    return null;
+            //}
+
+            var path = Path.Combine(
+                        Directory.GetCurrentDirectory(), "wwwroot",
+                        file + ".xlsx");
+
+            //using (var stream = new FileStream(path, FileMode.Create))
+            //{
+            //    await file.CopyToAsync(stream);
+            //}
 
             var prices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
             

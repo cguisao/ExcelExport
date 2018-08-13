@@ -1,47 +1,81 @@
-﻿@model IEnumerable<DBTester.Models.Profile>
+﻿@model IEnumerable<DBTester.Models.ServiceTimeStamp>
 @{
-    ViewBag.Title = "Update";
+    ViewBag.Title = "AzImport Update";
 }
 
-<h2>AzImport Tools</h2>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card ">
+            <div class="card-body">
+                <h2>AzImport Inventory Excel Importer</h2>
 
-<h3>AzImport Excel creator</h3>
+                <p>
+                    This application is intended to create an excel which will
+                    be able to take an excel from an Amazon report and return
+                    the items that are available in a spreadsheet.
+                </p>
 
-<form asp-controller="AzImporter" asp-action="UpdateAzImportsExcel" method="post"
-      enctype="multipart/form-data">
-
-    <p>
-        This application is intended to create an excel which will
-        be able to take an excel from an Amazon report and return
-        the items that are available in a spreadsheet.
-    </p>
-
-    <div class="form-row">
-        <div class="form-group col-md-12">
-            <label for="ExcelTitle">Excel</label>
+                <div id="dropzone">
+                    <form asp-controller="AzImporter" asp-action="DropzoneFileUpload" asp-antiforgery="false"
+                            class="dropzone" id="myAwesomeDropzone" enctype="multipart/form-data">
+                        <div class="text-center m-t-15 invisible">
+                            <input type="text" class="form-control" name="fileName" value="@ViewBag.ExcelGuid">
+                        </div>
+                        <div class="fallback">
+                            Drop files here or click to upload.<br>
+                            <input name="file" type="file" />
+                        </div>
+                    </form>
+                </div>
+                <form asp-controller="AzImporter" asp-action="UpdateAzImportsExcel" asp-antiforgery="false"
+                        enctype="multipart/form-data">
+                    <div class="text-center m-t-15 invisible">
+                        <input type="text" class="form-control" name="file" value="@ViewBag.ExcelGuid">
+                    </div>
+                    <div class="text-center m-t-15">
+                        <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="form-group col-md-12">
-            <input type="file" class="form-control-file" name="file" required>
-        </div>
-        <div class="form-group col-md-12">
-            <button class="form-control-file" type="submit">Upload File</button>
+    </div> <!-- end col -->
+</div> <!-- end row -->
+<p>
+    Last <b>@ViewBag.Wholesalers</b> database update <b>@ViewBag.TimeStamp Updated via  @ViewBag.type</b> <br />
+</p>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card m-b-30">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Last Updated Date</th>
+                                <th>Database Update Type</th>
+                                <th>Wholesaler</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.type)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Wholesalers)
+                                    </td>
+                                </tr>
+                                }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-
-    <p>
-        Last @ViewBag.Wholesalers database update <b>@ViewBag.TimeStamp Updated via  @ViewBag.type</b> <br />
-    </p>
-</form>
-
-
-@*<form asp-controller="AzImporter" asp-action="UpdateAzImports" method="post"
-      enctype="multipart/form-data">
-   
-    <p></p>
-
-    <button class="btn btn-primary" type="submit">Update</button>
-
-    <p>
-        Last Fragrancex database update <b>@ViewBag.TimeStamp Updated via  @ViewBag.type</b> <br />
-    </p>
-</form>*@
+</div>

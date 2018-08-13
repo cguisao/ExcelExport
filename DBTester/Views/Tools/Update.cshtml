@@ -2,53 +2,61 @@
 @{
     ViewBag.Title = "Update";
 }
+<div class="row">
+    <div class="col-md-12">
+        <div class="card m-b-30">
+            <div class="card-body">
+                <h2>Fragrancex's database One Click update</h2>
+            </div>
+            <div class="card-body">
+                <p>
+                    This application is intended to update the
+                    GTI Solution's Fragrancex database. Such
+                    update includes item price and availability
+                    once a day.
+                </p>
 
-<h2>Shopify Tools</h2>
+                <form asp-controller="Tools" asp-action="Updatefragrancex" method="post"
+                        enctype="multipart/form-data">
+                    <button class="btn btn-primary" type="submit">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card m-b-30">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Last Updated Date</th>
+                                <th>Database Update Type</th>
+                                <th>Wholesaler</th>
+                            </tr>
+                        </thead>
 
-<h3>Fragrancex's database update</h3>
-
-<p>
-    This application is intended to update the
-    GTI Solution's Fragrancex database. Such
-    update includes item price and availability
-    once a day.
-</p>
-
-<form asp-controller="Tools" asp-action="Updatefragrancex" method="post"
-      enctype="multipart/form-data">
-    <button class="btn btn-primary" type="submit">Update</button>
-</form>
-<br />
-
-<p>
-    The list can only be updated once a day, so the list below shows the last time that
-    the list was updated. If you press the button and the list has not been updated
-    today, the database will be updated. Otherwise, nothing will happen.
-</p>
-
-<br />
-
-<div class="table-responsive">
-    <table id="myTable" class="display table" width="80%">
-        <tr>
-            <th>Last Updated Date</th>
-            <th>DB Update Type</th>
-            <th>Wholesaler</th>
-        </tr>
-
-        @foreach (var item in Model)
-        {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.TimeStamp.Date)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.type)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Wholesalers)
-            </td>
-        </tr>
-        }
-    </table>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.type)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Wholesalers)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

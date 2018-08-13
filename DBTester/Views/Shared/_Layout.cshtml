@@ -2,133 +2,152 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <title>@ViewData["Title"] - GTI Solutions</title>
 
-    <environment include="Development">
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-        <link rel="stylesheet" href="~/css/site.css" />
-    </environment>
-    <environment exclude="Development">
-        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
-              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
-              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
-        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
-    </environment>
+    <link rel="shortcut icon" href="~/assets/images/favicon.ico">
+
+    <!-- DataTables -->
+    <link href="~/assets/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/plugins/datatables/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <!-- Responsive datatable examples -->
+    <link href="~/assets/plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+    <link rel="stylesheet" href="assets/plugins/metro/MetroJs.min.css">
+    <link rel="stylesheet" href="assets/plugins/morris/morris.css">
+    <link href="assets/plugins/jvectormap/jquery-jvectormap-2.0.2.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://rawgit.com/enyo/dropzone/master/dist/dropzone.css">
+
+    <link href="~/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="~/assets/plugins/animate/animate.css" rel="stylesheet" type="text/css">
+    <link href="~/assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="~/assets/css/style.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">GTI Solutionx</a>
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            Fragrancex
-                            <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a asp-area="" asp-controller="Tools" asp-action="Update">Database Update</a></li>
-                            <li><a asp-area="" asp-controller="Tools" asp-action="UpdateExcel">Excel DB Update</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            AZ Imports
-                            <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a asp-area="" asp-controller="AzImporter" asp-action="Index">Database Update</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            UPC
-                            <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a asp-area="" asp-controller="Upc" asp-action="Upcs">Upload</a></li>
-                            <li><a asp-area="" asp-controller="uPC" asp-action="UpcViewer">View</a></li>
-                        </ul>
-                    </li>
+    <header id="topnav">
+        <!-- MENU Start -->
+        <div class="navbar-custom">
+            <div class="container-fluid">
+                <div id="navigation">
+                    <!-- Navigation Menu-->
+                    <ul class="navigation-menu">
 
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            Shopify
-                            <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a asp-area="" asp-controller="Tools" asp-action="Tools">Excel Creator</a></li>
-                            @*<li><a asp-area="" asp-controller="Price" asp-action="PriceUpdater">Price Updater</a></li>*@
-                        </ul>
-                    </li>
+                        <li class="has-submenu">
+                            <a asp-controller="Home" asp-action="Index"><i class="mdi mdi-airplay"></i>GTI Solutionx</a>
+                        </li>
 
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            Amazon
-                            <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a asp-area="" asp-controller="Amazon" asp-action="Index">Price Update</a></li>
-                            @*<li><a asp-area="" asp-controller="Price" asp-action="PriceUpdater">Price Updater</a></li>*@
-                        </ul>
-                    </li>
+                        <li class="has-submenu">
+                            <a href="#"><i class="mdi mdi-gauge"></i>Wholesalers</a>
+                            <ul class="submenu">
+                                <li class="has-submenu">
+                                    <a href="#">Fragrancex</a>
+                                    <ul class="submenu">
+                                        <li><a asp-area="" asp-controller="Tools" asp-action="Update">API Database Update</a></li>
+                                        <li><a asp-area="" asp-controller="Tools" asp-action="UpdateExcel">Excel DB Update</a></li>
+                                        <li><a asp-area="" asp-controller="Upc" asp-action="Upcs">UPC Upload</a></li>
+                                    </ul>
+                                </li>
 
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            Profile
-                            <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a asp-area="" asp-controller="Profile" asp-action="Index">Profile Creator</a></li>
-                            <li><a asp-area="" asp-controller="Profile" asp-action="Profile">Profile Viewer</a></li>
-                            <li><a asp-area="" asp-controller="Profile" asp-action="Title">eBay Title Creator</a></li>
-                        </ul>
-                    </li>
+                                <li class="has-submenu">
+                                    <a href="#">AzImporter</a>
+                                    <ul class="submenu">
+                                        <li><a asp-area="" asp-controller="AzImporter" asp-action="Index">Excel Upload</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
 
-                </ul>
+                        <li class="has-submenu">
+                            <a href="#"><i class="mdi mdi-gauge"></i>Inventory Tracker</a>
+                            <ul class="submenu">
+                                <li><a asp-area="" asp-controller="Amazon" asp-action="Index">Amazon</a></li>
+                                <li><a asp-area="" asp-controller="Tools" asp-action="Tools">Ebay</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="has-submenu">
+                            <a href="#"><i class="mdi mdi-gauge"></i>Profile</a>
+                            <ul class="submenu">
+                                <li><a asp-area="" asp-controller="Profile" asp-action="Index">Profile Creator</a></li>
+                                <li><a asp-area="" asp-controller="Profile" asp-action="Profile">Profile Viewer</a></li>
+                                <li><a asp-area="" asp-controller="Profile" asp-action="Title">eBay Title Creator</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="has-submenu"></li>
+                    </ul>
+                    <!-- End navigation menu -->
+                </div> <!-- end navigation -->
+            </div> <!-- end container -->
+        </div> <!-- end navbar-custom -->
+    </header>
+    <!-- End Navigation Bar-->
+    @*<div class="container body-content">*@
+    <div class="wrapper">
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <p>&copy;@DateTime.Today.Year - GTI Solutionx</p>
+                </div>
             </div>
         </div>
-    </nav>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <div class="col-sm-12">
-                <p>&copy;@DateTime.Today.Year - GTI Solutionx</p>
-            </div>
-        </footer>
-    </div>
+    </footer>
+    <!-- End Footer -->
+    @*</div>*@
 
-    <environment include="Development">
-        <script src="~/lib/jquery/dist/jquery.js"></script>
-        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
-        <script src="~/js/site.js" asp-append-version="true"></script>
-    </environment>
-    <environment exclude="Development">
-        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
-                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
-                asp-fallback-test="window.jQuery"
-                crossorigin="anonymous"
-                integrity="sha384-K+ctZQ+LL8q6tP7I94W+qzQsfRV2a+AfHIi9k8z8l9ggpc8X+Ytst4yBo/hH+8Fk">
-        </script>
-        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
-                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
-                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
-                crossorigin="anonymous"
-                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
-        </script>
-        <script src="~/js/site.min.js" asp-append-version="true"></script>
-    </environment>
+    <!-- jQuery  -->
+    <script src="~/assets/js/jquery.min.js"></script>
+    <script src="~/assets/js/popper.min.js"></script>
+    <script src="~/assets/js/bootstrap.min.js"></script>
+    <script src="~/assets/js/modernizr.min.js"></script>
+    <script src="~/assets/js/detect.js"></script>
+    <script src="~/assets/js/fastclick.js"></script>
+    <script src="~/assets/js/jquery.slimscroll.js"></script>
+    <script src="~/assets/js/jquery.blockUI.js"></script>
+    <script src="~/assets/js/waves.js"></script>
+    <script src="~/assets/js/jquery.nicescroll.js"></script>
+    <script src="~/assets/js/jquery.scrollTo.min.js"></script>
+
+    <!-- Required datatable js -->
+    <script src="~/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/assets/plugins/datatables/dataTables.bootstrap4.min.js"></script>
+    <!-- Buttons examples -->
+    <script src="~/assets/plugins/datatables/dataTables.buttons.min.js"></script>
+    <script src="~/assets/plugins/datatables/buttons.bootstrap4.min.js"></script>
+    <script src="~/assets/plugins/datatables/jszip.min.js"></script>
+    <script src="~/assets/plugins/datatables/pdfmake.min.js"></script>
+    <script src="~/assets/plugins/datatables/vfs_fonts.js"></script>
+    <script src="~/assets/plugins/datatables/buttons.html5.min.js"></script>
+    <script src="~/assets/plugins/datatables/buttons.print.min.js"></script>
+    <script src="~/assets/plugins/datatables/buttons.colVis.min.js"></script>
+    <!-- Responsive examples -->
+    <script src="~/assets/plugins/datatables/dataTables.responsive.min.js"></script>
+    <script src="~/assets/plugins/datatables/responsive.bootstrap4.min.js"></script>
+
+    <!-- Datatable init js -->
+    <script src="~/assets/pages/datatables.init.js"></script>
+
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+
+    <!-- Plugings for the main dashboard-->
+    <script src="~/assets/plugins/metro/MetroJs.min.js"></script>
+    <script src="~/assets/plugins/jvectormap/jquery-jvectormap-2.0.2.min.js"></script>
+    <script src="~/assets/plugins/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="~/assets/plugins/sparkline-chart/jquery.sparkline.min.js"></script>
+    <script src="~/assets/plugins/morris/morris.min.js"></script>
+    <script src="~/assets/plugins/raphael/raphael-min.js"></script>
+    <script src="~/assets/pages/dashboard.js"></script>
+
+    <script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
 
     @RenderSection("Scripts", required: false)
 </body>

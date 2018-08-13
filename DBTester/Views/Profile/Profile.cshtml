@@ -3,103 +3,108 @@
     ViewBag.Title = "Profile Viewer";
 }
 
-@using X.PagedList.Mvc.Core;
-@using X.PagedList;
-
-<link href="/Content/PagedList.css" rel="stylesheet" type="text/css" />
-
-<h2>Profile Viewer</h2>
-<br />
-<div class="table-responsive">
-    <table id="myTable" class="display table" width="60%">
-        <thead>
-            <tr>
-                <th>Profile User</th>
-                <th>Items</th>
-                <th>Profit</th>
-                <th>Markdown</th>
-                <th>Shipping</th>
-                <th>Fee</th>
-                <th>Min</th>
-                <th>Max</th>
-            </tr>
-        </thead>
-        @foreach (var profile in ViewBag.onePageOfProfiles)
-        {
-            <tbody>
-                <tr>
-                    <td>
-                        @profile.ProfileUser
-                    </td>
-                    <td>
-                        @profile.items
-                    </td>
-                    <td>
-                        @profile.profit
-                    </td>
-                    <td>
-                        @profile.markdown
-                    </td>
-                    <td>
-                        @profile.shipping
-                    </td>
-                    <td>
-                        @profile.fee
-                    </td>
-                    <td>
-                        @profile.min
-                    </td>
-                    <td>
-                        @profile.max
-                    </td>
-                </tr>
-            </tbody>
-        }
-    </table>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card ">
+            <div class="card-body">
+                <h2>Profile Viewer</h2>
+                <br />
+                <div class="table-responsive">
+                    <table id="datatable2" class="table border-0 dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Profile User</th>
+                                <th>Items</th>
+                                <th>Profit</th>
+                                <th>Markdown</th>
+                                <th>Shipping</th>
+                                <th>Fee</th>
+                                <th>Min</th>
+                                <th>Max</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var profile in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @profile.ProfileUser
+                                    </td>
+                                    <td>
+                                        @profile.items
+                                    </td>
+                                    <td>
+                                        @profile.profit
+                                    </td>
+                                    <td>
+                                        @profile.markdown
+                                    </td>
+                                    <td>
+                                        @profile.shipping
+                                    </td>
+                                    <td>
+                                        @profile.fee
+                                    </td>
+                                    <td>
+                                        @profile.min
+                                    </td>
+                                    <td>
+                                        @profile.max
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-@Html.PagedListPager((IPagedList)ViewBag.onePageOfProfiles, page => Url.Action("Profile", new { page }))
-
-<script>
-    $(document).ready(function () {
-        $('#myTable').dataTable();
-    });
-</script>
-
-<h2>Title Viewer</h2>
-<div class="table-responsive">
-    <table id="myTable" class="display table" width="80%">
-        <tr>
-            <th>User</th>
-            <th>Long Title Start</th>
-            <th>Mid Title Start</th>
-            <th>Short Title Start</th>
-            <th>Title End</th>
-            <th>Size Divider</th>
-        </tr>
-
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ProfileUser)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LongstartTitle)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.MidtartTitle)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ShortstartTitle)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.endTtile)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.sizeDivider)
-                </td>
-            </tr>
-        }
-    </table>
-</div>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card ">
+            <div class="card-body">
+                <h2>Title Viewer</h2>
+                <div class="table-responsive">
+                    <table id="datatable2" class="table border-0 dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Long Title Start</th>
+                                <th>Mid Title Start</th>
+                                <th>Short Title Start</th>
+                                <th>Title End</th>
+                                <th>Size Divider</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ProfileUser)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.LongstartTitle)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.MidtartTitle)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ShortstartTitle)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.endTtile)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.sizeDivider)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
