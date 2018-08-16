@@ -21,7 +21,7 @@ namespace ExcelModifier
 
         public string sWebRootFolder { get; set; }
 
-        public Dictionary<int, double> prices { get; set; }
+        public Dictionary<int, double> fragrancexPrices { get; set; }
 
         public IDictionary<int, string> descriptions { get; set; }
 
@@ -143,7 +143,7 @@ namespace ExcelModifier
                                             .Replace("http", "https").Replace("httpss", "https");
 
                             double actualPrice = 0.0;
-                            prices.TryGetValue(Convert.ToInt32(itemID), out actualPrice);
+                            fragrancexPrices.TryGetValue(Convert.ToInt32(itemID), out actualPrice);
                             worksheet.Cells[row, 28].Value = actualPrice;
                         }
                     }
@@ -170,7 +170,7 @@ namespace ExcelModifier
 
             int item = Convert.ToInt32(itemID);
 
-            if (prices.TryGetValue(item, out value))
+            if (fragrancexPrices.TryGetValue(item, out value))
             {
                 // profit
                 summer = value + (value * profit) / 100;

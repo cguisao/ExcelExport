@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Extensions.Internal;
-using X.PagedList;
 
 namespace GTI_Solutions.Controllers
 {
@@ -66,9 +65,9 @@ namespace GTI_Solutions.Controllers
 
             var pageNumber = page ?? 1;
 
-            var onePageOfProfiles = profiles.ToPagedList(pageNumber, 10);
+            //var onePageOfProfiles = profiles.ToPagedList(pageNumber, 10);
 
-            ViewBag.onePageOfProfiles = onePageOfProfiles;
+            //ViewBag.onePageOfProfiles = onePageOfProfiles;
 
             return View(_context.Profile.ToList());
         }

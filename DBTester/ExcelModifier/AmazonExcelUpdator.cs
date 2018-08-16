@@ -16,7 +16,13 @@ namespace ExcelModifier
     {
         public string sWebRootFolder { get; set; }
 
-        public Dictionary<int, double> prices { get; set; }
+        public Dictionary<int, double> fragrancexPrices { get; set; }
+
+        public Dictionary<string, double> azImportPrice { get; set; }
+
+        public Dictionary<string, int> azImportQuantity { get; set; }
+
+        private string azImporterSku { get; set; }
 
         public void ExcelGenerator()
         {
@@ -118,6 +124,48 @@ namespace ExcelModifier
                                         worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
                                     }
                                 }
+                                else if(isAzImporter(rowSku))
+                                {
+                                    double sellingPrice = getSellingPrice();
+
+                                    // Price lower
+                                    if (isPriceLower(rowPrice, sellingPrice) && sellingPrice != 0)
+                                    {
+                                        worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
+                                        worksheet.Cells[row, 5].Value = worksheet.Cells[row, quantity].Value;
+                                        worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                        worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                                        worksheet.Cells[row, 8].Value = sellingPrice;
+                                    }
+
+                                    // The price is too high 
+                                    else if (isPriceTooHigh(rowPrice, sellingPrice) && sellingPrice != 0)
+                                    {
+                                        worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
+                                        worksheet.Cells[row, 5].Value = 3;
+                                        worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                        worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Blue);
+                                        worksheet.Cells[row, 8].Value = sellingPrice;
+                                    }
+                                    // In-stock
+                                    else if (sellingPrice != 0)
+                                    {
+                                        worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
+                                        worksheet.Cells[row, 5].Value = 3;
+                                        worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                        worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                                        worksheet.Cells[row, 8].Value = sellingPrice;
+                                    }
+                                    // Out of stock
+                                    else
+                                    {
+                                        worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
+                                        worksheet.Cells[row, 5].Value = 0;
+                                        worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                        worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
+                                    }
+                                    azImporterSku = "";
+                                }
                                 else
                                 {
                                     worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
@@ -135,6 +183,44 @@ namespace ExcelModifier
             }
             catch (Exception ex)
             {
+            }
+        }
+
+        private bool isAzImporter(string sku)
+        {
+            azImporterSku = "";
+            string internalSku = "";
+            int result= -5;
+            for(int i = 0; i < sku.Length; i++)
+            {
+                if(sku[i] == ' ')
+                {
+                    if(azImportQuantity.ContainsKey(internalSku))
+                    {
+                        azImportQuantity.TryGetValue(internalSku, out result);
+                        azImporterSku = internalSku;
+                        return true;
+                    }
+                    else
+                    {
+                        internalSku = internalSku + sku[i];
+                    }
+                }
+                else
+                {
+                    internalSku = internalSku + sku[i];
+                }
+            }
+            
+            if (azImportQuantity.ContainsKey(internalSku))
+            {
+                azImportQuantity.TryGetValue(internalSku, out result);
+                azImporterSku = internalSku;
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -156,13 +242,38 @@ namespace ExcelModifier
             }
         }
 
+        private double getSellingPrice()
+        {
+            double sellingPrice = 0;
+
+            double summer = 0.0;
+
+            azImportPrice.TryGetValue(azImporterSku, out sellingPrice);
+
+            if (sellingPrice == 0)
+            {
+                return 0.0;
+            }
+
+            // profit 20% by default
+            summer = sellingPrice + (sellingPrice * 20) / 100;
+
+            // shipping
+            summer = summer + 6;
+
+            // Amazon Fee 20%
+            summer = summer + (summer * 20) / 100;
+
+            return summer;
+        }
+
         public string getSellingPrice(long? skuID)
         {
             double sellingPrice = 0;
 
             double summer = 0.0;
 
-            prices.TryGetValue(Convert.ToInt32(skuID), out sellingPrice);
+            fragrancexPrices.TryGetValue(Convert.ToInt32(skuID), out sellingPrice);
             
             if(sellingPrice == 0)
             {

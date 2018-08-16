@@ -8,7 +8,6 @@ using DBTester.Code;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using X.PagedList;
 using System.Text;
 using OfficeOpenXml;
 using FrgxPublicApiSDK;
@@ -69,9 +68,9 @@ namespace DBTester.Controllers
 
             var pageNumber = page ?? 1;
 
-            var onePageOfUpcs = upcs.ToPagedList(pageNumber, 10);
+            //var onePageOfUpcs = upcs.ToPagedList(pageNumber, 10);
 
-            ViewBag.onePageOfUpcs = onePageOfUpcs;
+            //ViewBag.onePageOfUpcs = onePageOfUpcs;
 
             return View();
         }

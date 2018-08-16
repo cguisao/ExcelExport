@@ -8,7 +8,6 @@ using DBTester.Code;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using X.PagedList;
 using System.Text;
 using OfficeOpenXml;
 using FrgxPublicApiSDK;
@@ -206,7 +205,7 @@ namespace DBTester.Controllers
             ShopifyExcelCreator shopifyModifier = new ShopifyExcelCreator(upc, profile)
             {
                 sWebRootFolder = path,
-                prices = prices,
+                fragrancexPrices = prices,
                 descriptions = descriptions
             };
 

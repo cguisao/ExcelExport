@@ -24,9 +24,21 @@ namespace DBTester.Controllers
         
         public IActionResult Index()
         {
-            ViewBag.TimeStamp = _context.ServiceTimeStamp.LastOrDefault().TimeStamp.ToShortDateString();
+            ViewBag.TimeStampFragrancex = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .LastOrDefault()?.TimeStamp.ToShortDateString();
 
-            ViewBag.type = _context.ServiceTimeStamp.LastOrDefault().type;
+            ViewBag.typeAzFragrancex = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .LastOrDefault()?.type;
+
+            ViewBag.TimeStampAzImport = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
+                .LastOrDefault()?.TimeStamp.ToShortDateString();
+
+            ViewBag.typeAzImport = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
+                .LastOrDefault()?.type;
 
             Guid guid = Guid.NewGuid();
 
@@ -60,26 +72,22 @@ namespace DBTester.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateAmazonList(string file)
         {
-            //if (file == null || file.Length == 0)
-            //{
-            //    return null;
-            //}
-
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
 
-            //using (var stream = new FileStream(path, FileMode.Create))
-            //{
-            //    await file.CopyToAsync(stream);
-            //}
+            var fragrancexPrices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
 
-            var prices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
+            var azImportPrice = _context.AzImporter.Where(x => x.Quantity >= 5).ToDictionary(x => x.Sku, y => y.WholeSale);
             
+            var azImportQuantity = _context.AzImporter.ToDictionary(x => x.Sku, y => y.Quantity);
+
             AmazonExcelUpdator amazonExcelUpdator = new AmazonExcelUpdator()
             {
                 sWebRootFolder = path,
-                prices = prices
+                fragrancexPrices = fragrancexPrices,
+                azImportPrice = azImportPrice,
+                azImportQuantity = azImportQuantity
             };
 
             amazonExcelUpdator.ExcelGenerator();
@@ -96,10 +104,6 @@ namespace DBTester.Controllers
                 File(memory, Helper.GetContentType(path), "Amazon"
                 + "_Converted_" + DateTime.Today.GetDateTimeFormats()[10]
                 + Path.GetExtension(path).ToLowerInvariant());
-
-            //_context.Profile.Update(profile);
-
-            //_context.SaveChanges();
 
             System.IO.File.Delete(path);
 

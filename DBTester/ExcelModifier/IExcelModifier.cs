@@ -10,7 +10,7 @@ namespace ExcelModifier
     {
         string sWebRootFolder { get; set; }
 
-        Dictionary<int, double> prices { get; set; }
+        Dictionary<int, double> fragrancexPrices { get; set; }
 
         void ExcelGenerator();
 

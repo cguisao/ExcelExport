@@ -18,7 +18,7 @@ namespace ExcelModifier
 
         public string sWebRootFolder { get; set; }
 
-        public Dictionary<int, double> prices { get; set; }
+        public Dictionary<int, double> fragrancexPrices { get; set; }
 
         private Profile profile { get; set; }
 
@@ -73,7 +73,7 @@ namespace ExcelModifier
 
                             worksheet.Cells[row, itemsCol].Value = itemID;
 
-                            if (prices.TryGetValue(Convert.ToInt32(itemID), out value))
+                            if (fragrancexPrices.TryGetValue(Convert.ToInt32(itemID), out value))
                             {
                                 worksheet.Cells[row, itemQty].Value = profile.items;
                             }
