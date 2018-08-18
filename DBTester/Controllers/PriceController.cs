@@ -88,7 +88,7 @@ namespace DBTester.Controllers
 
             IExcelExtension excelExtension = new ShopifyExcelUpdator(profile)
             {
-                sWebRootFolder = path,
+                path = path,
                 fragrancexPrices = prices
             };
 

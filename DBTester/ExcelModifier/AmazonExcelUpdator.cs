@@ -14,7 +14,7 @@ namespace ExcelModifier
 {
     public class AmazonExcelUpdator : IExcelExtension
     {
-        public string sWebRootFolder { get; set; }
+        public string path { get; set; }
 
         public Dictionary<int, double> fragrancexPrices { get; set; }
 
@@ -26,7 +26,7 @@ namespace ExcelModifier
 
         public void ExcelGenerator()
         {
-            FileInfo file = new FileInfo(sWebRootFolder);
+            FileInfo file = new FileInfo(path);
             long? skuID;
             int execption = 0;
             try

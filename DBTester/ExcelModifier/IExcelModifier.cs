@@ -8,7 +8,7 @@ namespace ExcelModifier
 {
     interface IExcelExtension
     {
-        string sWebRootFolder { get; set; }
+        string path { get; set; }
 
         Dictionary<int, double> fragrancexPrices { get; set; }
 

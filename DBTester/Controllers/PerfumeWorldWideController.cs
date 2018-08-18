@@ -2,51 +2,45 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DBTester.Code;
 using DBTester.Models;
 using ExcelModifier;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace DBTester.Controllers
 {
-    public class AmazonController : Controller
+    public class PerfumeWorldWideController : Controller
     {
         public Context _context;
 
-        public AmazonController(Context context)
+        public PerfumeWorldWideController(Context context)
         {
             _context = context;
         }
-        
+
         public IActionResult Index()
         {
-            ViewBag.TimeStampFragrancex = _context.ServiceTimeStamp
-                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-                .LastOrDefault()?.TimeStamp.ToShortDateString();
-
-            ViewBag.typeAzFragrancex = _context.ServiceTimeStamp
-                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-                .LastOrDefault()?.type;
-
-            ViewBag.TimeStampAzImport = _context.ServiceTimeStamp
+            ViewBag.TimeStamp = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
                 .LastOrDefault()?.TimeStamp.ToShortDateString();
 
-            ViewBag.typeAzImport = _context.ServiceTimeStamp
+            ViewBag.type = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
                 .LastOrDefault()?.type;
+
+            ViewBag.Wholesalers = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
+                .LastOrDefault()?.Wholesalers;
 
             Guid guid = Guid.NewGuid();
 
             ViewBag.ExcelGuid = guid.ToString();
 
-            Profile profile = new Profile();
-
-            return View(_context.Profile.ToList());
+            return View(_context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
         }
 
         [HttpPost]
@@ -68,31 +62,29 @@ namespace DBTester.Controllers
 
             return Ok();
         }
-        
+
         [HttpPost]
-        public async Task<IActionResult> UpdateAmazonList(string file)
+        public async Task<IActionResult> CompareExcel(string file)
         {
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
 
-            var fragrancexPrices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
+            //var fragrancexPrices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
 
-            var azImportPrice = _context.AzImporter.Where(x => x.Quantity >= 5).ToDictionary(x => x.Sku, y => y.WholeSale);
-            
-            var azImportQuantity = _context.AzImporter.ToDictionary(x => x.Sku, y => y.Quantity);
+            var fragrancexUpc = _context.Fragrancex.Where(z => z.Upc != null).ToDictionary(x => x.ItemID, y => y.Upc);
 
-            AmazonExcelUpdator amazonExcelUpdator = new AmazonExcelUpdator()
+            PerfumeWorldWideComparer perfumeWorldWideComparer = new PerfumeWorldWideComparer()
             {
                 path = path,
-                fragrancexPrices = fragrancexPrices,
-                azImportPrice = azImportPrice,
-                azImportQuantity = azImportQuantity
+                //fragrancexPrices = fragrancexPrices,
+                fragrancexUpc = fragrancexUpc
             };
 
-            amazonExcelUpdator.ExcelGenerator();
+            perfumeWorldWideComparer.ExcelGenerator();
 
             var memory = new MemoryStream();
+
             using (var stream = new FileStream(path, FileMode.Open))
             {
                 await stream.CopyToAsync(memory);
@@ -101,9 +93,8 @@ namespace DBTester.Controllers
             memory.Position = 0;
 
             FileStreamResult returnFile =
-                File(memory, Helper.GetContentType(path), "Amazon"
-                + "_Converted_" + DateTime.Today.GetDateTimeFormats()[10]
-                + Path.GetExtension(path).ToLowerInvariant());
+                File(memory, Helper.GetContentType(path), Path.GetFileNameWithoutExtension(path)
+                + "_Converted" + Path.GetExtension(path).ToLowerInvariant());
 
             System.IO.File.Delete(path);
 

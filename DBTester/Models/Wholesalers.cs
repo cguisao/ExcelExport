@@ -8,6 +8,7 @@ namespace DBTester.Models
     public enum Wholesalers
     {
         Fragrancex,
-        AzImporter
+        AzImporter,
+        PerfumeWorldWide
     }
 }

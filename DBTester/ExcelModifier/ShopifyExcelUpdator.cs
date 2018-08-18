@@ -16,7 +16,7 @@ namespace ExcelModifier
             this.profile = profile;
         }
 
-        public string sWebRootFolder { get; set; }
+        public string path { get; set; }
 
         public Dictionary<int, double> fragrancexPrices { get; set; }
 
@@ -25,7 +25,7 @@ namespace ExcelModifier
         public void ExcelGenerator()
 
         {
-            FileInfo file = new FileInfo(sWebRootFolder);
+            FileInfo file = new FileInfo(path);
             Dictionary<string, long> dicSKU = new Dictionary<string, long>();
             Dictionary<string, string> dicTitle = new Dictionary<string, string>();
 

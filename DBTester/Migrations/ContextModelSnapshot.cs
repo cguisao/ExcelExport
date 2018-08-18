@@ -17,7 +17,7 @@ namespace GTISolutions.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.0-rtm-26452")
+                .HasAnnotation("ProductVersion", "2.0.1-rtm-125")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("DBTester.Models.AzImporter", b =>
@@ -120,6 +120,39 @@ namespace GTISolutions.Migrations
                     b.HasIndex("upcItemID");
 
                     b.ToTable("Fragrancex");
+                });
+
+            modelBuilder.Entity("DBTester.Models.PerfumeWorldWide", b =>
+                {
+                    b.Property<string>("sku");
+
+                    b.Property<string>("Brand");
+
+                    b.Property<double>("Cost");
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("Designer");
+
+                    b.Property<string>("Gender");
+
+                    b.Property<string>("Image");
+
+                    b.Property<double>("MSRP");
+
+                    b.Property<string>("Set");
+
+                    b.Property<string>("Size");
+
+                    b.Property<string>("Type");
+
+                    b.Property<double>("Weight");
+
+                    b.Property<long?>("upc");
+
+                    b.HasKey("sku");
+
+                    b.ToTable("PerfumeWorldWide");
                 });
 
             modelBuilder.Entity("DBTester.Models.Profile", b =>

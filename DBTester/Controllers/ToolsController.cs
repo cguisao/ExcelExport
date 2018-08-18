@@ -204,7 +204,7 @@ namespace DBTester.Controllers
 
             ShopifyExcelCreator shopifyModifier = new ShopifyExcelCreator(upc, profile)
             {
-                sWebRootFolder = path,
+                path = path,
                 fragrancexPrices = prices,
                 descriptions = descriptions
             };
