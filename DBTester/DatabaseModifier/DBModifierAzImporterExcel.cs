@@ -83,10 +83,10 @@ namespace DatabaseModifier
                             insideRow["MainImage"] = worksheet.Cells[row, 12].Value?.ToString();
                             insideRow["WholeSale"] = Convert.ToDouble(worksheet.Cells[row, 13].Value);
                             insideRow["Quantity"] = Convert.ToInt32(worksheet.Cells[row, 14].Value?.ToString());
-                            insideRow["ShortDescription"] = worksheet.Cells[row, 15].Value?.ToString();
-                            insideRow["Weight"] = Convert.ToDouble(worksheet.Cells[row, 16].Value?.ToString());
+                            insideRow["ShortDescription"] = worksheet.Cells[row, 25].Value?.ToString();
+                            insideRow["Weight"] = Convert.ToDouble(worksheet.Cells[row, 15].Value?.ToString());
                             insideRow["HTMLDescription"] = worksheet.Cells[row, 24].Value?.ToString();
-
+                             
                             uploadAzImporter.Rows.Add(insideRow);
                             uploadAzImporter.AcceptChanges();
 

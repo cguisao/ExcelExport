@@ -48,6 +48,11 @@ namespace GTI_Solutions.Controllers
                 .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
         }
 
+        public IActionResult Shipping()
+        {
+            return View(_context.Shipping);
+        }
+
         [HttpPost]
         public async Task<IActionResult> DropzoneFileUpload(IFormFile file, string fileName)
         {
@@ -290,6 +295,29 @@ namespace GTI_Solutions.Controllers
             //return new FileContentResult(bytes, MimeMapping.GetMimeMapping(f));
 
             return null;
+        }
+
+        [HttpPost]
+        public IActionResult AzImportsShipping(int Weight, double Price)
+        {
+            Shipping shipping = new Shipping();
+            shipping.ItemPrice = Price;
+            shipping.weightId = Weight;
+
+            if(_context.Shipping.Any(x => x.weightId == Weight))
+            {
+                _context.Shipping.Update(shipping);
+
+                _context.SaveChanges();
+            }
+            else
+            {
+                _context.Shipping.Add(shipping);
+
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("Shipping");
         }
     }
 }

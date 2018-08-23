@@ -210,6 +210,17 @@ namespace GTISolutions.Migrations
                     b.ToTable("ServiceTimeStamp");
                 });
 
+            modelBuilder.Entity("DBTester.Models.Shipping", b =>
+                {
+                    b.Property<int>("weightId");
+
+                    b.Property<double>("ItemPrice");
+
+                    b.HasKey("weightId");
+
+                    b.ToTable("Shipping");
+                });
+
             modelBuilder.Entity("DBTester.Models.UPC", b =>
                 {
                     b.Property<int>("ItemID");

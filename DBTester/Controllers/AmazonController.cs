@@ -76,18 +76,29 @@ namespace DBTester.Controllers
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
 
-            var fragrancexPrices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
+            //var listTest = _context.AzImporter.ToHashSet();
 
-            var azImportPrice = _context.AzImporter.Where(x => x.Quantity >= 5).ToDictionary(x => x.Sku, y => y.WholeSale);
+            var fragrancexPrices = _context.Fragrancex.ToDictionaryAsync(x => x.ItemID, y => y.WholePriceUSD);
+
+            var azImportPrice = _context.AzImporter.ToDictionaryAsync(x => x.Sku, y => y.WholeSale);
             
-            var azImportQuantity = _context.AzImporter.ToDictionary(x => x.Sku, y => y.Quantity);
+            var azImportQuantity = _context.AzImporter.ToDictionaryAsync(x => x.Sku, y => y.Quantity);
+
+            var ShippingWeight = _context.Shipping.ToDictionaryAsync(x => x.weightId, y => y.ItemPrice);
+
+            var azImporterWeightSku = _context.AzImporter.ToDictionaryAsync(x => x.Sku, y => y.Weight);
+            
+            //var azImport = _context.AzImporter.ToDictionaryAsync(x => x.Sku, listTest);
+
 
             AmazonExcelUpdator amazonExcelUpdator = new AmazonExcelUpdator()
             {
                 path = path,
-                fragrancexPrices = fragrancexPrices,
-                azImportPrice = azImportPrice,
-                azImportQuantity = azImportQuantity
+                fragrancexPrices = await fragrancexPrices,
+                azImportPrice = await azImportPrice,
+                azImportQuantity = await azImportQuantity,
+                ShippingtWeight = await ShippingWeight,
+                azImporterWeightSku = await azImporterWeightSku
             };
 
             amazonExcelUpdator.ExcelGenerator();

@@ -1,0 +1,75 @@
+﻿@model IEnumerable<DBTester.Models.Shipping>
+@{
+    ViewBag.Title = "AzImport Shipping";
+}
+
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+        <div class="card ">
+            <div class="card-body">
+                <h2>AzImport Shipping</h2>
+
+                <p>
+                    This application is intended to set up the AzImport
+                    shipping prices.
+                </p>
+                <form asp-controller="AzImporter" asp-action="AzImportsShipping" asp-antiforgery="false"
+                      enctype="multipart/form-data">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="ProfileUser">Weight:</label>
+                            <input type="number" class="form-control" name="Weight" placeholder="Weight" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="ProfileUser">Price:</label>
+                            <input type="text" class="form-control" name="Price" placeholder="Price" required>
+                        </div>
+                        <div class="text-center m-t-15">
+                            <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> <!-- end col -->
+    <div class="col-md-1">
+    </div>
+</div> <!-- end row -->
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+        <div class="card m-b-30">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Weight in Lbs</th>
+                                <th>Price Per Item</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model)
+                                {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.weightId) lbs
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ItemPrice)
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1">
+    </div>
+</div>

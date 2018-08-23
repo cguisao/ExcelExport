@@ -15,6 +15,7 @@ namespace DBTester.Models
         public DbSet<UPC> UPC { get; set; }
         public DbSet<AzImporter> AzImporter { get; set; }
         public DbSet<PerfumeWorldWide> PerfumeWorldWide { get; set; }
+        public DbSet<Shipping> Shipping { get; set; }
         public DbSet<ErrorViewModel> ErrorViewModel { get; set; }
     }
 }

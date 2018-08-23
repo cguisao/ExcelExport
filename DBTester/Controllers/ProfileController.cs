@@ -73,29 +73,70 @@ namespace GTI_Solutions.Controllers
         }
 
         [HttpPost]
-        public IActionResult ProfileCreator(string userID, string html, string longTitle
-            , string MidTitle, string shortTitle, string sizeDivider, string endTitle)
+        public IActionResult ProfileCreator(string userID, string html)
         {
-            Profile profile = new Profile
+            if(_context.Profile.Any(x => x.ProfileUser == userID))
             {
-                ProfileUser = userID,
+                Profile profile = new Profile
+                {
+                    ProfileUser = userID,
 
-                html = html,
+                    html = html
+                };
 
-                LongstartTitle = longTitle,
+                profile.fee = Convert.ToDouble(_context?.Profile.AsNoTracking().Where<Profile>(x => x.ProfileUser == userID).Select(y => y.fee).FirstOrDefault());
 
-                MidtartTitle = MidTitle,
+                profile.items = Convert.ToInt32(_context?.Profile.AsNoTracking().Where<Profile>(x => x.ProfileUser == userID).Select(y => y.items).FirstOrDefault());
 
-                ShortstartTitle = shortTitle,
+                try
+                {
+                    profile.markdown = Convert.ToDouble(_context?.Profile.AsNoTracking().Where<Profile>(x => x.ProfileUser == userID).Select(y => y.markdown).FirstOrDefault());
+                } catch (Exception e) { };
+                
+                try
+                {
+                    profile.LongstartTitle = Convert.ToString(_context?.Profile.AsNoTracking().Where<Profile>(x => x.ProfileUser == userID).Select(y => y.LongstartTitle).FirstOrDefault());
+                }
+                catch (Exception e) { };
+                
+                try
+                {
+                    profile.MidtartTitle = Convert.ToString(_context?.Profile.AsNoTracking().Where<Profile>(x => x.ProfileUser == userID).Select(y => y.MidtartTitle).FirstOrDefault());
+                }
+                catch (Exception e) { };
+                
+                try
+                {
+                    profile.ShortstartTitle = Convert.ToString(_context?.Profile.AsNoTracking().Where<Profile>(x => x.ProfileUser == userID).Select(y => y.ShortstartTitle).FirstOrDefault());
+                }
+                catch (Exception e) { };
+                
+                try
+                {
+                    profile.endTtile = Convert.ToString(_context?.Profile.AsNoTracking().Where<Profile>(x => x.ProfileUser == userID).Select(y => y.endTtile).FirstOrDefault());
+                }
+                catch (Exception e) { };
+                
+                try
+                {
+                    profile.sizeDivider = Convert.ToString(_context?.Profile.AsNoTracking().Where<Profile>(x => x.ProfileUser == userID).Select(y => y.sizeDivider).FirstOrDefault());
+                }
+                catch (Exception e) { };
+                
+                _context.Profile.Update(profile);
+            }
+            else
+            {
+                Profile profile = new Profile
+                {
+                    ProfileUser = userID,
 
-                sizeDivider = sizeDivider,
-
-                endTtile = items.Where(x => x.Value == endTitle).Select(x => x.Text).FirstOrDefault()
-            };
-
-
-            _context.Profile.Add(profile);
-
+                    html = html
+                };
+                
+                _context.Profile.Add(profile);
+            }
+            
             _context.SaveChanges();
 
             return RedirectToAction("Index");
