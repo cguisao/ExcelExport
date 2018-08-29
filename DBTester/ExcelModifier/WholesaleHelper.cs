@@ -151,16 +151,10 @@ namespace DatabaseModifier
             // AzImporter Fee
             summer = sellingPrice + 2;
 
-            // EA Group Fee
-            if (sellingPrice <= 15)
-            {
-                summer = summer + 1;
-            }
-            else
-            {
-                summer = summer + (summer * 5) / 100;
-            }
-
+            // EA Group Fee 20%
+            
+            summer = summer + (summer * 20) / 100;
+            
             // profit 20% by default
             summer = summer + (summer * 20) / 100;
 

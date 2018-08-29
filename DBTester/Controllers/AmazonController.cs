@@ -52,7 +52,7 @@ namespace DBTester.Controllers
 
             Profile profile = new Profile();
 
-            return View(_context.Profile.ToList());
+            return View(_context.Amazon.ToList());
         }
 
         public IActionResult Index()
@@ -109,15 +109,9 @@ namespace DBTester.Controllers
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
 
-            // Put the code here
-
             SetDictionariesAsync();
 
             amazonList = _context.Amazon.ToList();
-
-            //amazonItems = amazonList.ToDictionary(x => x.Asin, y => y.sku);
-
-            //amazonList2 = _context.Amazon.ToList();
 
             var tasks = new List<Task>();
 

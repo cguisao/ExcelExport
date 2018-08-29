@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DBTester.Models.Profile>
+﻿@model IEnumerable<DBTester.Models.Amazon>
 @{
     ViewBag.Title = "Update";
 }
@@ -35,6 +35,47 @@
                         <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card ">
+            <div class="card-body">
+                <h2>Amazon Listing Viewer</h2>
+                <br />
+                <div class="table-responsive">
+                    <table id="datatable2" class="table border-0 dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Asin</th>
+                                <th>SKU</th>
+                                <th>Price</th>
+                                <th>wholesaler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @item.Asin
+                                    </td>
+                                    <td>
+                                        @item.sku
+                                    </td>
+                                    <td>
+                                        @item.price
+                                    </td>
+                                    <td>
+                                        @item.wholesaler
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
