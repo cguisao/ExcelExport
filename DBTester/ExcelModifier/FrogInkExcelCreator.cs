@@ -1,31 +1,30 @@
-﻿using System;
+﻿using DBTester.Models;
+using OfficeOpenXml;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DBTester.Models;
-using OfficeOpenXml;
 
 namespace ExcelModifier
 {
-    public class ShopifyExcelCreator : IExcelExtension
+    public class FrogInkExcelCreator : IExcelExtension
     {
-        public ShopifyExcelCreator(Dictionary<int, long?> upcs, Profile profile)
+        public FrogInkExcelCreator(Dictionary<int, long?> _upc, Profile _profile)
         {
-            this.upcs = upcs;
-            this.profile = profile;
+            upcs = _upc;
+            profile = _profile;
         }
-
-        private Dictionary<int, long?> upcs { get; set; }
-
         public string path { get; set; }
 
         public Dictionary<int, double> fragrancexPrices { get; set; }
 
-        public IDictionary<int, string> descriptions { get; set; }
+        private Dictionary<int, long?> upcs { get; set; }
 
         private Profile profile { get; set; }
+
+        public Dictionary<int, string> descriptions { get; set; }
 
         public void ExcelGenerator()
         {
@@ -40,7 +39,7 @@ namespace ExcelModifier
                 {
                     StringBuilder sb = new StringBuilder();
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
-
+                    
                     worksheet.DeleteRow(1);
 
                     worksheet.Cells["A:AA"].Sort();
@@ -51,49 +50,43 @@ namespace ExcelModifier
 
                     PrepareExcel(worksheet, profile.min, profile.max);
 
-                    dicTitle = titleDic(worksheet);
-
                     int rowCount = worksheet.Dimension.Rows;
+
                     int ColCount = worksheet.Dimension.Columns;
+
+                    dicTitle = titleDic(worksheet);
 
                     long? itemID;
 
                     string title = "";
 
-                    for (int row = 1; row <= rowCount + 1; row++)
+                    for (int row = 1; row <= rowCount; row++)
                     {
                         execption++;
 
                         if (row == 1)
                         {
-                            worksheet.Cells[row, 1].Value = "Handle";
+                            worksheet.Cells[row, 1].Value = "Sku";
                             worksheet.Cells[row, 2].Value = "Title";
-                            worksheet.Cells[row, 3].Value = "Body (HTML)";
+                            worksheet.Cells[row, 3].Value = "Description";
                             worksheet.Cells[row, 4].Value = "Vendor";
-                            worksheet.Cells[row, 5].Value = "Type";
-                            worksheet.Cells[row, 6].Value = "Published";
-                            worksheet.Cells[row, 7].Value = "Option1 Name";
-                            worksheet.Cells[row, 8].Value = "Option1 Value";
-                            worksheet.Cells[row, 9].Value = "OPtion2 Name";
-                            worksheet.Cells[row, 10].Value = "Option2 Value";
-                            worksheet.Cells[row, 11].Value = "Option3 Name";
-                            worksheet.Cells[row, 12].Value = "Option3 Value";
-                            worksheet.Cells[row, 13].Value = "Variant SKU";
-                            worksheet.Cells[row, 14].Value = "Variant Grams";
-                            worksheet.Cells[row, 15].Value = "Variant Inventory Tracker";
-                            worksheet.Cells[row, 16].Value = "Variant Inventory Qty";
-                            worksheet.Cells[row, 17].Value = "Variant Inventory Policy";
-                            worksheet.Cells[row, 18].Value = "Variant Fulfillment Service";
-                            worksheet.Cells[row, 19].Value = "Variant Price";
-                            worksheet.Cells[row, 20].Value = "Variant Compare At Price";
-                            worksheet.Cells[row, 21].Value = "Variant Requires Shipping";
-                            worksheet.Cells[row, 22].Value = "Variant Taxable";
-                            worksheet.Cells[row, 23].Value = "Variant Barcode";
-                            worksheet.Cells[row, 24].Value = "Image Src";
-                            worksheet.Cells[row, 25].Value = "Image Alt Text";
-                            worksheet.Cells[row, 26].Value = "Tags";
-                            worksheet.Cells[row, 27].Value = "Collection";
-                            worksheet.Cells[row, 28].Value = "Price from Database (DELETE THE COLUMN!)";
+                            worksheet.Cells[row, 5].Value = "Quantity";
+                            worksheet.Cells[row, 6].Value = "Price";
+                            worksheet.Cells[row, 7].Value = "Images";
+                            worksheet.Cells[row, 8].Value = "optionname1";
+                            worksheet.Cells[row, 9].Value = "optionname2";
+                            worksheet.Cells[row, 10].Value = "optionname3";
+                            worksheet.Cells[row, 11].Value = "optionname4";
+                            worksheet.Cells[row, 12].Value = "optionname5";
+                            worksheet.Cells[row, 13].Value = "option1";
+                            worksheet.Cells[row, 14].Value = "option2";
+                            worksheet.Cells[row, 15].Value = "option3";
+                            worksheet.Cells[row, 16].Value = "option4";
+                            worksheet.Cells[row, 17].Value = "option5";
+                            worksheet.Cells[row, 18].Value = "product_identifier";
+                            worksheet.Cells[row, 19].Value = "product_identifier_type";
+                            worksheet.Cells[row, 20].Value = "brand";
+                            worksheet.Cells[row, 21].Value = "cost";
                         }
                         else
                         {
@@ -108,10 +101,10 @@ namespace ExcelModifier
 
                             //Logic for the HTML Body
 
-                            worksheet.Cells[row, 3].Value = BuildHTML(worksheet, row, profile.html, itemID);
+                            //worksheet.Cells[row, 3].Value = BuildHTML(worksheet, row, profile.html, itemID);
 
                             // SKU creator
-                            
+
                             long? value;
 
                             if (upcs.TryGetValue(Convert.ToInt32(itemID), out value))
@@ -135,7 +128,12 @@ namespace ExcelModifier
                             }
 
                             // This logic fixes the picture in some cases
-                            worksheet.Cells[row, 24].Value = fixPictureHTML(worksheet.Cells[row, 24].Value.ToString());
+
+                            worksheet.Cells[row, 24].Value =
+                                        worksheet.Cells[row, 24].Value.ToString()
+                                            .Replace("http://img.fragrancex.com/images/products/SKU/small/"
+                                            , "http://img.fragrancex.com/images/products/SKU/large/")
+                                            .Replace("http", "https").Replace("httpss", "https");
 
                             double actualPrice = 0.0;
                             fragrancexPrices.TryGetValue(Convert.ToInt32(itemID), out actualPrice);
@@ -151,7 +149,7 @@ namespace ExcelModifier
                 Console.WriteLine("Some error occurred while importing." + ex.Message);
             }
         }
-        
+
         public string getSellingPrice(long? itemID)
         {
             double shipping = profile.shipping;
@@ -187,32 +185,62 @@ namespace ExcelModifier
             return summer.ToString();
         }
 
-        private string BuildHTML(ExcelWorksheet worksheet, int row, string HTML, long? itemID)
+        private void PrepareExcel(ExcelWorksheet worksheet, int min, int max)
         {
-            string description = "";
-            descriptions.TryGetValue(Convert.ToInt32(itemID), out description);
-
-            int ColCount = worksheet.Dimension.Columns;
-
-            string[] variable = new string[6];
-
-            for (int col = 1; col <= ColCount; col++)
+            int rowCount = worksheet.Dimension.Rows;
+            string title = "";
+            for (int row = 1; row <= rowCount; row++)
             {
-                switch (col)
+                if (row == 1)
                 {
-                    case 2:
-                        HTML = HTML.Replace("HTMLTitle", worksheet.Cells[row, col].Value.ToString());
-                        break;
-                    case 3:
-                        HTML = HTML.Replace("HTMLBody", description);
-                        break;
-                    case 24:
-                        var pic = fixPictureHTML(worksheet.Cells[row, col].Value.ToString());
-                        HTML = HTML.Replace("HTMLPicture", pic);
-                        break;
+                    continue;
+                }
+                // Remove testers and unboxed items
+                title = worksheet.Cells[row, 1].Value.ToString();
+                if (title.ToLower().Contains("tester") || title.ToLower().Contains("unboxed")
+                    || title.ToLower().Contains("sample") || title.ToLower().Contains("jivago"))
+                {
+                    worksheet.DeleteRow(row, 1, true);
+                    row--;
+                    rowCount--;
+                    continue;
+                }
+
+                if (min != 0 && max != 0)
+                {
+                    long price = Convert.ToInt64(worksheet.Cells[row, 19].Value);
+                    if (price <= min || price > max)
+                    {
+                        worksheet.DeleteRow(row, 1, true);
+                        row--;
+                        rowCount--;
+                        continue;
+                    }
+                }
+
+                else if (min != 0)
+                {
+                    long price = Convert.ToInt64(worksheet.Cells[row, 19].Value);
+                    if (price <= min)
+                    {
+                        worksheet.DeleteRow(row, 1, true);
+                        row--;
+                        rowCount--;
+                        continue;
+                    }
+                }
+                else if (max != 0)
+                {
+                    long price = Convert.ToInt64(worksheet.Cells[row, 19].Value);
+                    if (price >= max)
+                    {
+                        worksheet.DeleteRow(row, 1, true);
+                        row--;
+                        rowCount--;
+                        continue;
+                    }
                 }
             }
-            return HTML;
         }
 
         private string BuildTitle(Dictionary<string, string> dicTitle, string title, string fragranceType)
@@ -252,7 +280,7 @@ namespace ExcelModifier
             sb.Replace("perfume", "");
             sb.Replace("(Unisex)", "");
             sb.Replace("(unisex)", "");
-            
+
             // Start of the Title
 
             addingTitleStart(sb, "EDT");
@@ -305,34 +333,6 @@ namespace ExcelModifier
             return sb.ToString();
         }
 
-        private string removeRepeats(string v)
-        {
-            char[] subString = v.ToArray();
-            string ans = "";
-            string cur = "";
-
-            foreach (char c in subString)
-            {
-                if (char.ToLower(c).Equals('/'))
-                {
-                    if (!ans.Contains(cur))
-                    {
-                        ans = ans + cur + "/";
-                        cur = "";
-                    }
-                    cur = "";
-                }
-                else
-                {
-                    cur = cur + c.ToString();
-                }
-            }
-            
-            ans = ans + cur;
-
-            return ans.TrimEnd('/');
-        }
-
         private void addingTitleStart(StringBuilder sb, string type)
         {
             // size does not go over 80 characters
@@ -359,6 +359,34 @@ namespace ExcelModifier
             {
                 sb.Insert(0, value: profile.ShortstartTitle + " ");
             }
+        }
+
+        private string removeRepeats(string v)
+        {
+            char[] subString = v.ToArray();
+            string ans = "";
+            string cur = "";
+
+            foreach (char c in subString)
+            {
+                if (char.ToLower(c).Equals('/'))
+                {
+                    if (!ans.Contains(cur))
+                    {
+                        ans = ans + cur + "/";
+                        cur = "";
+                    }
+                    cur = "";
+                }
+                else
+                {
+                    cur = cur + c.ToString();
+                }
+            }
+
+            ans = ans + cur;
+
+            return ans.TrimEnd('/');
         }
 
         private string shortTitle(string title)
@@ -451,64 +479,6 @@ namespace ExcelModifier
             return dic;
         }
 
-        private void PrepareExcel(ExcelWorksheet worksheet, int min, int max)
-        {
-            int rowCount = worksheet.Dimension.Rows;
-            string title = "";
-            for (int row = 1; row <= rowCount; row++)
-            {
-                if (row == 1)
-                {
-                    continue;
-                }
-                // Remove testers and unboxed items
-                title = worksheet.Cells[row, 1].Value.ToString();
-                if (title.ToLower().Contains("tester") || title.ToLower().Contains("unboxed")
-                    || title.ToLower().Contains("sample") || title.ToLower().Contains("jivago"))
-                {
-                    worksheet.DeleteRow(row, 1, true);
-                    row--;
-                    rowCount--;
-                    continue;
-                }
-
-                if (min != 0 && max != 0)
-                {
-                    long price = Convert.ToInt64(worksheet.Cells[row, 19].Value);
-                    if (price <= min || price > max)
-                    {
-                        worksheet.DeleteRow(row, 1, true);
-                        row--;
-                        rowCount--;
-                        continue;
-                    }
-                }
-
-                else if (min != 0)
-                {
-                    long price = Convert.ToInt64(worksheet.Cells[row, 19].Value);
-                    if (price <= min)
-                    {
-                        worksheet.DeleteRow(row, 1, true);
-                        row--;
-                        rowCount--;
-                        continue;
-                    }
-                }
-                else if (max != 0)
-                {
-                    long price = Convert.ToInt64(worksheet.Cells[row, 19].Value);
-                    if (price >= max)
-                    {
-                        worksheet.DeleteRow(row, 1, true);
-                        row--;
-                        rowCount--;
-                        continue;
-                    }
-                }
-            }
-        }
-
         private string getSize(string v)
         {
             char[] subString = v.ToArray();
@@ -525,23 +495,6 @@ namespace ExcelModifier
             }
 
             return ans;
-        }
-
-        private string fixPictureHTML(string html)
-        {
-            string returnHTML = html.Replace("http://img.fragrancex.com/images/products/SKU/small/"
-            , "http://img.fragrancex.com/images/products/SKU/large/");
-
-            if(returnHTML.Contains("httpss"))
-            {
-                return returnHTML.Replace("httpss", "https");
-            }
-            else if(!returnHTML.Contains("https") && returnHTML.Contains("http"))
-            {
-                return returnHTML.Replace("http", "https");
-            }
-
-            return returnHTML;
         }
     }
 }

@@ -70,8 +70,15 @@
                         <li class="has-submenu">
                             <a href="#"><i class="mdi mdi-gauge"></i>Inventory Tracker</a>
                             <ul class="submenu">
-                                <li><a asp-area="" asp-controller="Amazon" asp-action="Index">Amazon</a></li>
+                                <li class="has-submenu">
+                                    <a href="#">Amazon</a>
+                                    <ul class="submenu">
+                                        <li><a asp-area="" asp-controller="Amazon" asp-action="Index">Price Checker</a></li>
+                                        <li><a asp-area="" asp-controller="Amazon" asp-action="Upload">Uploader</a></li>
+                                    </ul>
+                                </li>
                                 <li><a asp-area="" asp-controller="Tools" asp-action="Tools">Ebay</a></li>
+                                <li><a asp-area="" asp-controller="FrogInk" asp-action="Index">Frog Ink</a></li>
                             </ul>
                         </li>
 

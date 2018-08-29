@@ -44,7 +44,7 @@ namespace GTI_Solutions.Controllers
             ViewBag.ExcelGuid = guid.ToString();
 
             return View(_context.ServiceTimeStamp
-                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
                 .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
         }
 

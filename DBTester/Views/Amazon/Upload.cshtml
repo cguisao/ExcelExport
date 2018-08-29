@@ -1,0 +1,57 @@
+﻿@model IEnumerable<DBTester.Models.Profile>
+@{
+    ViewBag.Title = "Update";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card m-b-30">
+            <div class="card-body">
+                <h2>Amazon Uploader</h2>
+
+                <p>
+                    This application is intended to create an excel which will
+                    be able to take an excel from an Amazon report and return
+                    the items that are available in a spreadsheet.
+                </p>
+                <div id="dropzone">
+                    <form asp-controller="Tools" asp-action="DropzoneFileUpload" asp-antiforgery="false"
+                          class="dropzone" id="myAwesomeDropzone" enctype="multipart/form-data">
+                        <div class="text-center m-t-15 invisible">
+                            <input type="text" class="form-control" name="fileName" value="@ViewBag.ExcelGuid">
+                        </div>
+                        <div class="fallback">
+                            Drop files here or click to upload.<br>
+                            <input name="file" type="file" />
+                        </div>
+                    </form>
+                </div>
+                <form asp-controller="Amazon" asp-action="UpdateAmazonDB" asp-antiforgery="false"
+                      enctype="multipart/form-data">
+                    <div class="text-center m-t-15 invisible">
+                        <input type="text" class="form-control" name="file" value="@ViewBag.ExcelGuid">
+                    </div>
+                    <div class="text-center m-t-15">
+                        <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<p>
+    Last <b>Fragrancex</b> database update <b>@ViewBag.TimeStampFragrancex Updated via  @ViewBag.typeAzFragrancex</b> <br />
+</p>
+
+<p>
+    Last <b>AzImporter</b> database update <b>@ViewBag.TimeStampAzImport Updated via  @ViewBag.typeAzImport</b> <br />
+</p>
+<p>
+    ASINs uploaded in the database <b>@ViewBag.amazonItems</b> <br />
+</p>
+<p>
+    Total Fragrancex ASINs uploaded in the database <b>@ViewBag.amazonFragrancex</b> <br />
+</p>
+<p>
+    Total AzImporter ASINs uploaded in the database <b>@ViewBag.amazonAzImporter</b> <br />
+</p>

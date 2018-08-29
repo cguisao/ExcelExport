@@ -1,0 +1,96 @@
+﻿@model IEnumerable<DBTester.Models.Profile>
+@{
+    ViewBag.Title = "Frog Ink";
+}
+
+<div class="text-center m-t-15">
+    <h2>Frog Ink Excel creator</h2>
+</div> 
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+        <div class="card m-b-30">
+             <div class="card-body">
+                <div class="text-center m-t-15">
+                    <h3></h3>
+                </div>
+                <p>
+                    This application is intended to create an excel which will
+                    be able to upload listings to Frog Ink and then to eBay.
+                </p>
+                <div id="dropzone">
+                    <form asp-controller="FrogInk" asp-action="DropzoneFileUpload" asp-antiforgery="false"
+                          class="dropzone" id="myAwesomeDropzone" enctype="multipart/form-data">
+                        <div class="text-center m-t-15 invisible">
+                            <input type="text" class="form-control" name="fileName" value="@ViewBag.ExcelGuid">
+                        </div>
+                        <div class="fallback">
+                            Drop files here or click to upload.<br>
+                            <input name="file" type="file" />
+                        </div>
+                    </form>
+                </div>
+                <br />
+                <form asp-controller="FrogInk" asp-action="ExportToExcel" method="post"
+                      enctype="multipart/form-data" style="width: 100%">
+
+                    <div class="form-row">
+                        <div class="form-group text-center col-md-6">
+                            <label for="inputUser">User</label>
+                            @Html.DropDownList("User",
+                                   Model.Select(m => new SelectListItem() { Text = m.ProfileUser }).ToList()
+                                   , "", new { @class = "form-control", required = "required" })
+                        </div>
+                        <div class="text-center m-t-15 invisible">
+                            <input type="text" class="form-control" name="file" value="@ViewBag.ExcelGuid">
+                        </div>
+                        <div class="form-group text-center col-md-6">
+                            <label for="inputshipping">Shipping</label>
+                            <input type="text" class="form-control" name="shipping" placeholder="Shipping" value="$6" readonly>
+                        </div>
+                        <div class="form-group text-center col-md-6">
+                            <label for="inputItems">Items</label>
+                            <input type="number" class="form-control" name="items" placeholder="Items" required>
+                        </div>
+                        <div class="form-group text-center col-md-6">
+                            <label for="inputFee">eBay Fee</label>
+                            <input type="text" class="form-control" name="fee" value="20%" readonly>
+                        </div>
+                        <div class="form-group text-center col-md-6">
+                            <label for="inputPromoting">Promoting Listing (Percentage)</label>
+                            <input type="text" class="form-control" name="promoting" placeholder="Promoting Listing" value="10%" readonly>
+                        </div>
+                        <div class="form-group text-center col-md-6">
+                            <label for="inputProfit">Profit (Percentage)</label>
+                            <input type="text" class="form-control" name="profit" placeholder="Profit" required>
+                        </div>
+                        <div class="form-group text-center col-md-6">
+                            <label for="inputMarkdown">Markdown (Not a percentage)</label>
+                            <input type="text" class="form-control" name="markdown" placeholder="Markdown">
+                        </div>
+                        <div class="form-group text-center col-md-12">
+                            <label for="inputPriceRange">Price Range</label>
+                        </div>
+                        <div class="form-group text-center col-md-6">
+                            <label for="inputMin">Min</label>
+                            <input type="number" class="form-control" name="min" placeholder="Min">
+                        </div>
+                        <div class="form-group text-center col-md-6">
+                            <label for="inputMax">Max</label>
+                            <input type="number" class="form-control" name="max" placeholder="Max">
+                        </div>
+                    </div>
+                    <div class="text-center m-t-15">
+                        <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                    </div>
+                </form>
+                <p>
+                    Last @ViewBag.Wholesalers database update <b>@ViewBag.TimeStamp Updated via  @ViewBag.type</b> <br />
+                </p>
+             </div>
+        </div>
+    </div> 
+    <div class="col-md-1">
+    </div>
+</div>

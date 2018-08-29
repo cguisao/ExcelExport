@@ -1,4 +1,5 @@
-﻿using DBTester.Models;
+﻿using DatabaseModifier;
+using DBTester.Models;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System;
@@ -12,26 +13,12 @@ using System.Threading.Tasks;
 
 namespace ExcelModifier
 {
-    public class AmazonExcelUpdator : IExcelExtension
+    public class AmazonExcelUpdator : WholesaleHelper, IExcelExtension
     {
         public string path { get; set; }
 
         public Dictionary<int, double> fragrancexPrices { get; set; }
-
-        public Dictionary<string, double> azImportPrice { get; set; }
-
-        public Dictionary<string, int> azImportQuantity { get; set; }
-
-        public Dictionary<int, double> ShippingtWeight { get; set; }
-
-        public Dictionary<string, int> azImporterWeightSku { get; set; }
-
-        private string azImporterSku { get; set; }
-
-        private int AzImporterRegisterWeight { get; set; }
-
-        private double AzImporterPriceWeight { get; set; }
-
+        
         public void ExcelGenerator()
         {
             FileInfo file = new FileInfo(path);
@@ -208,64 +195,7 @@ namespace ExcelModifier
             {
             }
         }
-
-        private bool isWeightRegister()
-        {
-            var weight = 0;
-            double WeightPrice = -1;
-            azImporterWeightSku.TryGetValue(azImporterSku, out weight);
-            ShippingtWeight.TryGetValue(weight, out WeightPrice);
-            AzImporterRegisterWeight = weight;
-
-            if (WeightPrice > 1)
-            {
-                AzImporterPriceWeight = WeightPrice;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        private bool isAzImporter(string sku)
-        {
-            azImporterSku = "";
-            string internalSku = "";
-            int result= -5;
-            for(int i = 0; i < sku.Length; i++)
-            {
-                if(sku[i] == ' ')
-                {
-                    if(azImportQuantity.ContainsKey(internalSku))
-                    {
-                        azImportQuantity.TryGetValue(internalSku, out result);
-                        azImporterSku = internalSku;
-                        return true;
-                    }
-                    else
-                    {
-                        internalSku = internalSku + sku[i];
-                    }
-                }
-                else
-                {
-                    internalSku = internalSku + sku[i];
-                }
-            }
-            
-            if (azImportQuantity.ContainsKey(internalSku))
-            {
-                azImportQuantity.TryGetValue(internalSku, out result);
-                azImporterSku = internalSku;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
+        
         private bool isPriceTooHigh(double rowPrice, double sellingPrice)
         {
             if (sellingPrice == 0)
@@ -283,32 +213,7 @@ namespace ExcelModifier
                 return false;
             }
         }
-
-        private double getSellingPrice()
-        {
-            double sellingPrice = 0;
-
-            double summer = 0.0;
-
-            azImportPrice.TryGetValue(azImporterSku, out sellingPrice);
-
-            if (sellingPrice == 0)
-            {
-                return 0.0;
-            }
-
-            // profit 20% by default
-            summer = sellingPrice + (sellingPrice * 20) / 100;
-
-            // shipping
-            summer = summer + AzImporterPriceWeight;
-
-            // Amazon Fee 20%
-            summer = summer + (summer * 20) / 100;
-
-            return summer;
-        }
-
+        
         public string getSellingPrice(long? skuID)
         {
             double sellingPrice = 0;
@@ -343,60 +248,6 @@ namespace ExcelModifier
             else
                 return false;
         }
-
-        private bool isFragrancex(long? innerItem)
-        {
-            Match hasLetters = Regex.Match(innerItem.ToString(), @"[a-zA-Z]");
-
-            if (hasLetters.Success)
-            {
-                return false;
-            }
-            
-            if(innerItem.ToString().Length != 6)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
-        private long? DigitGetter(string v)
-        {
-            string answer = "";
-
-            v.TrimStart();
-
-            for (int i = 0; i < v.Length; i++)
-            {
-                if(v[i] != ' ')
-                {
-                    answer = answer + v[i];
-                }
-                else
-                {
-                    try
-                    {
-                        Convert.ToInt64(answer);
-                        return Convert.ToInt64(answer);
-                    }
-                    catch (Exception e)
-                    {
-                        return 0;
-                    }
-                }
-            }
-            try
-            {
-                Convert.ToInt64(answer);
-                return Convert.ToInt64(answer);
-            }
-            catch (Exception e)
-            {
-                return 0;
-            }
-        }
+        
     }
 }

@@ -20,6 +20,23 @@ namespace GTISolutions.Migrations
                 .HasAnnotation("ProductVersion", "2.0.1-rtm-125")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("DBTester.Models.Amazon", b =>
+                {
+                    b.Property<int>("id");
+
+                    b.Property<string>("Asin");
+
+                    b.Property<double>("price");
+
+                    b.Property<string>("sku");
+
+                    b.Property<string>("wholesaler");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Amazon");
+                });
+
             modelBuilder.Entity("DBTester.Models.AzImporter", b =>
                 {
                     b.Property<int>("ItemID");
