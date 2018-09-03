@@ -30,6 +30,7 @@ namespace DatabaseModifier
             int result = -5;
             for (int i = 0; i < sku.Length; i++)
             {
+                internalSku = internalSku.ToUpper();
                 if (sku[i] == ' ')
                 {
                     if (azImportQuantity.ContainsKey(internalSku))
@@ -48,6 +49,8 @@ namespace DatabaseModifier
                     internalSku = internalSku + sku[i];
                 }
             }
+
+            internalSku = internalSku.ToUpper();
 
             if (azImportQuantity.ContainsKey(internalSku))
             {
@@ -120,7 +123,7 @@ namespace DatabaseModifier
         {
             var weight = 0;
             double WeightPrice = -1;
-            azImporterWeightSku.TryGetValue(azImporterSku, out weight);
+            azImporterWeightSku.TryGetValue(azImporterSku.ToUpper(), out weight);
             ShippingtWeight.TryGetValue(weight, out WeightPrice);
             AzImporterRegisterWeight = weight;
 
@@ -141,7 +144,7 @@ namespace DatabaseModifier
 
             double summer = 0.0;
 
-            azImportPrice.TryGetValue(azImporterSku, out sellingPrice);
+            azImportPrice.TryGetValue(azImporterSku.ToUpper(), out sellingPrice);
 
             if (sellingPrice == 0)
             {

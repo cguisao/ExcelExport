@@ -23,19 +23,19 @@ using DatabaseModifier;
 
 namespace DBTester.Controllers
 {
-    public class ToolsController : Controller
+    public class ShopifyController : Controller
     {
         private readonly IHostingEnvironment _hostingEnvironment;
 
         public Context _context;
  
-        public ToolsController(Context context, IHostingEnvironment hostingEnvironment)
+        public ShopifyController(Context context, IHostingEnvironment hostingEnvironment)
         {
             _context = context;
             _hostingEnvironment = hostingEnvironment;
         }
 
-        public IActionResult Tools()
+        public IActionResult Index()
         {
             ViewBag.TimeStamp = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())

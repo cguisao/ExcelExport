@@ -97,7 +97,7 @@ namespace ExcelModifier
                                             Amazon amazon = new Amazon();
                                             amazon.Asin = asin;
                                             sellingPrice = getSellingPrice();
-                                            amazon.sku = azImporterSku;
+                                            amazon.sku = azImporterSku.ToUpper();
                                             amazon.price = Convert.ToDouble(worksheet.Cells[row, 3].Value);
                                             amazon.wholesaler = Wholesalers.AzImporter.ToString();
                                             listAmazonSure.TryAdd(amazon.Asin, "");
@@ -114,33 +114,37 @@ namespace ExcelModifier
                     foreach (Amazon list in amazonPrintList.Where(x => x.wholesaler == Wholesalers.Fragrancex.ToString()))
                     {
                         Random rnd = new Random();
+                        Random rnd2 = new Random();
+                        double rand3 = Convert.ToDouble(rnd2.Next(1, 99)) / 100;
                         worksheet.Cells[row, 1].Value = list.sku + " " + rnd.Next(1, 49999);
                         worksheet.Cells[row, 2].Value = list.Asin;
                         worksheet.Cells[row, 3].Value = 1;
-                        worksheet.Cells[row, 4].Value = list.price;
+                        worksheet.Cells[row, 4].Value = list.price + rand3;
                         worksheet.Cells[row, 5].Value = "delete";
                         worksheet.Cells[row, 6].Value = "delete";
                         worksheet.Cells[row, 7].Value = 11;
-                        worksheet.Cells[row, 8].Value = 3;
+                        worksheet.Cells[row, 8].Value = 0;
                         worksheet.Cells[row, 9].Value = "a";
                         worksheet.Cells[row, 10].Value = "n";
                         worksheet.Cells[row, 14].Value = "unknown_binding";
                         row++;
                     }
 
-                    row = 2;
+                    //row = 2;
 
                     foreach (Amazon list in amazonPrintList.Where(x => x.wholesaler == Wholesalers.AzImporter.ToString()))
                     {
                         Random rnd = new Random();
+                        Random rnd2 = new Random();
+                        double rand3 = Convert.ToDouble(rnd2.Next(1, 99)) / 100;
                         worksheet.Cells[row, 1].Value = list.sku + " " + rnd.Next(1, 49999);
                         worksheet.Cells[row, 2].Value = list.Asin;
                         worksheet.Cells[row, 3].Value = 1;
-                        worksheet.Cells[row, 4].Value = list.price;
+                        worksheet.Cells[row, 4].Value = list.price + rand3;
                         worksheet.Cells[row, 5].Value = "delete";
                         worksheet.Cells[row, 6].Value = "delete";
                         worksheet.Cells[row, 7].Value = 11;
-                        worksheet.Cells[row, 8].Value = 3;
+                        worksheet.Cells[row, 8].Value = 0;
                         worksheet.Cells[row, 9].Value = "a";
                         worksheet.Cells[row, 10].Value = "n";
                         worksheet.Cells[row, 14].Value = "unknown_binding";

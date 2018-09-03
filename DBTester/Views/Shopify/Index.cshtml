@@ -20,7 +20,7 @@
                     be able to upload listings to shopify and then to eBay.
                 </p>
                 <div id="dropzone">
-                    <form asp-controller="Tools" asp-action="DropzoneFileUpload" asp-antiforgery="false"
+                    <form asp-controller="Shopify" asp-action="DropzoneFileUpload" asp-antiforgery="false"
                           class="dropzone" id="myAwesomeDropzone" enctype="multipart/form-data">
                         <div class="text-center m-t-15 invisible">
                             <input type="text" class="form-control" name="fileName" value="@ViewBag.ExcelGuid">
@@ -32,7 +32,7 @@
                     </form>
                 </div>
                 <br />
-                <form asp-controller="Tools" asp-action="ExportToExcel" method="post"
+                <form asp-controller="Shopify" asp-action="ExportToExcel" method="post"
                       enctype="multipart/form-data" style="width: 100%">
 
                     <div class="form-row">

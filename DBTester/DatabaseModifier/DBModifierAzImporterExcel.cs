@@ -69,7 +69,7 @@ namespace DatabaseModifier
                             DataRow insideRow = uploadAzImporter.NewRow();
 
                             insideRow["ItemID"] = row;
-                            insideRow["Sku"] = worksheet.Cells[row, 1].Value?.ToString();
+                            insideRow["Sku"] = worksheet.Cells[row, 1].Value?.ToString().ToUpper();
                             insideRow["Category"] = worksheet.Cells[row, 2].Value?.ToString();
                             insideRow["ItemName"] = worksheet.Cells[row, 3].Value?.ToString();
                             insideRow["Image1"] = worksheet.Cells[row, 4].Value?.ToString();

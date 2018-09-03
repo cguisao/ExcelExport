@@ -59,6 +59,7 @@ namespace GTI_Solutions.Controllers
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
+
             // Update the database once a day
             updateFragrancex();
 
@@ -115,9 +116,7 @@ namespace GTI_Solutions.Controllers
             var prices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
 
             var descriptions = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.Description);
-
-            // New Function here
-
+            
             FrogInkExcelCreator frogInkExcelCreator = new FrogInkExcelCreator(upc, profile)
             {
                 path = path,

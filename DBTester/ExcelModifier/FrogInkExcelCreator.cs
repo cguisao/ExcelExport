@@ -15,7 +15,9 @@ namespace ExcelModifier
         {
             upcs = _upc;
             profile = _profile;
+            titleObjects = new MultiMapObject<FrogList>();
         }
+
         public string path { get; set; }
 
         public Dictionary<int, double> fragrancexPrices { get; set; }
@@ -31,116 +33,185 @@ namespace ExcelModifier
             FileInfo file = new FileInfo(path);
             Dictionary<string, long> dicSKU = new Dictionary<string, long>();
             Dictionary<string, string> dicTitle = new Dictionary<string, string>();
-            int count = 1;
             int execption = 0;
             try
             {
                 using (ExcelPackage package = new ExcelPackage(file))
                 {
-                    StringBuilder sb = new StringBuilder();
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
-                    
-                    worksheet.DeleteRow(1);
 
-                    worksheet.Cells["A:AA"].Sort();
-
-                    worksheet.InsertRow(1, 1);
+                    dicTitle = titleDic(worksheet);
 
                     // Prepare the excel and remove whatever it needs to be removed.
+
+                    listCreator(worksheet);
 
                     PrepareExcel(worksheet, profile.min, profile.max);
 
                     int rowCount = worksheet.Dimension.Rows;
 
                     int ColCount = worksheet.Dimension.Columns;
-
-                    dicTitle = titleDic(worksheet);
-
-                    long? itemID;
-
+                    
                     string title = "";
 
-                    for (int row = 1; row <= rowCount; row++)
+                    worksheet.DeleteRow(1, rowCount);
+
+                    int row2 = 2;
+
+                    int innerList = 0;
+
+                    foreach(string list in titleObjects.Keys)
                     {
                         execption++;
 
-                        if (row == 1)
+                        if(execption == 1)
                         {
-                            worksheet.Cells[row, 1].Value = "Sku";
-                            worksheet.Cells[row, 2].Value = "Title";
-                            worksheet.Cells[row, 3].Value = "Description";
-                            worksheet.Cells[row, 4].Value = "Vendor";
-                            worksheet.Cells[row, 5].Value = "Quantity";
-                            worksheet.Cells[row, 6].Value = "Price";
-                            worksheet.Cells[row, 7].Value = "Images";
-                            worksheet.Cells[row, 8].Value = "optionname1";
-                            worksheet.Cells[row, 9].Value = "optionname2";
-                            worksheet.Cells[row, 10].Value = "optionname3";
-                            worksheet.Cells[row, 11].Value = "optionname4";
-                            worksheet.Cells[row, 12].Value = "optionname5";
-                            worksheet.Cells[row, 13].Value = "option1";
-                            worksheet.Cells[row, 14].Value = "option2";
-                            worksheet.Cells[row, 15].Value = "option3";
-                            worksheet.Cells[row, 16].Value = "option4";
-                            worksheet.Cells[row, 17].Value = "option5";
-                            worksheet.Cells[row, 18].Value = "product_identifier";
-                            worksheet.Cells[row, 19].Value = "product_identifier_type";
-                            worksheet.Cells[row, 20].Value = "brand";
-                            worksheet.Cells[row, 21].Value = "cost";
+                            // set the first row
+
+                            worksheet.Cells[1, 1].Value = "sku";
+                            worksheet.Cells[1, 2].Value = "title";
+                            worksheet.Cells[1, 3].Value = "description";
+                            worksheet.Cells[1, 4].Value = "quantity";
+                            worksheet.Cells[1, 5].Value = "price";
+                            worksheet.Cells[1, 6].Value = "images";
+                            worksheet.Cells[1, 7].Value = "optionname1";
+                            worksheet.Cells[1, 8].Value = "optionname2";
+                            worksheet.Cells[1, 9].Value = "optionname3";
+                            worksheet.Cells[1, 10].Value = "optionname4";
+                            worksheet.Cells[1, 11].Value = "optionname5";
+                            worksheet.Cells[1, 12].Value = "option1";
+                            worksheet.Cells[1, 13].Value = "option2";
+                            worksheet.Cells[1, 14].Value = "option3";
+                            worksheet.Cells[1, 15].Value = "option4";
+                            worksheet.Cells[1, 16].Value = "option5";
+                            worksheet.Cells[1, 17].Value = "product_identifier";
+                            worksheet.Cells[1, 18].Value = "product_identifier_type";
+                            worksheet.Cells[1, 19].Value = "brand";
+                            worksheet.Cells[1, 20].Value = "cost";
                         }
-                        else
+                        
+                        innerList = 1;
+                        foreach (FrogList inList in titleObjects[list])
                         {
-                            itemID = Convert.ToInt64(worksheet.Cells[row, 13].Value);
-
-                            // Logic for the title
-                            title = BuildTitle(dicTitle, worksheet.Cells[row, 2].Value.ToString()
-                                + " " + worksheet.Cells[row, 27].Value.ToString(), worksheet.Cells[row, 27].Value.ToString());
-                            worksheet.Cells[row, 2].Value = title;
-                            if (title.Length > 80)
-                                count++;
-
-                            //Logic for the HTML Body
-
-                            //worksheet.Cells[row, 3].Value = BuildHTML(worksheet, row, profile.html, itemID);
-
-                            // SKU creator
-
-                            long? value;
-
-                            if (upcs.TryGetValue(Convert.ToInt32(itemID), out value))
+                            // Title gets written once if it has variations
+                            if(innerList == 1 && titleObjects[list].Count != 1)
                             {
-                                worksheet.Cells[row, 23].Value = value;
+                                // set title
+                                title = BuildTitle(dicTitle, list, inList.collection);
+                                worksheet.Cells[row2, 2].Value = title;
+                                // set description
+                                worksheet.Cells[row2, 3].Value = inList.description;
+                                // set images
+                                worksheet.Cells[row2, 6].Value = fixPictureHTML(inList.pictures);
+                                // set option name 1
+                                worksheet.Cells[row2, 7].Value = "Size";
+                                // set option name 2
+                                worksheet.Cells[row2, 8].Value = "Fragrance Type";
+                                // set option name 3
+                                worksheet.Cells[row2, 9].Value = "Brand";
+                                // set product identifier type
+                                worksheet.Cells[row2, 18].Value = "UPC";
+                                // set brand 
+                                worksheet.Cells[row2, 19].Value = inList.brand;
+
+                                innerList++;
+                                row2++;
                             }
-
-                            // prices
-
-                            string price = getSellingPrice(itemID);
-
-                            if (double.Parse(price) != 0.0)
+                            if(titleObjects[list].Count != 1)
                             {
-                                worksheet.Cells[row, 19].Value = double.Parse(price);
-                                worksheet.Cells[row, 16].Value = profile.items;
+                                // set sku
+                                worksheet.Cells[row2, 1].Value = inList.sku;
+                                // set quantity
+                                worksheet.Cells[row2, 4].Value = "Quantity";
+                                // set price 
+                                string price = getSellingPrice(inList.sku);
+
+                                if (double.Parse(price) != 0.0)
+                                {
+                                    worksheet.Cells[row2, 5].Value = double.Parse(price);
+                                    // set quantity
+                                    worksheet.Cells[row2, 4].Value = 3;
+                                }
+                                else
+                                {
+                                    worksheet.Cells[row2, 5].Value = 100.0;
+                                    // set quantity
+                                    worksheet.Cells[row2, 4].Value = 0;
+                                }
+                                // set option 1
+                                worksheet.Cells[row2, 12].Value = inList.size;
+                                // set option 2
+                                worksheet.Cells[row2, 13].Value = inList.fragranceType;
+                                // set option 3
+                                worksheet.Cells[row2, 14].Value = inList.brand;
+                                // set product identifier 
+                                long? value;
+
+                                if (upcs.TryGetValue(Convert.ToInt32(inList.sku), out value))
+                                {
+                                    worksheet.Cells[row2, 17].Value = value;
+                                }
+                            
+                                row2++;
                             }
-                            else
+                            // Title gets written once if it does not have variations
+                            else if(titleObjects[list].Count == 1)
                             {
-                                worksheet.Cells[row, 19].Value = 100.0;
-                                worksheet.Cells[row, 16].Value = 0;
+                                // set title
+                                title = BuildTitle(dicTitle, list, inList.collection);
+                                worksheet.Cells[row2, 2].Value = title;
+                                // set description
+                                worksheet.Cells[row2, 3].Value = inList.description;
+                                // set images
+                                worksheet.Cells[row2, 6].Value = fixPictureHTML(inList.pictures);
+                                // set option name 1
+                                worksheet.Cells[row2, 7].Value = "Size";
+                                // set option name 2
+                                worksheet.Cells[row2, 8].Value = "Fragrance Type";
+                                // set option name 3
+                                worksheet.Cells[row2, 9].Value = "Brand";
+                                // set product identifier type
+                                worksheet.Cells[row2, 18].Value = "UPC";
+                                // set brand 
+                                worksheet.Cells[row2, 19].Value = inList.brand;
+
+                                // set sku
+                                worksheet.Cells[row2, 1].Value = inList.sku;
+                                // set quantity
+                                worksheet.Cells[row2, 4].Value = "Quantity";
+                                // set price 
+                                string price = getSellingPrice(inList.sku);
+
+                                if (double.Parse(price) != 0.0)
+                                {
+                                    worksheet.Cells[row2, 5].Value = double.Parse(price);
+                                    // set quantity
+                                    worksheet.Cells[row2, 4].Value = 3;
+                                }
+                                else
+                                {
+                                    worksheet.Cells[row2, 5].Value = 100.0;
+                                    // set quantity
+                                    worksheet.Cells[row2, 4].Value = 0;
+                                }
+                                // set option 1
+                                worksheet.Cells[row2, 12].Value = inList.size;
+                                // set option 2
+                                worksheet.Cells[row2, 13].Value = inList.fragranceType;
+                                // set option 3
+                                worksheet.Cells[row2, 14].Value = inList.brand;
+                                // set product identifier 
+                                long? value;
+
+                                if (upcs.TryGetValue(Convert.ToInt32(inList.sku), out value))
+                                {
+                                    worksheet.Cells[row2, 17].Value = value;
+                                }
+
+                                row2++;
                             }
-
-                            // This logic fixes the picture in some cases
-
-                            worksheet.Cells[row, 24].Value =
-                                        worksheet.Cells[row, 24].Value.ToString()
-                                            .Replace("http://img.fragrancex.com/images/products/SKU/small/"
-                                            , "http://img.fragrancex.com/images/products/SKU/large/")
-                                            .Replace("http", "https").Replace("httpss", "https");
-
-                            double actualPrice = 0.0;
-                            fragrancexPrices.TryGetValue(Convert.ToInt32(itemID), out actualPrice);
-                            worksheet.Cells[row, 28].Value = actualPrice;
                         }
                     }
-
                     package.Save();
                 }
             }
@@ -198,7 +269,7 @@ namespace ExcelModifier
                 // Remove testers and unboxed items
                 title = worksheet.Cells[row, 1].Value.ToString();
                 if (title.ToLower().Contains("tester") || title.ToLower().Contains("unboxed")
-                    || title.ToLower().Contains("sample") || title.ToLower().Contains("jivago"))
+                    || !title.ToLower().Contains("sample") || title.ToLower().Contains("jivago"))
                 {
                     worksheet.DeleteRow(row, 1, true);
                     row--;
@@ -251,7 +322,7 @@ namespace ExcelModifier
 
             string value;
 
-            dicTitle.TryGetValue(title, out value);
+            dicTitle.TryGetValue(title + " " + fragranceType, out value);
 
             if (value != null)
             {
@@ -479,6 +550,37 @@ namespace ExcelModifier
             return dic;
         }
 
+        private void listCreator(ExcelWorksheet worksheet)
+        {
+            int rowCount = worksheet.Dimension.Rows;
+            int ColCount = worksheet.Dimension.Columns;
+
+            for (int row = 1; row <= rowCount; row++)
+            {
+                if(row != 1)
+                {
+                    // Remove testers and unboxed items
+                    string title = worksheet.Cells[row, 1].Value.ToString();
+                    if (!title.ToLower().Contains("tester") && !title.ToLower().Contains("unboxed")
+                    && !title.ToLower().Contains("sample") && !title.ToLower().Contains("jivago"))
+                    {
+                        FrogList frogList = new FrogList();
+
+                        frogList.description = worksheet.Cells[row, 3].Value.ToString();
+                        frogList.brand = worksheet.Cells[row, 4].Value.ToString();
+                        frogList.fragranceType = worksheet.Cells[row, 5].Value.ToString();
+                        frogList.sku = Convert.ToInt64(worksheet.Cells[row, 13].Value);
+                        frogList.price = Convert.ToDouble(worksheet.Cells[row, 19].Value.ToString());
+                        frogList.pictures = fixPictureHTML(worksheet.Cells[row, 24].Value.ToString());
+                        frogList.size = worksheet.Cells[row, 8].Value.ToString();
+                        frogList.collection = worksheet.Cells[row, 27].Value.ToString();
+
+                        titleObjects.Add(worksheet.Cells[row, 2].Value.ToString(), frogList);
+                    }
+                }
+            }
+        }
+
         private string getSize(string v)
         {
             char[] subString = v.ToArray();
@@ -496,5 +598,24 @@ namespace ExcelModifier
 
             return ans;
         }
+
+        private string fixPictureHTML(string html)
+        {
+            string returnHTML = html.Replace("http://img.fragrancex.com/images/products/SKU/small/"
+            , "http://img.fragrancex.com/images/products/SKU/large/");
+
+            if (returnHTML.Contains("httpss"))
+            {
+                return returnHTML.Replace("httpss", "https");
+            }
+            else if (!returnHTML.Contains("https") && returnHTML.Contains("http"))
+            {
+                return returnHTML.Replace("http", "https");
+            }
+
+            return returnHTML;
+        }
+
+        private MultiMapObject<FrogList> titleObjects;
     }
 }
