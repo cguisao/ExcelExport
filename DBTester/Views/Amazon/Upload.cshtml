@@ -43,6 +43,27 @@
     <div class="col-xl-12">
         <div class="card ">
             <div class="card-body">
+                <h2>Amazon Black List</h2>
+                <form asp-controller="Amazon" asp-action="BlackList" asp-antiforgery="false"
+                      enctype="multipart/form-data">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="ProfileUser">Asin:</label>
+                            <input type="text" class="form-control" name="Asin" placeholder="Asin" required>
+                        </div>
+                        <div class="text-center m-t-15">
+                            <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card ">
+            <div class="card-body">
                 <h2>Amazon Listing Viewer</h2>
                 <br />
                 <div class="table-responsive">
@@ -53,6 +74,7 @@
                                 <th>SKU</th>
                                 <th>Price</th>
                                 <th>wholesaler</th>
+                                <th>BlackList</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -70,6 +92,9 @@
                                     </td>
                                     <td>
                                         @item.wholesaler
+                                    </td>
+                                    <td>
+                                        @item.blackList
                                     </td>
                                 </tr>
                             }
@@ -95,4 +120,7 @@
 </p>
 <p>
     Total AzImporter ASINs uploaded in the database <b>@ViewBag.amazonAzImporter</b> <br />
+</p>
+<p>
+    Total ASINs uploaded and Black Listed <b>@ViewBag.amazonBlackListed</b> <br />
 </p>

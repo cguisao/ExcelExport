@@ -2,6 +2,7 @@
 using DBTester.Code;
 using DBTester.Models;
 using ExcelModifier;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -40,11 +41,15 @@ namespace DBTester.Controllers
                 .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
                 .LastOrDefault()?.type;
 
-            ViewBag.amazonItems = _context.Amazon.Count();
+            ViewBag.amazonItems = _context.Amazon.Where(x => x.blackList != true).Count();
 
-            ViewBag.amazonFragrancex = _context.Amazon.Where(x => x.wholesaler == Wholesalers.Fragrancex.ToString()).Count();
+            ViewBag.amazonFragrancex = _context.Amazon.Where(x => x.wholesaler == Wholesalers.Fragrancex.ToString()
+                                         && x.blackList != true).Count();
 
-            ViewBag.amazonAzImporter = _context.Amazon.Where(x => x.wholesaler == Wholesalers.AzImporter.ToString()).Count();
+            ViewBag.amazonAzImporter = _context.Amazon.Where(x => x.wholesaler == Wholesalers.AzImporter.ToString()
+                                        && x.blackList != true).Count();
+
+            ViewBag.amazonBlackListed = _context.Amazon.Where(x => x.blackList == true).Count();
 
             Guid guid = Guid.NewGuid();
 
@@ -53,6 +58,11 @@ namespace DBTester.Controllers
             Profile profile = new Profile();
 
             return View(_context.Amazon.ToList());
+        }
+
+        public IActionResult BlackList()
+        {
+            return View(_context.Amazon.ToList().Where(x => x.blackList == true));
         }
 
         public IActionResult Index()
@@ -87,6 +97,13 @@ namespace DBTester.Controllers
         {
             if (file == null || file.Length == 0)
             {
+                return null;
+            }
+
+            if(!file.FileName.Contains(".xlsx"))
+            {
+                ModelState.Clear();
+                ModelState.AddModelError("", "Wrong file type");
                 return null;
             }
 
@@ -175,7 +192,7 @@ namespace DBTester.Controllers
                 + Path.GetExtension(path).ToLowerInvariant());
 
             System.IO.File.Delete(path);
-
+            
             return returnFile;
         }
 
@@ -216,6 +233,29 @@ namespace DBTester.Controllers
             System.IO.File.Delete(path);
 
             return returnFile;
+        }
+
+        [HttpPost]
+        public IActionResult BlackList(string Asin, string modifer)
+        {
+            Amazon currAsin = new Amazon();
+
+            var amazon = _context.Amazon.Where(x => x.Asin == Asin);
+
+            currAsin.id = Convert.ToInt32(amazon.Select(x => x.id).FirstOrDefault());
+            currAsin.Asin = Convert.ToString(amazon.Select(x => x.Asin).FirstOrDefault());
+            currAsin.sku = Convert.ToString(amazon.Select(x => x.sku).FirstOrDefault());
+            currAsin.wholesaler = Convert.ToString(amazon.Select(x => x.wholesaler).FirstOrDefault());
+            currAsin.price = Convert.ToDouble(amazon.Select(x => x.price).FirstOrDefault());
+
+            if (currAsin != null)
+            {
+                currAsin.blackList = Convert.ToBoolean(modifer);
+                _context.Amazon.Update(currAsin);
+                _context.SaveChanges();
+            }
+            
+            return Redirect("BlackList");
         }
 
         private void SetDictionariesAsync()

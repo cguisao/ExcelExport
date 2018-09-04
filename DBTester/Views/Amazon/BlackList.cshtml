@@ -1,0 +1,98 @@
+﻿@model IEnumerable<DBTester.Models.Amazon>
+@{
+    ViewBag.Title = "Update";
+}
+
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card ">
+            <div class="card-body">
+                <h2>Amazon Black List Add</h2>
+                <form asp-controller="Amazon" asp-action="BlackList" asp-antiforgery="false"
+                      enctype="multipart/form-data">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="ProfileUser">Asin:</label>
+                            <input type="text" class="form-control" name="Asin" placeholder="Asin" required>
+                        </div>
+                        <div class="form-group col-md-6 invisible">
+                            <input type="text" class="form-control" name="modifer" value="true">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card ">
+            <div class="card-body">
+                <h2>Amazon Black List Remove</h2>
+                <form asp-controller="Amazon" asp-action="BlackList" asp-antiforgery="false"
+                      enctype="multipart/form-data">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="ProfileUser">Asin:</label>
+                            <input type="text" class="form-control" name="Asin" placeholder="Asin" required>
+                        </div>
+                        <div class="form-group col-md-6 invisible">
+                            <input type="text" class="form-control" name="modifer" value="false">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card ">
+            <div class="card-body">
+                <h2>Amazon Black List Viewer</h2>
+                <br />
+                <div class="table-responsive">
+                    <table id="datatable2" class="table border-0 dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Asin</th>
+                                <th>SKU</th>
+                                <th>Price</th>
+                                <th>wholesaler</th>
+                                <th>BlackList</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                            <tr>
+                                <td>
+                                    @item.Asin
+                                </td>
+                                <td>
+                                    @item.sku
+                                </td>
+                                <td>
+                                    @item.price
+                                </td>
+                                <td>
+                                    @item.wholesaler
+                                </td>
+                                <td>
+                                    @item.blackList
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

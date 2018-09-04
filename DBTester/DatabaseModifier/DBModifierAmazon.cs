@@ -27,7 +27,8 @@ namespace DatabaseModifier
             ColumnMaker(amazonTable, "price", "System.Double");
             ColumnMaker(amazonTable, "sku", "System.String");
             ColumnMaker(amazonTable, "wholesaler", "System.String");
-
+            ColumnMaker(amazonTable, "blackList", "System.Boolean");
+            
             return amazonTable;
         }
 
@@ -52,6 +53,7 @@ namespace DatabaseModifier
                 insideRow["sku"] = item.sku;
                 insideRow["price"] = item.price;
                 insideRow["wholesaler"] = item.wholesaler;
+                insideRow["blackList"] = item.blackList;
 
                 uploadAmazon.Rows.Add(insideRow);
                 uploadAmazon.AcceptChanges();

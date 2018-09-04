@@ -20,6 +20,8 @@ namespace DBTester.Models
         public double price { get; set; }
 
         public string wholesaler { get; set; }
+
+        public bool blackList { get; set; }
         
     }
 }

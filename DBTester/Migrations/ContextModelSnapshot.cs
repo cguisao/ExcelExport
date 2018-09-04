@@ -26,6 +26,8 @@ namespace GTISolutions.Migrations
 
                     b.Property<string>("Asin");
 
+                    b.Property<bool>("blackList");
+
                     b.Property<double>("price");
 
                     b.Property<string>("sku");

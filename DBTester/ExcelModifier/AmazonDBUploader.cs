@@ -86,6 +86,7 @@ namespace ExcelModifier
                                             amazon.sku = skuID.ToString();
                                             amazon.price = Convert.ToDouble(worksheet.Cells[row, 3].Value);
                                             amazon.wholesaler = Wholesalers.Fragrancex.ToString();
+                                            amazon.blackList = false;
                                             listAmazonSure.TryAdd(amazon.Asin, "");
                                             amazonList.Add(amazon);
                                         }
@@ -100,6 +101,7 @@ namespace ExcelModifier
                                             amazon.sku = azImporterSku.ToUpper();
                                             amazon.price = Convert.ToDouble(worksheet.Cells[row, 3].Value);
                                             amazon.wholesaler = Wholesalers.AzImporter.ToString();
+                                            amazon.blackList = false;
                                             listAmazonSure.TryAdd(amazon.Asin, "");
                                             amazonList.Add(amazon);
                                         }
@@ -111,7 +113,8 @@ namespace ExcelModifier
 
                     row = 2;
 
-                    foreach (Amazon list in amazonPrintList.Where(x => x.wholesaler == Wholesalers.Fragrancex.ToString()))
+                    foreach (Amazon list in amazonPrintList.Where(x => x.wholesaler == Wholesalers.Fragrancex.ToString() 
+                        && x.blackList == false))
                     {
                         Random rnd = new Random();
                         Random rnd2 = new Random();
@@ -132,7 +135,8 @@ namespace ExcelModifier
 
                     //row = 2;
 
-                    foreach (Amazon list in amazonPrintList.Where(x => x.wholesaler == Wholesalers.AzImporter.ToString()))
+                    foreach (Amazon list in amazonPrintList.Where(x => x.wholesaler == Wholesalers.AzImporter.ToString()
+                        && x.blackList == false))
                     {
                         Random rnd = new Random();
                         Random rnd2 = new Random();
