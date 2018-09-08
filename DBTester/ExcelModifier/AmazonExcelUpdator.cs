@@ -36,6 +36,7 @@ namespace ExcelModifier
                     int sku = 0;
                     int price = 0;
                     int quantity = 0;
+                    int asinCol = 0;
 
                     for (int row = 1; row <= rowCount; row++)
                     {
@@ -57,6 +58,10 @@ namespace ExcelModifier
                                 {
                                     quantity = column;
                                 }
+                                else if (worksheet.Cells[row, column].Value.ToString().ToLower().Contains("asin"))
+                                {
+                                    asinCol = column;
+                                }
                             }
 
                             worksheet.Cells[row, 1].Value = "sku";
@@ -66,7 +71,7 @@ namespace ExcelModifier
                             worksheet.Cells[row, 5].Value = "quantity";
                             worksheet.Cells[row, 6].Value = "handling-time";
                             worksheet.Cells[row, 7].Value = "fulfillment-channel";
-                            worksheet.Cells[row, 8].Value = "Selling Price";
+                            worksheet.Cells[row, 8].Value = "Suggested Price";
                             worksheet.Cells[row, 9].Value = "Weight Price";
                         }
                         else
@@ -77,8 +82,17 @@ namespace ExcelModifier
                                 string rowSku = worksheet.Cells[row, 1].Value.ToString();
                                 long? digitSku = DigitGetter(rowSku);
                                 double rowPrice = Convert.ToDouble(worksheet.Cells[row, price].Value);
+                                string asin = Convert.ToString(worksheet.Cells[row, asinCol].Value);
 
-                                if (isFragrancex(digitSku))
+                                if (isBlackListed(asin))
+                                {
+                                    worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
+                                    worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                    worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Pink);
+                                    worksheet.Cells[row, 5].Value = 0;
+                                    worksheet.Cells[row, 8].Value = "ASIN Black Listed";
+                                }
+                                else if (isFragrancex(digitSku))
                                 {
                                     skuID = DigitGetter(rowSku);
                                     
@@ -99,7 +113,7 @@ namespace ExcelModifier
                                         worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
                                         worksheet.Cells[row, 5].Value = 3;
                                         worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                        worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Blue);
+                                        worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.MediumBlue);
                                         worksheet.Cells[row, 8].Value = sellingPrice;
                                     }
                                     // In-stock
@@ -122,56 +136,63 @@ namespace ExcelModifier
                                 }
                                 else if(isAzImporter(rowSku))
                                 {
-                                    // Weight is not register
-                                    if (!isWeightRegister())
+                                    int qty = 0;
+                                    azImportQuantity.TryGetValue(azImporterSku, out qty);
+                                    // In-stock
+                                    if (qty > 0)
                                     {
-                                        worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
-                                        worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                        worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Orange);
-                                        worksheet.Cells[row, 8].Value = "Weight Not Register";
-                                    }
-                                    else
-                                    {
-                                        double sellingPrice = getSellingPrice();
-                                        // Price too low
-                                        if (isPriceLower(rowPrice, sellingPrice) && sellingPrice != 0)
+                                        // Weight is not register
+                                        if (!isWeightRegister())
                                         {
                                             worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
-                                            worksheet.Cells[row, 5].Value = worksheet.Cells[row, quantity].Value;
                                             worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                            worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Red);
-                                            worksheet.Cells[row, 8].Value = sellingPrice;
-                                            worksheet.Cells[row, 9].Value = AzImporterPriceWeight;
+                                            worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Orange);
+                                            worksheet.Cells[row, 8].Value = "Weight Not Register";
                                         }
-
-                                        // Price is too high 
-                                        else if (isPriceTooHigh(rowPrice, sellingPrice) && sellingPrice != 0)
-                                        {
-                                            worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
-                                            worksheet.Cells[row, 5].Value = 3;
-                                            worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                            worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Blue);
-                                            worksheet.Cells[row, 9].Value = AzImporterPriceWeight;
-                                        }
-                                        // In-stock
-                                        else if (sellingPrice != 0)
-                                        {
-                                            worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
-                                            worksheet.Cells[row, 5].Value = 3;
-                                            worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                            worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Green);
-                                            worksheet.Cells[row, 8].Value = sellingPrice;
-                                            worksheet.Cells[row, 9].Value = AzImporterPriceWeight;
-                                        }
-                                        // Out of stock
                                         else
                                         {
-                                            worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
-                                            worksheet.Cells[row, 5].Value = 0;
-                                            worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                            worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
-                                            worksheet.Cells[row, 9].Value = AzImporterPriceWeight;
+                                            double sellingPrice = getSellingPrice();
+                                            // Price too low
+                                            if (isPriceLower(rowPrice, sellingPrice) && sellingPrice != 0)
+                                            {
+                                                worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
+                                                worksheet.Cells[row, 5].Value = worksheet.Cells[row, quantity].Value;
+                                                worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                                worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                                                worksheet.Cells[row, 8].Value = sellingPrice;
+                                                worksheet.Cells[row, 9].Value = AzImporterPriceWeight;
+                                            }
+
+                                            // Price is too high 
+                                            else if (isPriceTooHigh(rowPrice, sellingPrice) && sellingPrice != 0)
+                                            {
+                                                worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
+                                                worksheet.Cells[row, 5].Value = 3;
+                                                worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                                worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.MediumBlue);
+                                                worksheet.Cells[row, 8].Value = sellingPrice;
+                                                worksheet.Cells[row, 9].Value = AzImporterPriceWeight;
+                                            }
+
+                                            else
+                                            {
+                                                worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
+                                                worksheet.Cells[row, 5].Value = 3;
+                                                worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                                worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                                                worksheet.Cells[row, 8].Value = sellingPrice;
+                                                worksheet.Cells[row, 9].Value = AzImporterPriceWeight;
+                                            }
                                         }
+                                    }
+                                    // Out of stock
+                                    else
+                                    {
+                                        worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
+                                        worksheet.Cells[row, 5].Value = 0;
+                                        worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                        worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
+                                        worksheet.Cells[row, 9].Value = AzImporterPriceWeight;
                                     }
                                     azImporterSku = "";
                                     AzImporterPriceWeight = 0.0;
@@ -187,7 +208,31 @@ namespace ExcelModifier
                             }
                         }
                     }
-                    
+
+                    int start = 2;
+
+                    worksheet.Cells[execption + start, 1].Value = "Legend";
+                    start++;
+                    worksheet.Cells[execption + start, 1].Value = "Out of stock";
+                    worksheet.Cells[execption + start, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[execption + start, 2].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
+                    start++;
+                    worksheet.Cells[execption + start, 1].Value = "Weight not Register";
+                    worksheet.Cells[execption + start, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[execption + start, 2].Style.Fill.BackgroundColor.SetColor(Color.Orange);
+                    start++;
+                    worksheet.Cells[execption + start, 1].Value = "Price is too High";
+                    worksheet.Cells[execption + start, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[execption + start, 2].Style.Fill.BackgroundColor.SetColor(Color.MediumBlue);
+                    start++;
+                    worksheet.Cells[execption + start, 1].Value = "Price is too Low";
+                    worksheet.Cells[execption + start, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[execption + start, 2].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                    start++; ;
+                    worksheet.Cells[execption + start, 1].Value = "Price is Correct";
+                    worksheet.Cells[execption + start, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[execption + start, 2].Style.Fill.BackgroundColor.SetColor(Color.Green);
+
                     package.Save();
                 }
             }
@@ -195,7 +240,19 @@ namespace ExcelModifier
             {
             }
         }
-        
+
+        private bool isBlackListed(string asin)
+        {
+            if(blackListed.ContainsKey(asin))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         private bool isPriceTooHigh(double rowPrice, double sellingPrice)
         {
             if (sellingPrice == 0)

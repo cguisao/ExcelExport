@@ -23,6 +23,8 @@ namespace DatabaseModifier
 
         public double AzImporterPriceWeight { get; set; }
 
+        public Dictionary<string, bool> blackListed { get; set; }
+
         public bool isAzImporter(string sku)
         {
             azImporterSku = "";
@@ -150,22 +152,22 @@ namespace DatabaseModifier
             {
                 return 0.0;
             }
-
-            // AzImporter Fee
-            summer = sellingPrice + 2;
-
+            
             // EA Group Fee 20%
             
-            summer = summer + (summer * 20) / 100;
+            summer = sellingPrice + (sellingPrice * 15) / 100;
             
             // profit 20% by default
-            summer = summer + (summer * 20) / 100;
+            summer = summer + (sellingPrice * 20) / 100;
+
+            // AzImporter Fee
+            summer = summer + 2;
 
             // shipping
             summer = summer + AzImporterPriceWeight;
 
             // Amazon Fee 20%
-            summer = summer + (summer * 20) / 100;
+            summer = summer + (summer * 18) / 100;
 
             return summer;
         }

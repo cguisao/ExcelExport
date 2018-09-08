@@ -203,6 +203,8 @@ namespace DBTester.Controllers
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
 
+            var blackListed = _context.Amazon.Where(z => z.blackList == true).ToDictionary(x => x.Asin, y => y.blackList);
+
             SetDictionariesAsync();
             
             AmazonExcelUpdator amazonExcelUpdator = new AmazonExcelUpdator()
@@ -212,7 +214,8 @@ namespace DBTester.Controllers
                 azImportPrice = azImportPrice,
                 azImportQuantity = azImportQuantity,
                 ShippingtWeight = shippingWeight,
-                azImporterWeightSku = azImporterWeightSku
+                azImporterWeightSku = azImporterWeightSku,
+                blackListed = blackListed
             };
 
             amazonExcelUpdator.ExcelGenerator();
