@@ -141,6 +141,17 @@ namespace GTISolutions.Migrations
                     b.ToTable("Fragrancex");
                 });
 
+            modelBuilder.Entity("DBTester.Models.FragrancexTitle", b =>
+                {
+                    b.Property<int>("ItemID");
+
+                    b.Property<string>("Title");
+
+                    b.HasKey("ItemID");
+
+                    b.ToTable("FragrancexTitle");
+                });
+
             modelBuilder.Entity("DBTester.Models.PerfumeWorldWide", b =>
                 {
                     b.Property<string>("sku");

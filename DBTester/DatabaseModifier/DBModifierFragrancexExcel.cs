@@ -142,5 +142,4 @@ namespace DatabaseModifier
             upload(uploadFragrancex, bulkSize, "dbo.Fragrancex");
         }
     }
-    
 }

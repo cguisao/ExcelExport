@@ -339,11 +339,23 @@ namespace DBTester.Controllers
 
             var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
 
+            // Update the Fragrancex db
+
             _context.Database.ExecuteSqlCommand("delete from Fragrancex");
 
             DBModifierFragrancexExcel dBModifierFragrancexExcel = new DBModifierFragrancexExcel(path, upc);
 
             dBModifierFragrancexExcel.TableExecutor();
+
+            // Update the FragrancexList db
+
+            var fragranceTitle = _context.FragrancexTitle.ToDictionary(x => x.ItemID, y => y.Title);
+
+            DBModifierFragrancexExcelList dBModifierFragrancexExcelList = new DBModifierFragrancexExcelList(path, fragranceTitle);
+
+            _context.Database.ExecuteSqlCommand("delete from FragrancexTitle");
+
+            dBModifierFragrancexExcelList.TableExecutor();
 
             ServiceTimeStamp service = new ServiceTimeStamp();
 

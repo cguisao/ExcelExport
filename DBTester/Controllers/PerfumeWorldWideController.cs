@@ -18,6 +18,8 @@ namespace DBTester.Controllers
         public PerfumeWorldWideController(Context context)
         {
             _context = context;
+            fragrancex = _context.FragrancexTitle.ToDictionary(x => x.ItemID, y => y.Title);
+            fragrancexUpc = _context.Fragrancex.Where(z => z.Upc != null).ToDictionary(x => x.ItemID, y => y.Upc);
         }
 
         public IActionResult Index()
@@ -37,30 +39,10 @@ namespace DBTester.Controllers
             Guid guid = Guid.NewGuid();
 
             ViewBag.ExcelGuid = guid.ToString();
-
+            
             return View(_context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
                 .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> DropzoneFileUpload(IFormFile file, string fileName)
-        {
-            if (file == null || file.Length == 0)
-            {
-                return null;
-            }
-
-            var path = Path.Combine(
-                        Directory.GetCurrentDirectory(), "wwwroot",
-                        fileName + ".xlsx");
-
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            return Ok();
         }
 
         [HttpPost]
@@ -69,15 +51,10 @@ namespace DBTester.Controllers
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
-
-            //var fragrancexPrices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
-
-            var fragrancexUpc = _context.Fragrancex.Where(z => z.Upc != null).ToDictionary(x => x.ItemID, y => y.Upc);
-
-            PerfumeWorldWideComparer perfumeWorldWideComparer = new PerfumeWorldWideComparer()
+            
+            PerfumeWorldWideComparer perfumeWorldWideComparer = new PerfumeWorldWideComparer(fragrancex)
             {
                 path = path,
-                //fragrancexPrices = fragrancexPrices,
                 fragrancexUpc = fragrancexUpc
             };
 
@@ -100,5 +77,9 @@ namespace DBTester.Controllers
 
             return returnFile;
         }
+
+        Dictionary<int, string> fragrancex { get; set; }
+
+        Dictionary<int, long?> fragrancexUpc { get; set; }
     }
 }

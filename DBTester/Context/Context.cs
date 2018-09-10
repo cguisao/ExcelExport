@@ -17,6 +17,7 @@ namespace DBTester.Models
         public DbSet<PerfumeWorldWide> PerfumeWorldWide { get; set; }
         public DbSet<Shipping> Shipping { get; set; }
         public DbSet<Amazon> Amazon { get; set; }
+        public DbSet<FragrancexTitle> FragrancexTitle { get; set; }
         public DbSet<ErrorViewModel> ErrorViewModel { get; set; }
     }
 }
