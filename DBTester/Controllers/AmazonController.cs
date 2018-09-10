@@ -93,33 +93,6 @@ namespace DBTester.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DropzoneFileUpload(IFormFile file, string fileName)
-        {
-            if (file == null || file.Length == 0)
-            {
-                return null;
-            }
-
-            if(!file.FileName.Contains(".xlsx"))
-            {
-                ModelState.Clear();
-                ModelState.AddModelError("", "Wrong file type");
-                return null;
-            }
-
-            var path = Path.Combine(
-                        Directory.GetCurrentDirectory(), "wwwroot",
-                        fileName + ".xlsx");
-
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            return Ok();
-        }
-
-        [HttpPost]
         public async Task<IActionResult> UpdateAmazonDB(string file)
         {
             var path = Path.Combine(

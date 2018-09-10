@@ -311,26 +311,6 @@ namespace DBTester.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> DropzoneFileUpload(IFormFile file, string fileName)
-        {
-            if (file == null || file.Length == 0)
-            {
-                return null;
-            }
-            
-            var path = Path.Combine(
-                        Directory.GetCurrentDirectory(), "wwwroot",
-                        fileName + ".xlsx");
-
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-            
-            return Ok();
-        }
-
-        [HttpPost]
         public IActionResult UpdateFragrancexExcel(string file)
         {
             var path = Path.Combine(

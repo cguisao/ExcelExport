@@ -42,26 +42,6 @@ namespace DBTester.Controllers
             return View(_context.UPC.ToList());
         }
 
-        [HttpPost]
-        public async Task<IActionResult> DropzoneFileUpload(IFormFile file, string fileName)
-        {
-            if (file == null || file.Length == 0)
-            {
-                return null;
-            }
-
-            var path = Path.Combine(
-                        Directory.GetCurrentDirectory(), "wwwroot",
-                        fileName + ".xlsx");
-
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            return Ok();
-        }
-
         public IActionResult UpcViewer(int? page, string Search_Data)
         {
             var upcs = _context.UPC.ToList();
