@@ -90,7 +90,6 @@ namespace DBTester.Controllers
             
             using (var stream = new FileStream(path, FileMode.Create))
             {
-                //newFile.CopyTo(stream.ToString());
                 await file.CopyToAsync(stream);
             }
 
@@ -135,6 +134,9 @@ namespace DBTester.Controllers
             return returnFile;
         }
 
+        /*
+            This function is the http post from the index. 
+        */
         [HttpPost]
         public async Task<IActionResult> ExportToExcel(string file, string shipping
             , string fee, string profit, string promoting, string markdown, int items, int min

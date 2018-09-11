@@ -15,7 +15,7 @@ namespace ExcelModifier
         {
             upcs = _upc;
             profile = _profile;
-            titleObjects = new MultiMapObject<FrogList>();
+            titleObjects = new MultiMapFrog<FrogList>();
         }
 
         public string path { get; set; }
@@ -616,6 +616,6 @@ namespace ExcelModifier
             return returnHTML;
         }
 
-        private MultiMapObject<FrogList> titleObjects;
+        private MultiMapFrog<FrogList> titleObjects;
     }
 }
