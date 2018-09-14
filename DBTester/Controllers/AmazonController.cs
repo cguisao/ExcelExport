@@ -142,6 +142,21 @@ namespace DBTester.Controllers
             }
             finally
             {
+                //using (var con = _context.Database.GetDbConnection())
+                //{
+                //    using (var cmd = con.CreateCommand())
+                //    {
+                //        cmd.CommandText = "select f1, f2 from table";
+
+                //        using (var rdr = cmd.ExecuteReader())
+                //        {
+                //            var f1 = rdr.GetInt32(0);
+                //            var f2 = rdr.GetInt32(1`);
+                //        }
+                //    }
+                //}
+
+
                 _context.Database.ExecuteSqlCommand("delete from Amazon");
 
                 // Upload to the DB

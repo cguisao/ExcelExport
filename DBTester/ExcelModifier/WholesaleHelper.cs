@@ -23,47 +23,69 @@ namespace DatabaseModifier
 
         public double AzImporterPriceWeight { get; set; }
 
+        public double AzImporterWeight { get; set; }
+
         public Dictionary<string, bool> blackListed { get; set; }
 
         public bool isAzImporter(string sku)
         {
-            azImporterSku = "";
-            string internalSku = "";
             int result = -5;
-            for (int i = 0; i < sku.Length; i++)
+            string internalSku = sku.ToUpper();
+
+            for (int i = 1; i < sku.Length; i++)
             {
-                internalSku = internalSku.ToUpper();
-                if (sku[i] == ' ')
+                if (azImportQuantity.ContainsKey(internalSku.ToUpper()))
                 {
-                    if (azImportQuantity.ContainsKey(internalSku))
-                    {
-                        azImportQuantity.TryGetValue(internalSku, out result);
-                        azImporterSku = internalSku;
-                        return true;
-                    }
-                    else
-                    {
-                        internalSku = internalSku + sku[i];
-                    }
+                    azImportQuantity.TryGetValue(internalSku.ToUpper(), out result);
+                    azImporterSku = internalSku.ToUpper();
+                    return true;
                 }
                 else
                 {
-                    internalSku = internalSku + sku[i];
+                    internalSku = sku.Substring(0, sku.Length - i);
+                    //internalSku = internalSku + sku[i];
                 }
             }
 
-            internalSku = internalSku.ToUpper();
+            return false;
 
-            if (azImportQuantity.ContainsKey(internalSku))
-            {
-                azImportQuantity.TryGetValue(internalSku, out result);
-                azImporterSku = internalSku;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            //azImporterSku = "";
+            
+            
+            //for (int i = 0; i < sku.Length; i++)
+            //{
+            //    internalSku = internalSku.ToUpper();
+            //    //if (sku[i] == ' ')
+            //    //{
+            //        if (azImportQuantity.ContainsKey(internalSku))
+            //        {
+            //            azImportQuantity.TryGetValue(internalSku, out result);
+            //            azImporterSku = internalSku;
+            //            return true;
+            //        }
+            //        else
+            //        {
+            //            internalSku = internalSku + sku[i];
+            //        }
+            //    //}
+            //    //else
+            //    //{
+            //    //    internalSku = internalSku + sku[i];
+            //    //}
+            //}
+
+            //internalSku = internalSku.ToUpper();
+
+            //if (azImportQuantity.ContainsKey(internalSku))
+            //{
+            //    azImportQuantity.TryGetValue(internalSku, out result);
+            //    azImporterSku = internalSku;
+            //    return true;
+            //}
+            //else
+            //{
+            //    return false;
+            //}
         }
 
         public bool isFragrancex(long? innerItem)
@@ -93,7 +115,7 @@ namespace DatabaseModifier
 
             for (int i = 0; i < v.Length; i++)
             {
-                if (v[i] != ' ')
+                if (answer.Length != 6)
                 {
                     answer = answer + v[i];
                 }
@@ -121,17 +143,10 @@ namespace DatabaseModifier
             }
         }
 
-        public bool isWeightRegister()
+        public bool isWeightRegister(double WeightPrice)
         {
-            var weight = 0;
-            double WeightPrice = -1;
-            azImporterWeightSku.TryGetValue(azImporterSku.ToUpper(), out weight);
-            ShippingtWeight.TryGetValue(weight, out WeightPrice);
-            AzImporterRegisterWeight = weight;
-
             if (WeightPrice > 1)
             {
-                AzImporterPriceWeight = WeightPrice;
                 return true;
             }
             else

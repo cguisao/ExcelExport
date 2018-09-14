@@ -73,6 +73,7 @@ namespace ExcelModifier
                             worksheet.Cells[row, 7].Value = "fulfillment-channel";
                             worksheet.Cells[row, 8].Value = "Suggested Price";
                             worksheet.Cells[row, 9].Value = "Weight Price";
+                            worksheet.Cells[row, 9].Value = "Weight";
                         }
                         else
                         {
@@ -138,11 +139,19 @@ namespace ExcelModifier
                                 {
                                     int qty = 0;
                                     azImportQuantity.TryGetValue(azImporterSku, out qty);
+                                    var weight = 0;
+                                    double WeightPrice = -1;
+                                    azImporterWeightSku.TryGetValue(azImporterSku.ToUpper(), out weight);
+                                    AzImporterWeight = weight;
+                                    ShippingtWeight.TryGetValue(weight, out WeightPrice);
+                                    AzImporterRegisterWeight = weight;
+                                    AzImporterPriceWeight = WeightPrice;
+                                    double sellingPrice = getSellingPrice();
                                     // In-stock
                                     if (qty > 0)
                                     {
                                         // Weight is not register
-                                        if (!isWeightRegister())
+                                        if (!isWeightRegister(WeightPrice))
                                         {
                                             worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
                                             worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -151,7 +160,6 @@ namespace ExcelModifier
                                         }
                                         else
                                         {
-                                            double sellingPrice = getSellingPrice();
                                             // Price too low
                                             if (isPriceLower(rowPrice, sellingPrice) && sellingPrice != 0)
                                             {
@@ -160,7 +168,7 @@ namespace ExcelModifier
                                                 worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                                 worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Red);
                                                 worksheet.Cells[row, 8].Value = sellingPrice;
-                                                worksheet.Cells[row, 9].Value = AzImporterPriceWeight;
+                                                worksheet.Cells[row, 9].Value = AzImporterWeight;
                                             }
 
                                             // Price is too high 
@@ -171,7 +179,7 @@ namespace ExcelModifier
                                                 worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                                 worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.MediumBlue);
                                                 worksheet.Cells[row, 8].Value = sellingPrice;
-                                                worksheet.Cells[row, 9].Value = AzImporterPriceWeight;
+                                                worksheet.Cells[row, 9].Value = AzImporterWeight;
                                             }
 
                                             else
@@ -181,7 +189,7 @@ namespace ExcelModifier
                                                 worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                                 worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Green);
                                                 worksheet.Cells[row, 8].Value = sellingPrice;
-                                                worksheet.Cells[row, 9].Value = AzImporterPriceWeight;
+                                                worksheet.Cells[row, 9].Value = AzImporterWeight;
                                             }
                                         }
                                     }
@@ -192,10 +200,12 @@ namespace ExcelModifier
                                         worksheet.Cells[row, 5].Value = 0;
                                         worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                         worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
-                                        worksheet.Cells[row, 9].Value = AzImporterPriceWeight;
+                                        worksheet.Cells[row, 8].Value = sellingPrice;
+                                        worksheet.Cells[row, 9].Value = AzImporterWeight;
                                     }
                                     azImporterSku = "";
                                     AzImporterPriceWeight = 0.0;
+                                    AzImporterWeight = 0.0;
                                 }
                                 else
                                 {
