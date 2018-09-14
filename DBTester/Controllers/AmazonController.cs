@@ -128,7 +128,7 @@ namespace DBTester.Controllers
                 fragrancexPrices = fragrancexPrices,
                 azImportPrice = azImportPrice,
                 azImportQuantity = azImportQuantity,
-                ShippingtWeight = shippingWeight,
+                ShippingList = shippingWeight,
                 azImporterWeightSku = azImporterWeightSku
             };
             
@@ -193,18 +193,13 @@ namespace DBTester.Controllers
 
             var blackListed = _context.Amazon.Where(z => z.blackList == true).ToDictionary(x => x.Asin, y => y.blackList);
 
-            SetDictionariesAsync();
-            
-            AmazonExcelUpdator amazonExcelUpdator = new AmazonExcelUpdator()
-            {
-                path = path,
-                fragrancexPrices = fragrancexPrices,
-                azImportPrice = azImportPrice,
-                azImportQuantity = azImportQuantity,
-                ShippingtWeight = shippingWeight,
-                azImporterWeightSku = azImporterWeightSku,
-                blackListed = blackListed
-            };
+            var fragancex = _context.Fragrancex.ToDictionary(x => x.ItemID, x => x);
+
+            var azImporter = _context.AzImporter.ToDictionary(x => x.Sku, x => x);
+
+            var shipping = _context.Shipping.ToDictionary(x => x.weightId, x => x.ItemPrice);
+
+            AmazonExcelUpdator amazonExcelUpdator = new AmazonExcelUpdator(path, fragancex, azImporter, blackListed, shipping);
 
             amazonExcelUpdator.ExcelGenerator();
             

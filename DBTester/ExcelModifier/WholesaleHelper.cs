@@ -1,4 +1,5 @@
-﻿using ExcelModifier;
+﻿using DBTester.Models;
+using ExcelModifier;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace DatabaseModifier
 
         public Dictionary<string, int> azImportQuantity { get; set; }
 
-        public Dictionary<int, double> ShippingtWeight { get; set; }
+        public Dictionary<int, double> ShippingList { get; set; }
 
         public Dictionary<string, double> azImportPrice { get; set; }
 
@@ -25,67 +26,32 @@ namespace DatabaseModifier
 
         public double AzImporterWeight { get; set; }
 
-        public Dictionary<string, bool> blackListed { get; set; }
+        public Dictionary<string, bool> blackListedList { get; set; }
+
+        public Dictionary<int, Fragrancex> fragrancexList;
+
+        public Dictionary<string, AzImporter> azImporterList;
 
         public bool isAzImporter(string sku)
         {
-            int result = -5;
             string internalSku = sku.ToUpper();
 
             for (int i = 1; i < sku.Length; i++)
             {
-                if (azImportQuantity.ContainsKey(internalSku.ToUpper()))
+                if (azImporterList.ContainsKey(internalSku.ToUpper()))
                 {
-                    azImportQuantity.TryGetValue(internalSku.ToUpper(), out result);
-                    azImporterSku = internalSku.ToUpper();
+                    AzImporter a = new AzImporter();
+                    azImporterList.TryGetValue(internalSku.ToUpper(), out a);
+                    azImporter = a;
                     return true;
                 }
                 else
                 {
                     internalSku = sku.Substring(0, sku.Length - i);
-                    //internalSku = internalSku + sku[i];
                 }
             }
 
             return false;
-
-            //azImporterSku = "";
-            
-            
-            //for (int i = 0; i < sku.Length; i++)
-            //{
-            //    internalSku = internalSku.ToUpper();
-            //    //if (sku[i] == ' ')
-            //    //{
-            //        if (azImportQuantity.ContainsKey(internalSku))
-            //        {
-            //            azImportQuantity.TryGetValue(internalSku, out result);
-            //            azImporterSku = internalSku;
-            //            return true;
-            //        }
-            //        else
-            //        {
-            //            internalSku = internalSku + sku[i];
-            //        }
-            //    //}
-            //    //else
-            //    //{
-            //    //    internalSku = internalSku + sku[i];
-            //    //}
-            //}
-
-            //internalSku = internalSku.ToUpper();
-
-            //if (azImportQuantity.ContainsKey(internalSku))
-            //{
-            //    azImportQuantity.TryGetValue(internalSku, out result);
-            //    azImporterSku = internalSku;
-            //    return true;
-            //}
-            //else
-            //{
-            //    return false;
-            //}
         }
 
         public bool isFragrancex(long? innerItem)
@@ -157,23 +123,23 @@ namespace DatabaseModifier
 
         public double getSellingPrice()
         {
-            double sellingPrice = 0;
-
             double summer = 0.0;
 
-            azImportPrice.TryGetValue(azImporterSku.ToUpper(), out sellingPrice);
-
-            if (sellingPrice == 0)
+            if (azImporter.WholeSale == 0)
             {
                 return 0.0;
             }
-            
+
+            double s = 0.0;
+            ShippingList.TryGetValue(azImporter.Weight, out s);
+            AzImporterPriceWeight = s;
+
             // EA Group Fee 20%
-            
-            summer = sellingPrice + (sellingPrice * 15) / 100;
+
+            summer = azImporter.WholeSale + (azImporter.WholeSale * 15) / 100;
             
             // profit 20% by default
-            summer = summer + (sellingPrice * 20) / 100;
+            summer = summer + (azImporter.WholeSale * 20) / 100;
 
             // AzImporter Fee
             summer = summer + 2;
@@ -186,5 +152,10 @@ namespace DatabaseModifier
 
             return summer;
         }
+
+        public Fragrancex fragrancex { get; set; }
+
+        public AzImporter azImporter { get; set; }
+        
     }
 }

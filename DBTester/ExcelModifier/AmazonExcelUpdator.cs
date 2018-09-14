@@ -15,8 +15,20 @@ namespace ExcelModifier
 {
     public class AmazonExcelUpdator : WholesaleHelper, IExcelExtension
     {
+        public AmazonExcelUpdator(string _path, Dictionary<int, Fragrancex> _fragrancex
+            , Dictionary<string, AzImporter> _azImporter, Dictionary<string, bool> _blackListed
+            , Dictionary<int, double> _shipping)
+        {
+            this.path = _path;
+            fragrancexList = _fragrancex;
+            azImporterList = _azImporter;
+            blackListedList = _blackListed;
+            ShippingList = _shipping;
+            fragrancex = new Fragrancex();
+            azImporter = new AzImporter();
+        }
         public string path { get; set; }
-
+        
         public Dictionary<int, double> fragrancexPrices { get; set; }
         
         public void ExcelGenerator()
@@ -96,7 +108,9 @@ namespace ExcelModifier
                                 else if (isFragrancex(digitSku))
                                 {
                                     skuID = DigitGetter(rowSku);
-                                    
+                                    Fragrancex f = new Fragrancex();
+                                    fragrancexList.TryGetValue(Convert.ToInt32(skuID), out f);
+                                    fragrancex = f;
                                     double sellingPrice = Convert.ToDouble(getSellingPrice(skuID));
                                     
                                     // Price lower
@@ -137,21 +151,12 @@ namespace ExcelModifier
                                 }
                                 else if(isAzImporter(rowSku))
                                 {
-                                    int qty = 0;
-                                    azImportQuantity.TryGetValue(azImporterSku, out qty);
-                                    var weight = 0;
-                                    double WeightPrice = -1;
-                                    azImporterWeightSku.TryGetValue(azImporterSku.ToUpper(), out weight);
-                                    AzImporterWeight = weight;
-                                    ShippingtWeight.TryGetValue(weight, out WeightPrice);
-                                    AzImporterRegisterWeight = weight;
-                                    AzImporterPriceWeight = WeightPrice;
                                     double sellingPrice = getSellingPrice();
                                     // In-stock
-                                    if (qty > 0)
+                                    if (azImporter.Quantity > 0)
                                     {
                                         // Weight is not register
-                                        if (!isWeightRegister(WeightPrice))
+                                        if (!isWeightRegister(AzImporterPriceWeight))
                                         {
                                             worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
                                             worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -168,7 +173,7 @@ namespace ExcelModifier
                                                 worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                                 worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Red);
                                                 worksheet.Cells[row, 8].Value = sellingPrice;
-                                                worksheet.Cells[row, 9].Value = AzImporterWeight;
+                                                worksheet.Cells[row, 9].Value = azImporter.Weight;
                                             }
 
                                             // Price is too high 
@@ -179,7 +184,7 @@ namespace ExcelModifier
                                                 worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                                 worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.MediumBlue);
                                                 worksheet.Cells[row, 8].Value = sellingPrice;
-                                                worksheet.Cells[row, 9].Value = AzImporterWeight;
+                                                worksheet.Cells[row, 9].Value = azImporter.Weight;
                                             }
 
                                             else
@@ -189,7 +194,7 @@ namespace ExcelModifier
                                                 worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                                 worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Green);
                                                 worksheet.Cells[row, 8].Value = sellingPrice;
-                                                worksheet.Cells[row, 9].Value = AzImporterWeight;
+                                                worksheet.Cells[row, 9].Value = azImporter.Weight;
                                             }
                                         }
                                     }
@@ -201,7 +206,7 @@ namespace ExcelModifier
                                         worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                         worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
                                         worksheet.Cells[row, 8].Value = sellingPrice;
-                                        worksheet.Cells[row, 9].Value = AzImporterWeight;
+                                        worksheet.Cells[row, 9].Value = azImporter.Weight;
                                     }
                                     azImporterSku = "";
                                     AzImporterPriceWeight = 0.0;
@@ -248,12 +253,13 @@ namespace ExcelModifier
             }
             catch (Exception ex)
             {
+                throw (ex);
             }
         }
 
         private bool isBlackListed(string asin)
         {
-            if(blackListed.ContainsKey(asin))
+            if(blackListedList.ContainsKey(asin))
             {
                 return true;
             }
@@ -283,18 +289,14 @@ namespace ExcelModifier
         
         public string getSellingPrice(long? skuID)
         {
-            double sellingPrice = 0;
-
             double summer = 0.0;
 
-            fragrancexPrices.TryGetValue(Convert.ToInt32(skuID), out sellingPrice);
-            
-            if(sellingPrice == 0)
+            if(fragrancex == null)
             {
                 return "0.0";
             }
 
-            double innerPrice = Convert.ToDouble(sellingPrice);
+            double innerPrice = Convert.ToDouble(fragrancex.WholePriceUSD);
 
             // profit 20% by default
             summer = innerPrice + (innerPrice * 20) / 100;
