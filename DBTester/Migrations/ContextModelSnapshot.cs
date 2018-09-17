@@ -154,11 +154,11 @@ namespace GTISolutions.Migrations
 
             modelBuilder.Entity("DBTester.Models.PerfumeWorldWide", b =>
                 {
-                    b.Property<string>("sku");
+                    b.Property<int>("ItemID");
 
                     b.Property<string>("Brand");
 
-                    b.Property<double>("Cost");
+                    b.Property<double?>("Cost");
 
                     b.Property<string>("Description");
 
@@ -168,7 +168,7 @@ namespace GTISolutions.Migrations
 
                     b.Property<string>("Image");
 
-                    b.Property<double>("MSRP");
+                    b.Property<double?>("MSRP");
 
                     b.Property<string>("Set");
 
@@ -176,11 +176,13 @@ namespace GTISolutions.Migrations
 
                     b.Property<string>("Type");
 
-                    b.Property<double>("Weight");
+                    b.Property<double?>("Weight");
+
+                    b.Property<string>("sku");
 
                     b.Property<long?>("upc");
 
-                    b.HasKey("sku");
+                    b.HasKey("ItemID");
 
                     b.ToTable("PerfumeWorldWide");
                 });

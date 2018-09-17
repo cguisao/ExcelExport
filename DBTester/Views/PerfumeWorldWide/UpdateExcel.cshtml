@@ -1,0 +1,97 @@
+﻿@model IEnumerable<DBTester.Models.ServiceTimeStamp>
+@{
+    ViewBag.Title = "Update";
+}
+
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card ">
+            <div class="card-body">
+                <h3>Perfume World Wide Excel Database Update</h3>
+                <p class="text-muted font-14">
+                    This application is intended to update the
+                    GTI Solution's Perfume World Wide database by Excel. Such
+                    update includes item price and availability
+                    as many times as the user wishes.
+                </p>
+
+                <div id="dropzone">
+                    <form asp-controller="Home" asp-action="DropzoneFileUpload" asp-antiforgery="false"
+                            class="dropzone" id="myAwesomeDropzone" enctype="multipart/form-data">
+                        <div class="text-center m-t-15 invisible">
+                            <input type="text" class="form-control" name="fileName" value="@ViewBag.ExcelGuid">
+                        </div>
+                        <div class="fallback">
+                            Drop files here or click to upload.<br>
+                            <input name="file" type="file" />
+                        </div>
+                    </form>
+                </div>
+                <form asp-controller="PerfumeWorldWide" asp-action="UpdateDatabase" asp-antiforgery="false"
+                        enctype="multipart/form-data">
+                    <div class="text-center m-t-15 invisible">
+                        <input type="text" class="form-control" name="file" value="@ViewBag.ExcelGuid">
+                    </div>
+                    <div class="text-center m-t-15">
+                        <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> <!-- end col -->
+</div> <!-- end row -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card m-b-30">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Last Updated Date</th>
+                                <th>Database Update Type</th>
+                                <th>Wholesaler</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.type)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Wholesalers)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        Dropzone.options.myAwesomeDropzone = {
+            paramName: "file", // The name that will be used to transfer the file
+            maxFilesize: 20, // MB
+            accept: function (file, done) {
+                if (file.name == "justinbieber.jpg") {
+                    done("Naha, you don't.");
+                }
+                else {
+                    done("Upload Successful");
+                    location.reload();
+                }
+            }
+            
+        };
+    });
+</script>

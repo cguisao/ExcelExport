@@ -83,6 +83,14 @@ namespace DBTester.Controllers
                 .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
                 .LastOrDefault()?.type;
 
+            ViewBag.TimeStampPerfumeWorldWide = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.PerfumeWorldWide.ToString())
+                .LastOrDefault()?.TimeStamp.ToShortDateString();
+
+            ViewBag.typePerfumeWorldWide = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.PerfumeWorldWide.ToString())
+                .LastOrDefault()?.type;
+
             Guid guid = Guid.NewGuid();
 
             ViewBag.ExcelGuid = guid.ToString();

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using DatabaseModifier;
 using DBTester.Code;
 using DBTester.Models;
 using ExcelModifier;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DBTester.Controllers
 {
@@ -45,6 +47,29 @@ namespace DBTester.Controllers
                 .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
         }
 
+        public IActionResult UpdateExcel()
+        {
+            ViewBag.TimeStamp = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.PerfumeWorldWide.ToString())
+                .LastOrDefault()?.TimeStamp.ToShortDateString();
+
+            ViewBag.type = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.PerfumeWorldWide.ToString())
+                .LastOrDefault()?.type;
+
+            ViewBag.Wholesalers = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.PerfumeWorldWide.ToString())
+                .LastOrDefault()?.Wholesalers;
+
+            Guid guid = Guid.NewGuid();
+
+            ViewBag.ExcelGuid = guid.ToString();
+
+            return View(_context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.PerfumeWorldWide.ToString())
+                .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
+        }
+
         [HttpPost]
         public async Task<IActionResult> CompareExcel(string file)
         {
@@ -76,6 +101,36 @@ namespace DBTester.Controllers
             System.IO.File.Delete(path);
 
             return returnFile;
+        }
+
+        [HttpPost]
+        public IActionResult UpdateDatabase(string file)
+        {
+            var path = Path.Combine(
+                        Directory.GetCurrentDirectory(), "wwwroot",
+                        file + ".xlsx");
+
+            DBModifierPerfumeWorldWideExcel dBModifierPerfumeWorldWideExcel = new DBModifierPerfumeWorldWideExcel(path);
+
+            _context.Database.ExecuteSqlCommand("delete from PerfumeWorldWide");
+
+            dBModifierPerfumeWorldWideExcel.TableExecutor();
+
+            ServiceTimeStamp service = new ServiceTimeStamp();
+
+            service.TimeStamp = DateTime.Today;
+
+            service.Wholesalers = Wholesalers.PerfumeWorldWide.ToString();
+
+            service.type = "Excel";
+
+            _context.ServiceTimeStamp.Add(service);
+
+            _context.SaveChanges();
+
+            System.IO.File.Delete(path);
+
+            return RedirectToAction("UpdateExcel");
         }
 
         Dictionary<int, string> fragrancex { get; set; }
