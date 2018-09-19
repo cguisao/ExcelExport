@@ -21,7 +21,7 @@ namespace DBTester.Models
         public string Set { get; set; }
         public string Description { get; set; }
         public string Image { get; set; }
-        public double? Cost { get; set; }
+        public double Cost { get; set; }
         public double? Weight { get; set; }
         public double? MSRP { get; set; }
         public long? upc { get; set; }

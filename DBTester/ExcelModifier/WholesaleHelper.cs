@@ -28,9 +28,11 @@ namespace DatabaseModifier
 
         public Dictionary<string, bool> blackListedList { get; set; }
 
-        public Dictionary<int, Fragrancex> fragrancexList;
+        public Dictionary<int, Fragrancex> fragrancexList { get; set; }
 
-        public Dictionary<string, AzImporter> azImporterList;
+        public Dictionary<string, AzImporter> azImporterList { get; set; }
+
+        public Dictionary<string, PerfumeWorldWide> perfumeWorldWideList { get; set; }
 
         public bool isAzImporter(string sku)
         {
@@ -54,6 +56,66 @@ namespace DatabaseModifier
             return false;
         }
 
+        public bool isPerfumeWorldWide(string sku)
+        {
+            // Take care when it is in the dictionary, because it is faster
+
+            if (perfumeWorldWideList.ContainsKey(sku))
+            {
+                return true;
+            }
+
+            // Take care of sku where the first character is a letter and the second is a '-'
+
+            Match hasLetterAndDash = Regex.Match(sku, @"^[a-zA-Z][-]");
+            
+            if(hasLetterAndDash.Success)
+            {
+                return true;
+            }
+
+            // Take care of sku where 3 first chars are letters follow by a number
+
+            Match has3LettersAndNumber = Regex.Match(sku, @"^[a-zA-Z]{3}\d{1}");
+
+            if(has3LettersAndNumber.Success)
+            {
+                return true;
+            }
+
+            // Take care of sku where the first 2 chars are letters follow by a -
+
+            Match has3Letters = Regex.Match(sku, @"^[a-zA-Z]{2}[-]");
+
+            if (has3Letters.Success)
+            {
+                return true;
+            }
+
+            // Take care of sku where the first 3 chars are letters follow by a dash
+
+            Match has3LettersAndDash = Regex.Match(sku, @"^[a-zA-Z]{3}[-]");
+            
+            if(has3LettersAndDash.Success)
+            {
+                return true;
+            }
+
+            // Take care of sku where they begin with numbers 5-6 digits long
+
+            int i = 0;
+            
+            if (Int32.TryParse(sku, out i))
+            {
+                if(i.ToString().Length == 6 || i.ToString().Length == 5)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public bool isFragrancex(long? innerItem)
         {
             Match hasLetters = Regex.Match(innerItem.ToString(), @"[a-zA-Z]");
@@ -63,7 +125,7 @@ namespace DatabaseModifier
                 return false;
             }
 
-            if (innerItem.ToString().Length != 6)
+            if (innerItem.ToString().Length != 6 || perfumeWorldWideList.ContainsKey(innerItem.ToString()))
             {
                 return false;
             }
@@ -73,7 +135,7 @@ namespace DatabaseModifier
             }
         }
 
-        public long? DigitGetter(string v)
+        public int DigitGetter(string v)
         {
             string answer = "";
 
@@ -90,7 +152,7 @@ namespace DatabaseModifier
                     try
                     {
                         Convert.ToInt64(answer);
-                        return Convert.ToInt64(answer);
+                        return Convert.ToInt32(answer);
                     }
                     catch (Exception e)
                     {
@@ -101,7 +163,7 @@ namespace DatabaseModifier
             try
             {
                 Convert.ToInt64(answer);
-                return Convert.ToInt64(answer);
+                return Convert.ToInt32(answer);
             }
             catch (Exception e)
             {
@@ -153,9 +215,16 @@ namespace DatabaseModifier
             return summer;
         }
 
+        long? IWholesaleHelper.DigitGetter(string v)
+        {
+            throw new NotImplementedException();
+        }
+
         public Fragrancex fragrancex { get; set; }
 
         public AzImporter azImporter { get; set; }
+
+        public PerfumeWorldWide perfumeWorldWide { get; set; }
         
     }
 }

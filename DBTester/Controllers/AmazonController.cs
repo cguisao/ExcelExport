@@ -130,7 +130,12 @@ namespace DBTester.Controllers
                 task.RunSynchronously();
             });
 
-            AmazonDBUploader amazonDBUploader = new AmazonDBUploader(amazonItems, amazonList, amazonList2)
+            var azImporter = _context.AzImporter.ToDictionary(x => x.Sku, x => x);
+
+            var perfumeWorldWide = _context.PerfumeWorldWide.ToDictionary(x => x.sku, x => x);
+
+            AmazonDBUploader amazonDBUploader = new AmazonDBUploader(amazonItems, amazonList, amazonList2, azImporter
+                , perfumeWorldWide)
             {
                 path = path,
                 fragrancexPrices = fragrancexPrices,
@@ -207,7 +212,10 @@ namespace DBTester.Controllers
 
             var shipping = _context.Shipping.ToDictionary(x => x.weightId, x => x.ItemPrice);
 
-            AmazonExcelUpdator amazonExcelUpdator = new AmazonExcelUpdator(path, fragancex, azImporter, blackListed, shipping);
+            var perfumeWorldWide = _context.PerfumeWorldWide.ToDictionary(x => x.sku, x => x);
+
+            AmazonExcelUpdator amazonExcelUpdator = new AmazonExcelUpdator(path, fragancex, azImporter
+                , blackListed, shipping, perfumeWorldWide);
 
             amazonExcelUpdator.ExcelGenerator();
             

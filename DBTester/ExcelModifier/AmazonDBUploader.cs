@@ -14,11 +14,15 @@ namespace ExcelModifier
 {
     public class AmazonDBUploader : WholesaleHelper, IExcelExtension
     {
-        public AmazonDBUploader(Dictionary<string, string> _amazonItems, List<Amazon> _amazonList, List<Amazon> _amazonList2)
+        public AmazonDBUploader(Dictionary<string, string> _amazonItems, List<Amazon> _amazonList
+            , List<Amazon> _amazonList2, Dictionary<string, AzImporter> _azImporter
+            , Dictionary<string, PerfumeWorldWide> _perfumeWorldWide)
         {
             amazonItems = _amazonItems;
             amazonList = _amazonList;
             amazonPrintList = _amazonList2;
+            azImporterList = _azImporter;
+            perfumeWorldWideList = _perfumeWorldWide;
             listAmazonSure = new Dictionary<string, string>();
         }
         
@@ -60,6 +64,9 @@ namespace ExcelModifier
                         }
                         else
                         {
+                            if(execption == 2441)
+                            {
+                            }
                             if (!string.IsNullOrEmpty(worksheet.Cells[row, 1].Value?.ToString()))
                             {
                                 // if the first row is a perfume/Cologne
@@ -98,7 +105,7 @@ namespace ExcelModifier
                                             Amazon amazon = new Amazon();
                                             amazon.Asin = asin;
                                             sellingPrice = getSellingPrice();
-                                            amazon.sku = azImporterSku.ToUpper();
+                                            amazon.sku = azImporter.Sku.ToUpper();
                                             amazon.price = Convert.ToDouble(worksheet.Cells[row, 3].Value);
                                             amazon.wholesaler = Wholesalers.AzImporter.ToString();
                                             amazon.blackList = false;
