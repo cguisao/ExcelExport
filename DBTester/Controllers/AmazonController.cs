@@ -107,43 +107,41 @@ namespace DBTester.Controllers
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
 
-            SetDictionariesAsync();
+            //SetDictionariesAsync();
 
-            amazonList = _context.Amazon.ToList();
+            //amazonList = _context.Amazon.ToList();
 
-            var tasks = new List<Task>();
+            //var tasks = new List<Task>();
 
-            //Task amazonListTask = new Task(() => amazonList = _context.Amazon.ToList());
+            ////Task amazonListTask = new Task(() => amazonList = _context.Amazon.ToList());
 
-            Task amazonItemsTask = new Task(() => amazonItems = amazonList.ToDictionary(x => x.Asin, y => y.sku));
+            //Task amazonItemsTask = new Task(() => amazonItems = amazonList.ToDictionary(x => x.Asin, y => y.sku));
 
-            Task amazonList2Task = new Task(() => amazonList2 = _context.Amazon.ToList());
+            //Task amazonList2Task = new Task(() => amazonList2 = _context.Amazon.ToList());
 
-            //tasks.Add(amazonListTask);
+            ////tasks.Add(amazonListTask);
 
-            tasks.Add(amazonItemsTask);
+            //tasks.Add(amazonItemsTask);
 
-            tasks.Add(amazonList2Task);
+            //tasks.Add(amazonList2Task);
 
-            Parallel.ForEach(tasks, task =>
-            {
-                task.RunSynchronously();
-            });
+            //Parallel.ForEach(tasks, task =>
+            //{
+            //    task.RunSynchronously();
+            //});
 
             var azImporter = _context.AzImporter.ToDictionary(x => x.Sku, x => x);
 
             var perfumeWorldWide = _context.PerfumeWorldWide.ToDictionary(x => x.sku, x => x);
 
-            AmazonDBUploader amazonDBUploader = new AmazonDBUploader(amazonItems, amazonList, amazonList2, azImporter
-                , perfumeWorldWide)
-            {
-                path = path,
-                fragrancexPrices = fragrancexPrices,
-                azImportPrice = azImportPrice,
-                azImportQuantity = azImportQuantity,
-                ShippingList = shippingWeight,
-                azImporterWeightSku = azImporterWeightSku
-            };
+            var fragrancex = _context.Fragrancex.ToDictionary(x => x.ItemID, x => x);
+
+            var amazon = _context.Amazon.ToDictionary(x => x.Asin, x => x);
+
+            var shipping = _context.Shipping.ToDictionary(x => x.weightId, x => x.ItemPrice);
+
+            AmazonDBUploader amazonDBUploader = new AmazonDBUploader(path, azImporter, fragrancex
+                , perfumeWorldWide, amazon, shipping);
             
             try
             {

@@ -11,12 +11,12 @@ namespace DatabaseModifier
 {
     public class DBModifierAmazon : Database, IDatabaseModifier
     {
-        public DBModifierAmazon(List<Amazon> _amazonList)
+        public DBModifierAmazon(Dictionary<string, Amazon> _amazonList)
         {
             amazonList = _amazonList;
         }
 
-        private List<Amazon> amazonList { get; set; }
+        private Dictionary<string, Amazon> amazonList { get; set; }
 
         public DataTable CreateTable()
         {
@@ -42,18 +42,18 @@ namespace DatabaseModifier
 
             int id = 1;
 
-            foreach (Amazon item in amazonList)
+            foreach (var item in amazonList)
             {
                 exception++;
 
                 DataRow insideRow = uploadAmazon.NewRow();
 
                 insideRow["id"] = id;
-                insideRow["Asin"] = item.Asin;
-                insideRow["sku"] = item.sku;
-                insideRow["price"] = item.price;
-                insideRow["wholesaler"] = item.wholesaler;
-                insideRow["blackList"] = item.blackList;
+                insideRow["Asin"] = item.Value.Asin;
+                insideRow["sku"] = item.Value.sku;
+                insideRow["price"] = item.Value.price;
+                insideRow["wholesaler"] = item.Value.wholesaler;
+                insideRow["blackList"] = item.Value.blackList;
 
                 uploadAmazon.Rows.Add(insideRow);
                 uploadAmazon.AcceptChanges();

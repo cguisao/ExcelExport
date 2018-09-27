@@ -12,15 +12,7 @@ namespace DatabaseModifier
     {
         public string azImporterSku { get; set; }
 
-        public int AzImporterRegisterWeight { get; set; }
-
-        public Dictionary<string, int> azImporterWeightSku { get; set; }
-
-        public Dictionary<string, int> azImportQuantity { get; set; }
-
         public Dictionary<int, double> ShippingList { get; set; }
-
-        public Dictionary<string, double> azImportPrice { get; set; }
 
         public double AzImporterPriceWeight { get; set; }
 
@@ -59,6 +51,20 @@ namespace DatabaseModifier
         public bool isPerfumeWorldWide(string sku)
         {
             // Take care when it is in the dictionary, because it is faster
+
+            string internalSku = sku;
+
+            for (int i = 1; i < sku.Length; i++)
+            {
+                if (perfumeWorldWideList.ContainsKey(internalSku))
+                {
+                    return true;
+                }
+                else
+                {
+                    internalSku = sku.Substring(0, sku.Length - i);
+                }
+            }
 
             if (perfumeWorldWideList.ContainsKey(sku))
             {
@@ -103,11 +109,11 @@ namespace DatabaseModifier
 
             // Take care of sku where they begin with numbers 5-6 digits long
 
-            int i = 0;
+            int j = 0;
             
-            if (Int32.TryParse(sku, out i))
+            if (Int32.TryParse(sku, out j))
             {
-                if(i.ToString().Length == 6 || i.ToString().Length == 5)
+                if(j.ToString().Length == 6 || j.ToString().Length == 5)
                 {
                     return true;
                 }

@@ -14,16 +14,18 @@ namespace ExcelModifier
 {
     public class AmazonDBUploader : WholesaleHelper, IExcelExtension
     {
-        public AmazonDBUploader(Dictionary<string, string> _amazonItems, List<Amazon> _amazonList
-            , List<Amazon> _amazonList2, Dictionary<string, AzImporter> _azImporter
-            , Dictionary<string, PerfumeWorldWide> _perfumeWorldWide)
+        public AmazonDBUploader(string _path, Dictionary<string, AzImporter> _azImporter, Dictionary<int, Fragrancex> _fragracex
+            , Dictionary<string, PerfumeWorldWide> _perfumeWorldWide, Dictionary<string, Amazon> _amazon
+            , Dictionary<int, double> _shipping)
         {
-            amazonItems = _amazonItems;
-            amazonList = _amazonList;
-            amazonPrintList = _amazonList2;
+            path = _path;
+            fragrancexList = _fragracex;
             azImporterList = _azImporter;
             perfumeWorldWideList = _perfumeWorldWide;
-            listAmazonSure = new Dictionary<string, string>();
+            amazonList = _amazon;
+            ShippingList = _shipping;
+            amazonPrintList = new List<Amazon>();
+            setList();
         }
         
         public void ExcelGenerator()
@@ -64,9 +66,6 @@ namespace ExcelModifier
                         }
                         else
                         {
-                            if(execption == 2441)
-                            {
-                            }
                             if (!string.IsNullOrEmpty(worksheet.Cells[row, 1].Value?.ToString()))
                             {
                                 // if the first row is a perfume/Cologne
@@ -75,7 +74,7 @@ namespace ExcelModifier
                                 //double rowPrice = Convert.ToDouble(worksheet.Cells[row, price].Value);
                                 string asin = worksheet.Cells[row, 2].Value.ToString();
 
-                                if (isAmazonList(asin))
+                                if (amazonList.ContainsKey(asin))
                                 {
                                     amazonPrintList.RemoveAll(x => x.Asin == asin);
                                 }
@@ -83,7 +82,7 @@ namespace ExcelModifier
                                 {
                                     double sellingPrice = 0.0;
                                     // Add to the dictionary
-                                    if (isFragrancex(digitSku))
+                                    if (isFragrancex(digitSku) || isPerfumeWorldWide(rowSku))
                                     {
                                         if (!isInDB(asin))
                                         {
@@ -94,8 +93,7 @@ namespace ExcelModifier
                                             amazon.price = Convert.ToDouble(worksheet.Cells[row, 3].Value);
                                             amazon.wholesaler = Wholesalers.Fragrancex.ToString();
                                             amazon.blackList = false;
-                                            listAmazonSure.TryAdd(amazon.Asin, "");
-                                            amazonList.Add(amazon);
+                                            amazonList.Add(asin, amazon);
                                         }
                                     }
                                     else if (isAzImporter(rowSku))
@@ -109,8 +107,7 @@ namespace ExcelModifier
                                             amazon.price = Convert.ToDouble(worksheet.Cells[row, 3].Value);
                                             amazon.wholesaler = Wholesalers.AzImporter.ToString();
                                             amazon.blackList = false;
-                                            listAmazonSure.TryAdd(amazon.Asin, "");
-                                            amazonList.Add(amazon);
+                                            amazonList.Add(asin, amazon);
                                         }
                                     }
                                 }
@@ -176,33 +173,7 @@ namespace ExcelModifier
 
         private bool isInDB(string asin)
         {
-            if(amazonItems.ContainsKey(asin))
-            {
-                if(listAmazonSure.ContainsKey(asin))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (listAmazonSure.ContainsKey(asin))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
-
-        private bool isAmazonList(string key)
-        {
-            if (amazonItems.ContainsKey(key))
+            if(amazonList.ContainsKey(asin))
             {
                 return true;
             }
@@ -212,6 +183,14 @@ namespace ExcelModifier
             }
         }
         
+        private void setList()
+        {
+            foreach(var item in amazonList)
+            {
+                amazonPrintList.Add(item.Value);
+            }
+        }
+
         public string getSellingPrice(long? skuID)
         {
             double sellingPrice = 0;
@@ -243,15 +222,9 @@ namespace ExcelModifier
 
         public Dictionary<int, double> fragrancexPrices { get; set; }
 
-        public Dictionary<string, string> amazonItems { get; set; }
-
-        public List<Amazon> amazonList { get; set; }
+        public Dictionary<string, Amazon> amazonList { get; set; }
 
         private List<Amazon> amazonPrintList { get; set; }
-
-        private List<Amazon> amazonStock { get; set; }
-
-        private Dictionary<string, string> listAmazonSure { get; set; }
-
+        
     }
 }
