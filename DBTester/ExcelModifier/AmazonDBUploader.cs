@@ -82,13 +82,14 @@ namespace ExcelModifier
                                 {
                                     double sellingPrice = 0.0;
                                     // Add to the dictionary
-                                    if (isFragrancex(digitSku) || isPerfumeWorldWide(rowSku))
+                                    if (isFragrancex(digitSku))
                                     {
                                         if (!isInDB(asin))
                                         {
                                             Amazon amazon = new Amazon();
                                             amazon.Asin = asin;
                                             skuID = DigitGetter(rowSku);
+                                            if(skuID == 0)
                                             amazon.sku = skuID.ToString();
                                             amazon.price = Convert.ToDouble(worksheet.Cells[row, 3].Value);
                                             amazon.wholesaler = Wholesalers.Fragrancex.ToString();
@@ -168,6 +169,7 @@ namespace ExcelModifier
             }
             catch (Exception ex)
             {
+                throw ex;
             }
         }
 
