@@ -1,0 +1,273 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>React.AspNet.Middleware</name>
+    </assembly>
+    <members>
+        <member name="T:React.AspNet.AspNetFileSystem">
+            <summary>
+            Handles file system functionality, such as reading files. Maps all paths from
+            application-relative (~/...) to full paths using ASP.NET's MapPath method.
+            </summary>
+        </member>
+        <member name="M:React.AspNet.AspNetFileSystem.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:React.AspNet.AspNetFileSystem"/> class.
+            </summary>
+            <param name="hostingEnv">The ASP.NET 5 hosting environment</param>
+        </member>
+        <member name="M:React.AspNet.AspNetFileSystem.MapPath(System.String)">
+            <summary>
+            Converts a path from an application relative path (~/...) to a full filesystem path
+            </summary>
+            <param name="relativePath">App-relative path of the file</param>
+            <returns>Full path of the file</returns>
+        </member>
+        <member name="T:React.AspNet.AssemblyRegistration">
+            <summary>
+            Handles registration of ReactJS.NET components that are only applicable
+            in the context of an ASP.NET web application.
+            </summary>
+        </member>
+        <member name="M:React.AspNet.AssemblyRegistration.Register(React.TinyIoC.TinyIoCContainer)">
+            <summary>
+            Registers components in the React IoC container
+            </summary>
+            <param name="container">Container to register components in</param>
+        </member>
+        <member name="T:React.AspNet.BabelFileMiddleware">
+            <summary>
+            Enables serving static JavaScript files compiled via Babel. Wraps around StaticFileMiddleware.
+            </summary>
+        </member>
+        <member name="M:React.AspNet.BabelFileMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,React.AspNet.BabelFileOptions,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILoggerFactory)">
+            <summary>
+            Creates a new instance of the BabelFileMiddleware.
+            </summary>
+            <param name="next">The next middleware in the pipeline.</param>
+            <param name="options">The configuration options.</param>
+            <param name="hostingEnv">The hosting environment.</param>
+            <param name="loggerFactory">An <see cref="T:Microsoft.Extensions.Logging.ILoggerFactory"/> instance used to create loggers.</param>
+        </member>
+        <member name="M:React.AspNet.BabelFileMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Processes a request to determine if it matches a known JavaScript file, and if so, transforms
+            it via Babel and serves it
+            </summary>
+            <param name="context">ASP.NET HTTP context</param>
+        </member>
+        <member name="M:React.AspNet.BabelFileMiddleware.CreateFileMiddleware(React.IBabel)">
+            <summary>
+            Creates the internal <see cref="T:Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware"/> used to serve files.
+            </summary>
+            <param name="babel"></param>
+            <returns></returns>
+        </member>
+        <member name="T:React.AspNet.BabelFileOptions">
+            <summary>
+            Options for serving JavaScript files transformed via Babel.
+            </summary>
+        </member>
+        <member name="P:React.AspNet.BabelFileOptions.Extensions">
+            <summary>
+            Collection of extensions that will be handled. Defaults to ".jsx" and ".js".
+            </summary>
+        </member>
+        <member name="P:React.AspNet.BabelFileOptions.StaticFileOptions">
+            <summary>
+            Options for static file middleware used to serve JavaScript files.
+            </summary>
+        </member>
+        <member name="M:React.AspNet.BabelFileOptions.#ctor">
+            <summary>
+            Creates a new instance of the <see cref="T:React.AspNet.BabelFileOptions"/> class.
+            </summary>
+        </member>
+        <member name="T:React.AspNet.BabelFileSystem">
+            <summary>
+            File system that serves transformed JavaScript files.
+            </summary>
+        </member>
+        <member name="M:React.AspNet.BabelFileSystem.#ctor(React.IBabel,System.String,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Creates a new instance of the BabelFileSystem.
+            </summary>
+            <param name="transformer">Babel transformer used to compile files</param>
+            <param name="root">The root directory</param>
+            <param name="extensions">Extensions of files that will be treated as JavaScript files</param>
+        </member>
+        <member name="M:React.AspNet.BabelFileSystem.#ctor(React.IBabel,Microsoft.Extensions.FileProviders.IFileProvider,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Creates a new instance of the BabelFileSystem.
+            </summary>
+            <param name="transformer">Babel transformer used to compile files</param>
+            <param name="fileSystem">File system used to look up files</param>
+            <param name="extensions">Extensions of files that will be treated as JavaScript files</param>
+        </member>
+        <member name="M:React.AspNet.BabelFileSystem.GetFileInfo(System.String)">
+            <summary>
+            Locate a file at the given path. 
+            </summary>
+            <param name="subpath">The path that identifies the file</param>
+            <returns>The discovered file if any</returns>
+        </member>
+        <member name="M:React.AspNet.BabelFileSystem.GetDirectoryContents(System.String)">
+            <summary>
+            Enumerate a directory at the given path, if any
+            </summary>
+            <param name="subpath">The path that identifies the directory</param>
+            <returns>The contents if any</returns>
+        </member>
+        <member name="M:React.AspNet.BabelFileSystem.Watch(System.String)">
+            <summary>
+            Creates a <see cref="T:Microsoft.Framework.Primitives.IChangeToken"/> for the 
+            specified <paramref name="filter"/>.
+            </summary>
+            <param name="filter">
+            Filter string used to determine what files or folders to monitor. 
+            Example: **/*.cs, *.*, subFolder/**/*.cshtml.</param>
+            <returns>
+            An <see cref="T:Microsoft.Framework.Primitives.IChangeToken"/> that is notified
+            when a file matching <paramref name="filter"/> is added, modified or deleted.
+            </returns>
+        </member>
+        <member name="T:React.AspNet.HttpContextLifetimeProvider">
+            <summary>
+            Handles registering per-request objects in the dependency injection container.
+            </summary>
+        </member>
+        <member name="M:React.AspNet.HttpContextLifetimeProvider.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor)">
+            <summary>
+            Creates a new <see cref="T:React.AspNet.HttpContextLifetimeProvider" />.
+            </summary>
+        </member>
+        <member name="F:React.AspNet.HttpContextLifetimeProvider.PREFIX">
+            <summary>
+            Prefix to use on HttpContext items
+            </summary>
+        </member>
+        <member name="F:React.AspNet.HttpContextLifetimeProvider._keyName">
+            <summary>
+            Name of the key for this particular registration
+            </summary>
+        </member>
+        <member name="P:React.AspNet.HttpContextLifetimeProvider.Registrations">
+            <summary>
+            Gets the current per-request registrations for the current request.
+            </summary>
+        </member>
+        <member name="M:React.AspNet.HttpContextLifetimeProvider.GetObject">
+            <summary>
+            Gets the value of this item in the dependency injection container.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:React.AspNet.HttpContextLifetimeProvider.SetObject(System.Object)">
+            <summary>
+            Sets the value of this item in the dependency injection container.
+            </summary>
+            <param name="value">Value to set</param>
+        </member>
+        <member name="M:React.AspNet.HttpContextLifetimeProvider.ReleaseObject">
+            <summary>
+            Removes this item from the dependency injection container.
+            </summary>
+        </member>
+        <member name="T:React.AspNet.HttpContextLifetimeProvider.PerRequestRegistrations">
+            <summary>
+            Contains all per-request dependency injection registrations.
+            </summary>
+        </member>
+        <member name="M:React.AspNet.HttpContextLifetimeProvider.PerRequestRegistrations.Dispose">
+            <summary>
+            Disposes all registrations in this container.
+            </summary>
+        </member>
+        <member name="T:React.AspNet.MemoryFileCacheCore">
+            <summary>
+            Memory cache implementation for React.ICache. Uses IMemoryCache from .NET Core.
+            </summary>
+        </member>
+        <member name="M:React.AspNet.MemoryFileCacheCore.#ctor(Microsoft.Extensions.Caching.Memory.IMemoryCache,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:React.AspNet.MemoryFileCacheCore" /> class.
+            </summary>
+            <param name="cache">The cache to use</param>
+            <param name="hostingEnv">The ASP.NET hosting environment.</param>
+        </member>
+        <member name="M:React.AspNet.MemoryFileCacheCore.Get``1(System.String,``0)">
+            <summary>
+            Get an item from the cache. Returns <paramref name="fallback"/> if the item does
+            not exist.
+            </summary>
+            <typeparam name="T">Type of data</typeparam>
+            <param name="key">The cache key</param>
+            <param name="fallback">Value to return if item is not in the cache</param>
+            <returns>Data from cache, otherwise <paramref name="fallback"/></returns>
+        </member>
+        <member name="M:React.AspNet.MemoryFileCacheCore.Set``1(System.String,``0,System.TimeSpan,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Sets an item in the cache.
+            </summary>
+            <typeparam name="T">Type of data</typeparam>
+            <param name="key">The cache key</param>
+            <param name="data">Data to cache</param>
+            <param name="slidingExpiration">
+            Sliding expiration, if cache key is not accessed in this time period it will 
+            automatically be removed from the cache
+            </param>
+            <param name="cacheDependencyFiles">
+            Filenames this cached item is dependent on. If any of these files change, the cache
+            will be cleared automatically
+            </param>
+        </member>
+        <member name="T:React.AspNet.ReactBuilderExtensions">
+            <summary>
+            Handles registering ReactJS.NET middleware in an ASP.NET <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.
+            </summary>
+        </member>
+        <member name="M:React.AspNet.ReactBuilderExtensions.UseReact(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.Action{React.IReactSiteConfiguration},React.AspNet.BabelFileOptions)">
+            <summary>
+            Initialises ReactJS.NET for this application
+            </summary>
+            <param name="app">ASP.NET application builder</param>
+            <param name="configure">ReactJS.NET configuration</param>
+            <param name="fileOptions">Options to use for serving files</param>
+            <returns>The application builder (for chaining)</returns>
+        </member>
+        <member name="M:React.AspNet.ReactBuilderExtensions.AsPerRequestSingleton(Microsoft.AspNetCore.Http.IHttpContextAccessor,React.TinyIoC.TinyIoCContainer.RegisterOptions)">
+            <summary>
+            Registers a class such that every ASP.NET web request has a single instance of it.
+            </summary>
+            <param name="httpContextAccessor">ASP.NET HTTP context accessor</param>
+            <param name="registerOptions">Registration options</param>
+            <returns>Registration options (for chaining)</returns>
+        </member>
+        <member name="M:React.AspNet.ReactBuilderExtensions.EnsureServicesRegistered(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Ensures React services have been registered in the ASP.NET dependency injection container.
+            </summary>
+            <param name="app">ASP.NET application builder</param>
+        </member>
+        <member name="M:React.AspNet.ReactBuilderExtensions.RegisterAspNetServices(React.TinyIoC.TinyIoCContainer,System.IServiceProvider)">
+            <summary>
+            Registers required ASP.NET services in ReactJS.NET's TinyIoC container. This is used
+            for ASP.NET services that are required by ReactJS.NET.
+            </summary>
+            <param name="container">ReactJS.NET dependency injection container</param>
+            <param name="services">ASP.NET dependency injection container</param>
+        </member>
+        <member name="T:React.AspNet.ReactServiceCollectionExtensions">
+            <summary>
+            Handles registering ReactJS.NET services in the ASP.NET <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
+            </summary>
+        </member>
+        <member name="M:React.AspNet.ReactServiceCollectionExtensions.AddReact(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Registers all services required for ReactJS.NET
+            </summary>
+            <param name="services">ASP.NET services</param>
+            <returns>The service collection (for chaining)</returns>
+        </member>
+    </members>
+</doc>

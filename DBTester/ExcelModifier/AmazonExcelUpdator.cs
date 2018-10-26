@@ -65,7 +65,8 @@ namespace ExcelModifier
                                 {
                                     price = column;
                                 }
-                                else if (worksheet.Cells[row, column].Value.ToString().ToLower().Contains("quantity"))
+                                else if (worksheet.Cells[row, column].Value.ToString().ToLower().Contains("quantity")
+                                    || worksheet.Cells[row, column].Value.ToString().ToLower().Contains("qty"))
                                 {
                                     quantity = column;
                                 }

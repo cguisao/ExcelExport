@@ -593,41 +593,51 @@ namespace ExcelModifier
         {
             int rowCount = worksheet.Dimension.Rows;
             int ColCount = worksheet.Dimension.Columns;
-
-            for (int row = 1; row <= rowCount; row++)
+            int exception = 0;
+            try
             {
-                if (row != 1)
+                for (int row = 1; row <= rowCount; row++)
                 {
-                    // Remove testers and unboxed items
-                    string title = worksheet.Cells[row, 1].Value.ToString();
-                    if (!title.ToLower().Contains("tester") && !title.ToLower().Contains("unboxed")
-                    && !title.ToLower().Contains("sample") && !title.ToLower().Contains("jivago")
-                    && !title.ToLower().Contains("damaged box") && !title.ToLower().Contains("scratched box")
-                    && !title.ToLower().Contains("damaged packaging"))
+                    if (row != 1)
                     {
-                        ShopifyList shopifyList = new ShopifyList();
-
-                        shopifyList.title = worksheet.Cells[row, 1].Value.ToString();
-                        shopifyList.description = worksheet.Cells[row, 3].Value.ToString();
-                        shopifyList.brand = worksheet.Cells[row, 4].Value.ToString();
-                        shopifyList.fragranceType = worksheet.Cells[row, 5].Value.ToString();
-                        shopifyList.sku = Convert.ToInt64(worksheet.Cells[row, 13].Value);
-                        shopifyList.price = Convert.ToDouble(worksheet.Cells[row, 19].Value.ToString());
-                        shopifyList.pictures = fixPictureHTML(worksheet.Cells[row, 24].Value.ToString());
-                        shopifyList.size = worksheet.Cells[row, 8].Value.ToString();
-                        shopifyList.collection = worksheet.Cells[row, 27].Value.ToString();
-                        shopifyList.vendor = worksheet.Cells[row, 4].Value.ToString();
-                        if(worksheet.Cells[row, 20].Value != null)
+                        exception++;
+                        if(exception == 31)
                         {
-                            shopifyList.comparePrice = Convert.ToInt32(worksheet.Cells[row, 20].Value);
-                        }
-                        shopifyList.option1Name = worksheet.Cells[row, 7].Value.ToString();
-                        shopifyList.option1Value = worksheet.Cells[row, 8].Value.ToString();
-                        shopifyList.tags = worksheet.Cells[row, 26].Value.ToString();
 
-                        titleObjects.Add(worksheet.Cells[row, 1].Value.ToString(), shopifyList);
+                        }
+                        // Remove testers and unboxed items
+                        string title = worksheet.Cells[row, 1].Value.ToString();
+                        if (!title.ToLower().Contains("tester") && !title.ToLower().Contains("unboxed")
+                        && !title.ToLower().Contains("sample") && !title.ToLower().Contains("jivago")
+                        && !title.ToLower().Contains("damaged box") && !title.ToLower().Contains("scratched box")
+                        && !title.ToLower().Contains("damaged packaging"))
+                        {
+                            ShopifyList shopifyList = new ShopifyList();
+
+                            shopifyList.title = worksheet.Cells[row, 1].Value.ToString();
+                            shopifyList.brand = worksheet.Cells[row, 4].Value.ToString();
+                            shopifyList.fragranceType = worksheet.Cells[row, 5].Value.ToString();
+                            shopifyList.sku = Convert.ToInt64(worksheet.Cells[row, 13].Value);
+                            shopifyList.price = Convert.ToDouble(worksheet.Cells[row, 19].Value.ToString());
+                            shopifyList.pictures = fixPictureHTML(worksheet.Cells[row, 24].Value.ToString());
+                            shopifyList.size = worksheet.Cells[row, 8].Value.ToString();
+                            shopifyList.collection = worksheet.Cells[row, 27].Value.ToString();
+                            shopifyList.vendor = worksheet.Cells[row, 4].Value.ToString();
+                            if (worksheet.Cells[row, 20].Value != null)
+                            {
+                                shopifyList.comparePrice = Convert.ToInt32(worksheet.Cells[row, 20].Value);
+                            }
+                            shopifyList.option1Name = worksheet.Cells[row, 7].Value.ToString();
+                            shopifyList.option1Value = worksheet.Cells[row, 8].Value.ToString();
+                            shopifyList.tags = worksheet.Cells[row, 26].Value.ToString();
+
+                            titleObjects.Add(worksheet.Cells[row, 1].Value.ToString(), shopifyList);
+                        }
                     }
                 }
+            }catch(Exception e)
+            {
+                throw e;
             }
         }
 

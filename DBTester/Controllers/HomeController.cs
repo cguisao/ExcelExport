@@ -17,6 +17,11 @@ namespace DBTester.Controllers
             return View();
         }
 
+        public IActionResult test()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> DropzoneFileUpload(IFormFile file, string fileName)
         {
