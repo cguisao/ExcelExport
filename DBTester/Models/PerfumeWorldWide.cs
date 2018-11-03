@@ -25,5 +25,6 @@ namespace DBTester.Models
         public double? Weight { get; set; }
         public double? MSRP { get; set; }
         public long? upc { get; set; }
+        public bool isInstock { get; set; }
     }
 }

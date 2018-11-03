@@ -158,7 +158,7 @@ namespace GTISolutions.Migrations
 
                     b.Property<string>("Brand");
 
-                    b.Property<double?>("Cost");
+                    b.Property<double>("Cost");
 
                     b.Property<string>("Description");
 
@@ -177,6 +177,8 @@ namespace GTISolutions.Migrations
                     b.Property<string>("Type");
 
                     b.Property<double?>("Weight");
+
+                    b.Property<bool>("isInstock");
 
                     b.Property<string>("sku");
 

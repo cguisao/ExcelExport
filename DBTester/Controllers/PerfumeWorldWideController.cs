@@ -20,8 +20,6 @@ namespace DBTester.Controllers
         public PerfumeWorldWideController(Context context)
         {
             _context = context;
-            fragrancex = _context.FragrancexTitle.ToDictionary(x => x.ItemID, y => y.Title);
-            fragrancexUpc = _context.Fragrancex.Where(z => z.Upc != null).ToDictionary(x => x.ItemID, y => y.Upc);
         }
 
         public IActionResult Index()
@@ -76,7 +74,11 @@ namespace DBTester.Controllers
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
-            
+
+            fragrancex = _context.FragrancexTitle.ToDictionary(x => x.ItemID, y => y.Title);
+
+            fragrancexUpc = _context.Fragrancex.Where(z => z.Upc != null).ToDictionary(x => x.ItemID, y => y.Upc);
+
             PerfumeWorldWideComparer perfumeWorldWideComparer = new PerfumeWorldWideComparer(fragrancex)
             {
                 path = path,
@@ -110,10 +112,13 @@ namespace DBTester.Controllers
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
 
-            DBModifierPerfumeWorldWideExcel dBModifierPerfumeWorldWideExcel = new DBModifierPerfumeWorldWideExcel(path);
+            PerfumeWorldWide = _context.PerfumeWorldWide.ToDictionary(x => x.sku, y => y);
+
+            DBModifierPerfumeWorldWideExcel dBModifierPerfumeWorldWideExcel 
+                = new DBModifierPerfumeWorldWideExcel(path, PerfumeWorldWide);
 
             _context.Database.ExecuteSqlCommand("delete from PerfumeWorldWide");
-
+            
             dBModifierPerfumeWorldWideExcel.TableExecutor();
 
             ServiceTimeStamp service = new ServiceTimeStamp();
@@ -133,8 +138,10 @@ namespace DBTester.Controllers
             return RedirectToAction("UpdateExcel");
         }
 
-        Dictionary<int, string> fragrancex { get; set; }
+        private Dictionary<int, string> fragrancex { get; set; }
 
-        Dictionary<int, long?> fragrancexUpc { get; set; }
+        private Dictionary<int, long?> fragrancexUpc { get; set; }
+
+        private Dictionary<string, PerfumeWorldWide> PerfumeWorldWide { get; set; }
     }
 }
