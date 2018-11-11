@@ -29,6 +29,7 @@ namespace DBTester.Models
         public double WholePriceEUR { get; set; }
         public double WholePriceGBP { get; set; }
         public double WholePriceUSD { get; set; }
+        public bool isInstock { get; set; }
 
         public long? Upc { get; set; }
         public UPC upc { get; set; }

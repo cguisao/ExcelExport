@@ -10,10 +10,10 @@ namespace ExcelModifier
     {
         string path { get; set; }
 
-        Dictionary<int, double> fragrancexPrices { get; set; }
+        //Dictionary<int, double> fragrancexPrices { get; set; }
 
         void ExcelGenerator();
 
-        string getSellingPrice(long? itemID);
+        //string getSellingPrice(long? itemID);
     }
 }

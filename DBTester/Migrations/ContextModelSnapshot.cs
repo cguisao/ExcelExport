@@ -132,6 +132,8 @@ namespace GTISolutions.Migrations
 
                     b.Property<double>("WholePriceUSD");
 
+                    b.Property<bool>("isInstock");
+
                     b.Property<int?>("upcItemID");
 
                     b.HasKey("ItemID");
@@ -253,6 +255,45 @@ namespace GTISolutions.Migrations
                     b.HasKey("weightId");
 
                     b.ToTable("Shipping");
+                });
+
+            modelBuilder.Entity("DBTester.Models.ShopifyUser", b =>
+                {
+                    b.Property<int>("ItemID");
+
+                    b.Property<string>("body");
+
+                    b.Property<string>("collection");
+
+                    b.Property<double>("comparePrice");
+
+                    b.Property<string>("handle");
+
+                    b.Property<string>("image");
+
+                    b.Property<string>("option1Name");
+
+                    b.Property<string>("option1Value");
+
+                    b.Property<double>("price");
+
+                    b.Property<string>("sku");
+
+                    b.Property<string>("tags");
+
+                    b.Property<string>("title");
+
+                    b.Property<string>("type");
+
+                    b.Property<long?>("upc");
+
+                    b.Property<string>("userID");
+
+                    b.Property<string>("vendor");
+
+                    b.HasKey("ItemID");
+
+                    b.ToTable("ShopifyUser");
                 });
 
             modelBuilder.Entity("DBTester.Models.UPC", b =>

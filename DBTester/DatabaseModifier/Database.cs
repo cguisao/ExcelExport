@@ -33,30 +33,54 @@ namespace DatabaseModifier
                 Configuration = builder.Build();
                 string connectionstring = Configuration.GetConnectionString("BloggingDatabase");
 
-                using (SqlConnection sourceConnection =
-                       new SqlConnection(connectionstring))
+                using (SqlConnection sourceConnection = new SqlConnection(connectionstring))
                 {
                     sourceConnection.Open();
 
-                    using (SqlBulkCopy bulkCopy = new SqlBulkCopy(connectionstring))
+                    var command = sourceConnection.CreateCommand();
+                    command.Connection = sourceConnection;
+                    command.CommandText = "DELETE FROM " + tableName;
+                    command.ExecuteNonQuery();
+
+                    using (SqlTransaction trans = sourceConnection.BeginTransaction())
                     {
-                        bulkCopy.DestinationTableName = tableName;
-
-                        // Set the BatchSize.
-                        bulkCopy.BatchSize = bulkSize;
-
                         try
                         {
-                            // Write from the source to the destination.
-                            bulkCopy.WriteToServer(dataTable);
+                            using (SqlBulkCopy bulkCopy = new SqlBulkCopy(connectionstring
+                                , SqlBulkCopyOptions.KeepIdentity | SqlBulkCopyOptions.UseInternalTransaction))
+                            {
+                                bulkCopy.DestinationTableName = tableName;
+
+                                // Set the BatchSize.
+                                bulkCopy.BatchSize = bulkSize;
+
+                                try
+                                {
+                                    // Write from the source to the destination.
+                                    bulkCopy.WriteToServer(dataTable);
+                                    trans.Commit();
+                                }
+                                catch (Exception ex)
+                                {
+                                    throw ex;
+                                }
+                                finally
+                                {
+                                    sourceConnection.Close();
+                                }
+                            }
                         }
-                        catch (Exception ex)
+                        catch(Exception e)
                         {
-                            Console.WriteLine(ex.Message);
+                            trans.Rollback();
+                            throw e;
                         }
+                        
                     }
+                    
                 }
             }
         }
+        
     }
 }

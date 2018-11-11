@@ -198,20 +198,22 @@ namespace DBTester.Controllers
                 profile.markdown = Double.Parse(markdownMatch.Value);
             }
             
-            var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
+            var shopifyProfile = _context.ShopifyUser.ToList();
+            var fragrancex = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y);
+            var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y);
 
-            var prices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
-
-            var descriptions = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.Description);
-
-            ShopifyExcelCreator shopifyModifier = new ShopifyExcelCreator(upc, profile)
+            ShopifyExcelCreator shopifyModifier = 
+                new ShopifyExcelCreator(profile, shopifyProfile, fragrancex, upc, path);
+            
+            try
             {
-                path = path,
-                fragrancexPrices = prices,
-                descriptions = descriptions
-            };
-
-            shopifyModifier.ExcelGenerator();
+                shopifyModifier.ExcelGenerator();
+            }
+            catch (Exception e)
+            {
+                System.IO.File.Delete(path);
+                return null;
+            }
             
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))

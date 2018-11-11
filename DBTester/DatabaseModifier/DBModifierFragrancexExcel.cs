@@ -69,9 +69,8 @@ namespace DatabaseModifier
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
                     int rowCount = worksheet.Dimension.Rows;
                     long? value = 0;
-                    int itemID = 0;
-                    int description = 0;
-                    int price = 0;
+                    int itemID = 0, description = 0, price = 0, brandName = 0,
+                        image = 0, type = 0;
                         
                     for (int row = 1; row <= rowCount; row++)
                     {
@@ -93,6 +92,18 @@ namespace DatabaseModifier
                                 {
                                     price = column;
                                 }
+                                else if (worksheet.Cells[row, column].Value.ToString().ToLower().Contains("vendor"))
+                                {
+                                    brandName = column;
+                                }
+                                else if (worksheet.Cells[row, column].Value.ToString().ToLower().Contains("image src"))
+                                {
+                                    image = column;
+                                }
+                                else if (worksheet.Cells[row, column].Value.ToString().ToLower().Contains("type"))
+                                {
+                                    type = column;
+                                }
                             }
                         }
                         else
@@ -102,18 +113,18 @@ namespace DatabaseModifier
                             DataRow insideRow = uploadFragrancex.NewRow();
 
                             insideRow["ItemID"] = Convert.ToInt32(worksheet.Cells[row, itemID].Value?.ToString());
-                            insideRow["BrandName"] = null;
+                            insideRow["BrandName"] = worksheet.Cells[row, brandName].Value?.ToString();
                             insideRow["Description"] = worksheet.Cells[row, description].Value?.ToString();
                             insideRow["Gender"] = null;
-                            insideRow["Instock"] = true;
-                            insideRow["LargeImageUrl"] = null;
+                            insideRow["Instock"] = null;
+                            insideRow["LargeImageUrl"] = worksheet.Cells[row, image].Value?.ToString();
                             insideRow["MetricSize"] = null;
                             insideRow["ParentCode"] = null;
                             insideRow["ProductName"] = null;
                             insideRow["RetailPriceUSD"] = 0.0;
                             insideRow["Size"] = null;
                             insideRow["SmallImageURL"] = null;
-                            insideRow["Type"] = null;
+                            insideRow["Type"] = worksheet.Cells[row, type].Value?.ToString();
                             insideRow["WholePriceAUD"] = 0.0;
                             insideRow["WholePriceCAD"] = 0.0;
                             insideRow["WholePriceEUR"] = 0.0;

@@ -1,36 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using DatabaseModifier;
 using DBTester.Models;
 using OfficeOpenXml;
 
 namespace ExcelModifier
 {
-    public class ShopifyExcelCreator : IExcelExtension
+    public class ShopifyExcelCreator : DBRawQueries, IExcelExtension, IDatabaseModifier
     {
-        public ShopifyExcelCreator(Dictionary<int, long?> upcs, Profile profile)
+        public ShopifyExcelCreator(Profile _profile, List<ShopifyUser> _shopifyProfile
+            , Dictionary<int, Fragrancex> _fragrancex, Dictionary<int, UPC> _upc, string _path)
         {
-            this.upcs = upcs;
-            this.profile = profile;
-            titleObjects = new MultiMapShopify<ShopifyList>();
+            profile = _profile;
+            shopifyProfile = _shopifyProfile;
+            fragrancex = _fragrancex;
+            upc = _upc;
+            path = _path;
             dicTitle = new Dictionary<string, string>();
         }
+        
+        private List<ShopifyUser> shopifyProfile { get; set; }
 
-        private Dictionary<int, long?> upcs { get; set; }
+        private Dictionary<int, Fragrancex> fragrancex { get; set; }
+
+        private Dictionary<int, UPC> upc { get; set; }
 
         public string path { get; set; }
 
-        public Dictionary<int, double> fragrancexPrices { get; set; }
-
-        public IDictionary<int, string> descriptions { get; set; }
-
         private Profile profile { get; set; }
+
+        private Dictionary<string, string> dicTitle { set; get; }
 
         public void ExcelGenerator()
         {
+            // First update the database with the new items
+
             FileInfo file = new FileInfo(path);
             Dictionary<string, long> dicSKU = new Dictionary<string, long>();
             
@@ -41,71 +49,72 @@ namespace ExcelModifier
                 {
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
                     
-                    // Prepare the excel and remove whatever it needs to be removed.
-
-                    PrepareExcel(worksheet, profile.min, profile.max);
-
                     listCreator(worksheet);
-
-                    //dicTitle = titleDic(worksheet);
+                    
                     setTitleDic();
                     
                     // delete everything from the spreadsheet
                     worksheet.DeleteRow(2, worksheet.Dimension.Rows);
-
-                    long? itemID;
+                    
+                    string itemID;
 
                     string title = "";
 
                     int row = 2;
-
-                    foreach (string list in titleObjects.Keys)
+                    
+                    try
                     {
-                        foreach (ShopifyList inList in titleObjects[list])
+                        foreach (var item in shopifyProfile.Where(y => y.userID == profile.ProfileUser)
+                                .OrderBy(x => x.handle)
+                                .OrderBy(x => x.option1Value))
                         {
                             execption++;
 
-                            itemID = inList.sku;
+                            itemID = item.sku;
 
+                            Fragrancex fra = new Fragrancex();
+
+                            fragrancex.TryGetValue(Convert.ToInt32(itemID), out fra);
+
+                            string description = string.Empty;
+
+                            double price = 0.0;
+
+                            if(fra != null)
+                            {
+                                description = fra.Description;
+
+                                price = fra.WholePriceUSD;
+                            }
+                            
                             // Set Handle
-                            worksheet.Cells[row, 1].Value = inList.title;
+                            worksheet.Cells[row, 1].Value = item.title;
 
                             // Logic for the title
-                            title = BuildTitle(dicTitle, inList.title, inList.collection);
+                            title = BuildTitle(dicTitle, item.handle, item.collection);
                             worksheet.Cells[row, 2].Value = title;
 
                             //Logic for the HTML Body
-                            worksheet.Cells[row, 3].Value = BuildHTML(title, row, profile.html, itemID, inList.pictures);
+                            worksheet.Cells[row, 3].Value = BuildHTML(title, row, profile.html, item.image
+                                , description);
 
                             // Set Vendor
-                            worksheet.Cells[row, 4].Value = inList.vendor;
+                            worksheet.Cells[row, 4].Value = item.vendor;
 
                             // Set Type
-                            worksheet.Cells[row, 5].Value = inList.fragranceType;
+                            worksheet.Cells[row, 5].Value = item.type;
 
                             // Set Publish
                             worksheet.Cells[row, 6].Value = "TRUE";
 
                             // Option1 Name
-                            worksheet.Cells[row, 7].Value = inList.option1Name;
+                            worksheet.Cells[row, 7].Value = item.option1Name;
 
                             // Option1 Value
-                            worksheet.Cells[row, 8].Value = inList.option1Value;
-
-                            // Option2 Name
-                            //worksheet.Cells[row, 9].Value = "Fragrance Type";
-
-                            // Option2 Value
-                            //worksheet.Cells[row, 10].Value = inList.fragranceType;
-
-                            // Option3 Name
-                            //worksheet.Cells[row, 11].Value = "Brand";
-
-                            // Option3 Value
-                            //worksheet.Cells[row, 12].Value = inList.brand;
+                            worksheet.Cells[row, 8].Value = item.option1Value;
 
                             // Set SKU
-                            worksheet.Cells[row, 13].Value = inList.sku;
+                            worksheet.Cells[row, 13].Value = item.sku;
 
                             // Set Variant
                             worksheet.Cells[row, 14].Value = 400;
@@ -120,11 +129,11 @@ namespace ExcelModifier
                             worksheet.Cells[row, 18].Value = "manual";
 
                             // Set Variant Compare At Price
-                            if(inList.comparePrice != 0)
+                            if (item.comparePrice != 0)
                             {
-                                worksheet.Cells[row, 20].Value = inList.comparePrice;
+                                worksheet.Cells[row, 20].Value = item.comparePrice;
                             }
-                            
+
                             // Set Variant Requires Shipping
                             worksheet.Cells[row, 21].Value = "TRUE";
 
@@ -132,29 +141,31 @@ namespace ExcelModifier
                             worksheet.Cells[row, 22].Value = "FALSE";
 
                             // UPC creator
-                            long? value;
 
-                            if (upcs.TryGetValue(Convert.ToInt32(itemID), out value))
+                            UPC upcs = new UPC();
+
+                            upc.TryGetValue(Convert.ToInt32(itemID), out upcs);
+
+                            if (upcs != null)
                             {
-                                worksheet.Cells[row, 23].Value = value;
+                                worksheet.Cells[row, 23].Value = upcs.Upc;
                             }
 
                             // Set Image
-                            worksheet.Cells[row, 24].Value = fixPictureHTML(inList.pictures);
+                            worksheet.Cells[row, 24].Value = fixPictureHTML(item.image);
 
                             // Set Tags
-                            worksheet.Cells[row, 26].Value = inList.tags;
+                            worksheet.Cells[row, 26].Value = item.tags;
 
                             // Set Collection
-                            worksheet.Cells[row, 27].Value = inList.collection;
-                            
-                            // Prices
-                            string price = getSellingPrice(itemID);
+                            worksheet.Cells[row, 27].Value = item.collection;
 
-                            if (double.Parse(price) != 0.0)
+                            // Prices  
+
+                            if (price != 0.0)
                             {
                                 // Set Price
-                                worksheet.Cells[row, 19].Value = double.Parse(price);
+                                worksheet.Cells[row, 19].Value = getSellingPrice(price);
                                 // Set Variant Inventory Qty
                                 worksheet.Cells[row, 16].Value = profile.items;
                             }
@@ -166,91 +177,83 @@ namespace ExcelModifier
                                 worksheet.Cells[row, 16].Value = 0;
                             }
 
-                            double actualPrice = 0.0;
-                            fragrancexPrices.TryGetValue(Convert.ToInt32(itemID), out actualPrice);
-                            worksheet.Cells[row, 28].Value = actualPrice;
+                            worksheet.Cells[row, 28].Value = price;
 
                             row++;
                         }
                     }
-                    
+                    catch (Exception e)
+                    {
+                        throw e;
+                    }
+
                     package.Save();
+
+                    try
+                    {
+                        TableExecutor();
+                    }
+                    catch (Exception e)
+                    {
+                        throw e;
+                    }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Some error occurred while importing." + ex.Message);
+                throw ex;
             }
         }
-
+        
         private void setTitleDic()
         {
             string valueTitle = string.Empty;
             string keyTitle = string.Empty;
-            int counter = 1;
 
-            foreach (string list in titleObjects.Keys)
+            foreach (var item in shopifyProfile.Where(y => y.userID == profile.ProfileUser)
+                        .OrderBy(x => x.handle)
+                        .OrderBy(x => x.option1Value))
             {
-                foreach (ShopifyList inList in titleObjects[list])
+                if (!dicTitle.ContainsKey(item.handle))
                 {
-                    if(counter ==1)
-                    {
-                        keyTitle = list;
-                        valueTitle = valueTitle + getSize(inList.size);
-                        counter++;
-                    }
-                    else
-                    {
-                        valueTitle = valueTitle + profile.sizeDivider + getSize(inList.size);
-                    }
+                    keyTitle = item.handle;
+                    valueTitle = valueTitle + getSize(item.option1Value);
+                    dicTitle.Add(keyTitle, valueTitle);
                 }
-                dicTitle.Add(keyTitle, valueTitle);
+                else
+                {
+                    dicTitle.TryGetValue(item.handle, out valueTitle);
+                    dicTitle[item.handle] = valueTitle + profile.sizeDivider + getSize(item.option1Value);
+                }
                 valueTitle = string.Empty;
-                counter = 1;
             }
         }
 
-        public string getSellingPrice(long? itemID)
+        private string getSellingPrice(double price)
         {
-            double shipping = profile.shipping;
-            double fee = profile.fee;
-            double profit = profile.profit;
-            double markdown = profile.markdown;
-
-            double value;
-
             double summer = 0.0;
 
-            int item = Convert.ToInt32(itemID);
+            // profit
+            summer = price + (price * profile.profit) / 100;
 
-            if (fragrancexPrices.TryGetValue(item, out value))
-            {
-                // profit
-                summer = value + (value * profit) / 100;
+            // shipping
+            summer = summer + profile.shipping;
 
-                // shipping
-                summer = summer + shipping;
+            // fee (Amazon or eBay)
+            summer = summer + (summer * 15) / 100;
 
-                // fee (Amazon or eBay)
-                summer = summer + (summer * 15) / 100;
+            // Promoted
 
-                // Promoted
+            summer = summer + (summer * 13) / 100;
 
-                summer = summer + (summer * 13) / 100;
-
-                // MarkDown
-                summer = summer + markdown;
-            }
-
+            // MarkDown
+            summer = summer + profile.markdown;
+            
             return summer.ToString();
         }
 
-        private string BuildHTML(string title, int row, string HTML, long? itemID, string pictures)
+        private string BuildHTML(string title, int row, string HTML, string pictures, string description)
         {
-            string description = string.Empty;
-
-            descriptions.TryGetValue(Convert.ToInt32(itemID), out description);
-
             HTML = HTML.Replace("HTMLTitle",title);
 
             HTML = HTML.Replace("HTMLBody", description);
@@ -270,10 +273,8 @@ namespace ExcelModifier
 
             dicTitle.TryGetValue(title, out value);
 
-            if (value != null)
+            if (getSize(value) != null)
             {
-                value = removeRepeats(value);
-
                 // Remove Perfume and (Unisex)
 
                 sb.Replace("Perfume", "");
@@ -288,12 +289,12 @@ namespace ExcelModifier
 
                 sb.Append(value);
 
-                if (value != null && value != "")
+                if (string.IsNullOrEmpty(value) && value != "")
                 {
                     sb.Append("Oz");
                 }
             }
-            else if (value == null)
+            else if (string.IsNullOrEmpty(value))
             {
                 value = title;
             }
@@ -350,34 +351,6 @@ namespace ExcelModifier
             return sb.ToString();
         }
 
-        private string removeRepeats(string v)
-        {
-            char[] subString = v.ToArray();
-            string ans = "";
-            string cur = "";
-
-            foreach (char c in subString)
-            {
-                if (char.ToLower(c).Equals('/'))
-                {
-                    if (!ans.Contains(cur))
-                    {
-                        ans = ans + cur + "/";
-                        cur = "";
-                    }
-                    cur = "";
-                }
-                else
-                {
-                    cur = cur + c.ToString();
-                }
-            }
-            
-            ans = ans + cur;
-
-            return ans.TrimEnd('/');
-        }
-
         private void addingTitleStart(StringBuilder sb, string type)
         {
             // size does not go over 80 characters
@@ -425,135 +398,7 @@ namespace ExcelModifier
 
             return ans;
         }
-
-        private Dictionary<string, string> titleDic(ExcelWorksheet worksheet)
-        {
-            int rowCount = worksheet.Dimension.Rows;
-            int ColCount = worksheet.Dimension.Columns;
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            string prev = null;
-            string cur = null;
-            string result = null;
-
-            for (int row = 1; row <= rowCount; row++)
-            {
-                if (row != 1 && cur == null)
-                {
-                    cur = worksheet.Cells[row, 2].Value.ToString()
-                        + " " + worksheet.Cells[row, 27].Value.ToString();
-                    result = getSize(worksheet.Cells[row, 8].Value.ToString());
-                    if (row == rowCount)
-                        dic.Add(cur, result);
-                    continue;
-                }
-
-                else if (row != 1 && prev == null)
-                {
-                    prev = worksheet.Cells[row, 2].Value.ToString()
-                        + " " + worksheet.Cells[row, 27].Value.ToString();
-                    if (string.Compare(prev, cur) == 0)
-                        result = result + profile.sizeDivider + " " + getSize(worksheet.Cells[row, 8].Value.ToString());
-                    else
-                    {
-                        dic.Add(cur, result);
-                        cur = null;
-                        prev = null;
-                        row--;
-                    }
-                }
-
-                else if (row != 1 && (cur != null && prev != null))
-                {
-                    prev = worksheet.Cells[row, 2].Value.ToString()
-                        + " " + worksheet.Cells[row, 27].Value.ToString();
-                    if (string.Compare(prev, cur) == 0)
-                    {
-                        result = result + profile.sizeDivider + " " + getSize(worksheet.Cells[row, 8].Value.ToString());
-                        if (row == rowCount)
-                            dic.Add(cur, result);
-                    }
-
-                    else
-                    {
-                        dic.Add(cur, result);
-                        cur = null;
-                        prev = null;
-                        row--;
-                    }
-                }
-
-                else if (row == 1)
-                    continue;
-                else
-                {
-                    cur = null;
-                    prev = null;
-                    dic.Add(cur, result);
-                    row = row - 2;
-                }
-            }
-
-            return dic;
-        }
-
-        private void PrepareExcel(ExcelWorksheet worksheet, int min, int max)
-        {
-            int rowCount = worksheet.Dimension.Rows;
-            string title = "";
-            for (int row = 1; row <= rowCount; row++)
-            {
-                if (row == 1)
-                {
-                    continue;
-                }
-                // Remove testers and unboxed items
-                title = worksheet.Cells[row, 1].Value.ToString();
-                if (title.ToLower().Contains("tester") || title.ToLower().Contains("unboxed")
-                    || title.ToLower().Contains("sample") || title.ToLower().Contains("jivago"))
-                {
-                    worksheet.DeleteRow(row, 1, true);
-                    row--;
-                    rowCount--;
-                    continue;
-                }
-
-                if (min != 0 && max != 0)
-                {
-                    long price = Convert.ToInt64(worksheet.Cells[row, 19].Value);
-                    if (price <= min || price > max)
-                    {
-                        worksheet.DeleteRow(row, 1, true);
-                        row--;
-                        rowCount--;
-                        continue;
-                    }
-                }
-
-                else if (min != 0)
-                {
-                    long price = Convert.ToInt64(worksheet.Cells[row, 19].Value);
-                    if (price <= min)
-                    {
-                        worksheet.DeleteRow(row, 1, true);
-                        row--;
-                        rowCount--;
-                        continue;
-                    }
-                }
-                else if (max != 0)
-                {
-                    long price = Convert.ToInt64(worksheet.Cells[row, 19].Value);
-                    if (price >= max)
-                    {
-                        worksheet.DeleteRow(row, 1, true);
-                        row--;
-                        rowCount--;
-                        continue;
-                    }
-                }
-            }
-        }
-
+        
         private string getSize(string v)
         {
             char[] subString = v.ToArray();
@@ -594,6 +439,7 @@ namespace ExcelModifier
             int rowCount = worksheet.Dimension.Rows;
             int ColCount = worksheet.Dimension.Columns;
             int exception = 0;
+
             try
             {
                 for (int row = 1; row <= rowCount; row++)
@@ -601,37 +447,53 @@ namespace ExcelModifier
                     if (row != 1)
                     {
                         exception++;
-                        if(exception == 31)
-                        {
+                        var item = shopifyProfile
+                            .Where(
+                                x => x.sku == worksheet.Cells[row, 13].Value.ToString() && 
+                                x.userID == profile.ProfileUser).FirstOrDefault();
 
-                        }
-                        // Remove testers and unboxed items
-                        string title = worksheet.Cells[row, 1].Value.ToString();
-                        if (!title.ToLower().Contains("tester") && !title.ToLower().Contains("unboxed")
-                        && !title.ToLower().Contains("sample") && !title.ToLower().Contains("jivago")
-                        && !title.ToLower().Contains("damaged box") && !title.ToLower().Contains("scratched box")
-                        && !title.ToLower().Contains("damaged packaging"))
+                        if(item == null)
                         {
-                            ShopifyList shopifyList = new ShopifyList();
-
-                            shopifyList.title = worksheet.Cells[row, 1].Value.ToString();
-                            shopifyList.brand = worksheet.Cells[row, 4].Value.ToString();
-                            shopifyList.fragranceType = worksheet.Cells[row, 5].Value.ToString();
-                            shopifyList.sku = Convert.ToInt64(worksheet.Cells[row, 13].Value);
-                            shopifyList.price = Convert.ToDouble(worksheet.Cells[row, 19].Value.ToString());
-                            shopifyList.pictures = fixPictureHTML(worksheet.Cells[row, 24].Value.ToString());
-                            shopifyList.size = worksheet.Cells[row, 8].Value.ToString();
-                            shopifyList.collection = worksheet.Cells[row, 27].Value.ToString();
-                            shopifyList.vendor = worksheet.Cells[row, 4].Value.ToString();
-                            if (worksheet.Cells[row, 20].Value != null)
+                            // Remove testers and unboxed items
+                            string title = worksheet.Cells[row, 1].Value.ToString();
+                            if (!title.ToLower().Contains("tester") && !title.ToLower().Contains("unboxed")
+                            && !title.ToLower().Contains("sample") && !title.ToLower().Contains("jivago")
+                            && !title.ToLower().Contains("damaged box") && !title.ToLower().Contains("scratched box")
+                            && !title.ToLower().Contains("damaged packaging"))
                             {
-                                shopifyList.comparePrice = Convert.ToInt32(worksheet.Cells[row, 20].Value);
-                            }
-                            shopifyList.option1Name = worksheet.Cells[row, 7].Value.ToString();
-                            shopifyList.option1Value = worksheet.Cells[row, 8].Value.ToString();
-                            shopifyList.tags = worksheet.Cells[row, 26].Value.ToString();
+                                ShopifyUser user = new ShopifyUser();
 
-                            titleObjects.Add(worksheet.Cells[row, 1].Value.ToString(), shopifyList);
+                                user.sku = worksheet.Cells[row, 13].Value?.ToString();
+                                user.handle = worksheet.Cells[row, 1].Value?.ToString();
+                                user.title = worksheet.Cells[row, 2].Value?.ToString();
+                                user.body = worksheet.Cells[row, 3].Value?.ToString();
+                                user.vendor = worksheet.Cells[row, 4].Value?.ToString();
+                                user.type = worksheet.Cells[row, 5].Value?.ToString();
+                                user.option1Name = worksheet.Cells[row, 7].Value?.ToString();
+                                user.option1Value = worksheet.Cells[row, 8].Value?.ToString();
+                                user.price = Convert.ToDouble(worksheet.Cells[row, 19].Value?.ToString());
+                                if (worksheet.Cells[row, 20].Value != null)
+                                {
+                                    user.comparePrice = Convert.ToDouble(worksheet.Cells[row, 20].Value?.ToString());
+                                }
+                                user.image = fixPictureHTML(worksheet.Cells[row, 24].Value?.ToString());
+                                user.tags = worksheet.Cells[row, 26].Value?.ToString();
+                                user.collection = worksheet.Cells[row, 27].Value?.ToString();
+                                // UPC creator
+
+                                UPC upcs = new UPC();
+
+                                upc.TryGetValue(Convert.ToInt32(worksheet.Cells[row, 13].Value), out upcs);
+
+                                if(upcs != null)
+                                {
+                                    user.upc = upcs.Upc;
+                                }
+                                
+                                user.userID = profile.ProfileUser;
+                                
+                                shopifyProfile.Add(user);
+                            }
                         }
                     }
                 }
@@ -641,8 +503,72 @@ namespace ExcelModifier
             }
         }
 
-        private MultiMapShopify<ShopifyList> titleObjects;
+        public DataTable CreateTable()
+        {
+            DataTable shopifyUserTable = new DataTable("Amazon");
 
-        private Dictionary<string, string> dicTitle { set; get; }
+            ColumnMaker(shopifyUserTable, "ItemID", "System.Int32");
+            ColumnMaker(shopifyUserTable, "body", "System.String");
+            ColumnMaker(shopifyUserTable, "collection", "System.String");
+            ColumnMaker(shopifyUserTable, "comparePrice", "System.Double");
+            ColumnMaker(shopifyUserTable, "handle", "System.String");
+            ColumnMaker(shopifyUserTable, "image", "System.String");
+            ColumnMaker(shopifyUserTable, "option1Name", "System.String");
+            ColumnMaker(shopifyUserTable, "option1Value", "System.String");
+            ColumnMaker(shopifyUserTable, "price", "System.Double");
+            ColumnMaker(shopifyUserTable, "sku", "System.String");
+            ColumnMaker(shopifyUserTable, "tags", "System.String");
+            ColumnMaker(shopifyUserTable, "title", "System.String");
+            ColumnMaker(shopifyUserTable, "type", "System.String");
+            ColumnMaker(shopifyUserTable, "upc", "System.Int64");
+            ColumnMaker(shopifyUserTable, "vendor", "System.String");
+            ColumnMaker(shopifyUserTable, "user", "System.String");
+
+            return shopifyUserTable;
+        }
+
+        public void TableExecutor()
+        {
+            DataTable uploadShopifyUser = CreateTable();
+            int bulkSize = 0;
+            try
+            {
+                foreach (var profile in shopifyProfile)
+                {
+                    DataRow insideRow = uploadShopifyUser.NewRow();
+
+                    insideRow["ItemID"] = bulkSize + 1;
+                    insideRow["sku"] = profile.sku;
+                    insideRow["handle"] = profile.handle;
+                    insideRow["title"] = profile.title;
+                    insideRow["body"] = profile.body;
+                    insideRow["vendor"] = profile.vendor;
+                    insideRow["type"] = profile.type;
+                    insideRow["option1Name"] = profile.option1Name;
+                    insideRow["option1Value"] = profile.option1Value;
+                    insideRow["price"] = profile.price;
+                    insideRow["comparePrice"] = profile.comparePrice;
+                    insideRow["image"] = profile.image;
+                    insideRow["tags"] = profile.tags;
+                    insideRow["collection"] = profile.collection;
+                    if(profile.upc != null)
+                    {
+                        insideRow["upc"] = profile.upc;
+                    }
+                    insideRow["user"] = profile.userID;
+
+                    uploadShopifyUser.Rows.Add(insideRow);
+                    uploadShopifyUser.AcceptChanges();
+                    bulkSize++;
+                }
+
+                upload(uploadShopifyUser, bulkSize, "dbo.ShopifyUser");
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }   
+        }
+        
     }
 }

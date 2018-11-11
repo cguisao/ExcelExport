@@ -134,4 +134,47 @@ namespace ExcelModifier
             }
         }
     }
+
+    public class MultiMapShopifyUser<ShopifyUser>
+    {
+        Dictionary<string, List<ShopifyUser>> _dictionary =
+            new Dictionary<string, List<ShopifyUser>>();
+
+        public void Add(string key, ShopifyUser value)
+        {
+            List<ShopifyUser> list;
+            if (this._dictionary.TryGetValue(key, out list))
+            {
+                list.Add(value);
+            }
+            else
+            {
+                list = new List<ShopifyUser>();
+                list.Add(value);
+                this._dictionary[key] = list;
+            }
+        }
+
+        public IEnumerable<string> Keys
+        {
+            get
+            {
+                return this._dictionary.Keys;
+            }
+        }
+
+        public List<ShopifyUser> this[string key]
+        {
+            get
+            {
+                List<ShopifyUser> list;
+                if (!this._dictionary.TryGetValue(key, out list))
+                {
+                    list = new List<ShopifyUser>();
+                    this._dictionary[key] = list;
+                }
+                return list;
+            }
+        }
+    }
 }
