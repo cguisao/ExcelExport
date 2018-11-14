@@ -62,8 +62,6 @@ namespace GTI_Solutions.Controllers
 
             DBModifierAzImporterExcel AzImporter = new DBModifierAzImporterExcel(path);
 
-            _context.Database.ExecuteSqlCommand("delete from AzImporter");
-
             AzImporter.TableExecutor();
 
             ServiceTimeStamp service = new ServiceTimeStamp();

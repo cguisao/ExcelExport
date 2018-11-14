@@ -323,10 +323,6 @@ namespace DBTester.Controllers
 
             var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
 
-            // Update the Fragrancex db
-
-            _context.Database.ExecuteSqlCommand("delete from Fragrancex");
-
             DBModifierFragrancexExcel dBModifierFragrancexExcel = new DBModifierFragrancexExcel(path, upc);
 
             dBModifierFragrancexExcel.TableExecutor();
@@ -336,8 +332,6 @@ namespace DBTester.Controllers
             var fragranceTitle = _context.FragrancexTitle.ToDictionary(x => x.ItemID, y => y.Title);
 
             DBModifierFragrancexExcelList dBModifierFragrancexExcelList = new DBModifierFragrancexExcelList(path, fragranceTitle);
-
-            _context.Database.ExecuteSqlCommand("delete from FragrancexTitle");
 
             dBModifierFragrancexExcelList.TableExecutor();
 
@@ -393,9 +387,7 @@ namespace DBTester.Controllers
                 //allProducts.Add(product);
 
                 var allProducts = listingApiClient.GetAllProducts();
-
-                _context.Database.ExecuteSqlCommand("delete from Fragrancex");
-
+                
                 DBModifierFragrancexAPI dBModifierFragrancexAPI = new DBModifierFragrancexAPI("", upc)
                 {
                     allProducts = allProducts

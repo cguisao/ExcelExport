@@ -167,9 +167,6 @@ namespace DBTester.Controllers
                 //    }
                 //}
 
-
-                _context.Database.ExecuteSqlCommand("delete from Amazon");
-
                 // Upload to the DB
 
                 DBModifierAmazon dBModifierAmazon = new DBModifierAmazon(amazonDBUploader.amazonList);

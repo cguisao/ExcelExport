@@ -117,8 +117,6 @@ namespace DBTester.Controllers
             DBModifierPerfumeWorldWideExcel dBModifierPerfumeWorldWideExcel 
                 = new DBModifierPerfumeWorldWideExcel(path, PerfumeWorldWide);
 
-            _context.Database.ExecuteSqlCommand("delete from PerfumeWorldWide");
-            
             dBModifierPerfumeWorldWideExcel.TableExecutor();
 
             ServiceTimeStamp service = new ServiceTimeStamp();

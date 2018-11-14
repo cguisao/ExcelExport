@@ -48,10 +48,6 @@ namespace DBTester.Controllers
 
             var pageNumber = page ?? 1;
 
-            //var onePageOfUpcs = upcs.ToPagedList(pageNumber, 10);
-
-            //ViewBag.onePageOfUpcs = onePageOfUpcs;
-
             return View();
         }
 

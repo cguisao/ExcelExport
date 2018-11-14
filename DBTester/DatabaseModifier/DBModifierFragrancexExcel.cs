@@ -116,7 +116,7 @@ namespace DatabaseModifier
                             insideRow["BrandName"] = worksheet.Cells[row, brandName].Value?.ToString();
                             insideRow["Description"] = worksheet.Cells[row, description].Value?.ToString();
                             insideRow["Gender"] = null;
-                            insideRow["Instock"] = null;
+                            insideRow["Instock"] = true;
                             insideRow["LargeImageUrl"] = worksheet.Cells[row, image].Value?.ToString();
                             insideRow["MetricSize"] = null;
                             insideRow["ParentCode"] = null;

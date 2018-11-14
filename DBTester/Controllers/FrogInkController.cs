@@ -184,8 +184,6 @@ namespace GTI_Solutions.Controllers
 
                 var allProducts = listingApiClient.GetAllProducts();
 
-                _context.Database.ExecuteSqlCommand("delete from Fragrancex");
-
                 DBModifierFragrancexAPI dBModifierFragrancexAPI = new DBModifierFragrancexAPI("", upc)
                 {
                     allProducts = allProducts
