@@ -54,6 +54,8 @@ namespace DatabaseModifier
                                 // Set the BatchSize.
                                 bulkCopy.BatchSize = bulkSize;
 
+                                bulkCopy.BulkCopyTimeout = 0;
+
                                 try
                                 {
                                     // Write from the source to the destination.
