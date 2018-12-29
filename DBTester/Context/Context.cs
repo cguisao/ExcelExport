@@ -20,5 +20,7 @@ namespace DBTester.Models
         public DbSet<FragrancexTitle> FragrancexTitle { get; set; }
         public DbSet<ErrorViewModel> ErrorViewModel { get; set; }
         public DbSet<ShopifyUser> ShopifyUser { get; set; }
+        public DbSet<UsersList> UsersList { get; set; }
+        public DbSet<UsersListTemp> UsersListTemp { get; set; }
     }
 }
