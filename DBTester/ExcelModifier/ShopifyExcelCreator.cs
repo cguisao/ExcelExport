@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using DatabaseModifier;
 using DBTester.Models;
 using OfficeOpenXml;
@@ -12,18 +14,32 @@ namespace ExcelModifier
 {
     public class ShopifyExcelCreator : DBRawQueries, IExcelExtension, IDatabaseModifier
     {
-        public ShopifyExcelCreator(Profile _profile, List<ShopifyUser> _shopifyProfile
-            , Dictionary<int, Fragrancex> _fragrancex, Dictionary<int, UPC> _upc, string _path)
+        public ShopifyExcelCreator(Profile _profile, Dictionary<string, ShopifyUser> _shopifyProfile
+            , Dictionary<int, Fragrancex> _fragrancex, ConcurrentDictionary<string, string> _shopifyUser
+            , Dictionary<int, UPC> _upc, string _path)
         {
             profile = _profile;
             shopifyProfile = _shopifyProfile;
             fragrancex = _fragrancex;
+            shopifyUser = _shopifyUser;
             upc = _upc;
             path = _path;
             dicTitle = new Dictionary<string, string>();
         }
-        
-        private List<ShopifyUser> shopifyProfile { get; set; }
+
+        public ShopifyExcelCreator(Profile _profile, Dictionary<string, ShopifyUser> _shopifyProfile
+            , ConcurrentDictionary<string, string> _shopifyUser, string _path)
+        {
+            profile = _profile;
+            shopifyUser = _shopifyUser;
+            shopifyProfile = _shopifyProfile;
+            path = _path;
+            dicTitle = new Dictionary<string, string>();
+        }
+
+        private Dictionary<string, ShopifyUser> shopifyProfile { get; set; }
+
+        public ConcurrentDictionary<string, string> shopifyUser { get; set; }
 
         private Dictionary<int, Fragrancex> fragrancex { get; set; }
 
@@ -34,7 +50,7 @@ namespace ExcelModifier
         private Profile profile { get; set; }
 
         private Dictionary<string, string> dicTitle { set; get; }
-
+        
         public void ExcelGenerator()
         {
             // First update the database with the new items
@@ -42,144 +58,172 @@ namespace ExcelModifier
             FileInfo file = new FileInfo(path);
             Dictionary<string, long> dicSKU = new Dictionary<string, long>();
             
-            int execption = 0;
+            
             try
             {
                 using (ExcelPackage package = new ExcelPackage(file))
                 {
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
-                    
+
                     listCreator(worksheet);
-                    
+
                     setTitleDic();
-                    
+
+                    tableExecutor();
+
+                    package.Save();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void saveExcel()
+        {
+            FileInfo file = new FileInfo(path);
+            try
+            {
+                using (ExcelPackage package = new ExcelPackage(file))
+                {
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
+
                     // delete everything from the spreadsheet
                     worksheet.DeleteRow(2, worksheet.Dimension.Rows);
-                    
+
                     string itemID;
 
                     string title = "";
 
                     int row = 2;
-                    
+
+                    int execption = 0;
+
+                    setTitleDic();
+
                     try
                     {
-                        foreach (var item in shopifyProfile.Where(y => y.userID == profile.ProfileUser)
-                                .OrderBy(x => x.handle)
-                                .OrderBy(x => x.option1Value))
+                        foreach (var item in shopifyProfile
+                            .OrderBy(x => x.Value.handle)
+                            .OrderBy(x => x.Value.option1Value))
                         {
-                            execption++;
-
-                            itemID = item.sku;
-
-                            Fragrancex fra = new Fragrancex();
-
-                            fragrancex.TryGetValue(Convert.ToInt32(itemID), out fra);
-
-                            string description = string.Empty;
-
-                            double price = 0.0;
-
-                            if(fra != null)
+                            if (shopifyUser.ContainsKey(item.Value.sku + "_" + profile.ProfileUser))
                             {
-                                description = fra.Description;
+                                execption++;
 
-                                price = fra.WholePriceUSD;
+                                itemID = item.Value.sku;
+
+                                Fragrancex fra = new Fragrancex();
+
+                                fragrancex.TryGetValue(Convert.ToInt32(itemID), out fra);
+
+                                string description = string.Empty;
+
+                                double price = 0.0;
+
+                                if (fra != null)
+                                {
+                                    description = fra.Description;
+
+                                    price = fra.WholePriceUSD;
+                                }
+
+                                // Set Handle
+                                worksheet.Cells[row, 1].Value = item.Value.handle;
+
+                                // Logic for the title
+                                title = BuildTitle(dicTitle, item.Value.handle, item.Value.collection);
+                                worksheet.Cells[row, 2].Value = title;
+
+                                //Logic for the HTML Body
+                                worksheet.Cells[row, 3].Value = BuildHTML(title, row, profile.html, item.Value.image
+                                    , description);
+
+                                // Set Vendor
+                                worksheet.Cells[row, 4].Value = item.Value.vendor;
+
+                                // Set Type
+                                worksheet.Cells[row, 5].Value = item.Value.type;
+
+                                // Set Publish
+                                worksheet.Cells[row, 6].Value = "TRUE";
+
+                                // Option1 Name
+                                worksheet.Cells[row, 7].Value = "Size";
+
+                                // Option1 Value
+                                worksheet.Cells[row, 8].Value = item.Value.option1Value;
+
+                                // Set SKU
+                                worksheet.Cells[row, 13].Value = item.Value.sku;
+
+                                // Set Variant
+                                worksheet.Cells[row, 14].Value = 400;
+
+                                // Set Variant Inventory Tracker
+                                worksheet.Cells[row, 15].Value = "shopify";
+
+                                // Set Variant Inventory Policy
+                                worksheet.Cells[row, 17].Value = "deny";
+
+                                // Set Variant Fulfillment Service
+                                worksheet.Cells[row, 18].Value = "manual";
+
+                                // Set Variant Compare At Price
+                                //if (item.Value.comparePrice != 0)
+                                //{
+                                //    worksheet.Cells[row, 20].Value = item.Value.comparePrice;
+                                //}
+
+                                // Set Variant Requires Shipping
+                                worksheet.Cells[row, 21].Value = "TRUE";
+
+                                // Set Variant Taxable
+                                worksheet.Cells[row, 22].Value = "FALSE";
+
+                                // UPC creator
+
+                                UPC upcs = new UPC();
+
+                                upc.TryGetValue(Convert.ToInt32(itemID), out upcs);
+
+                                if (upcs != null)
+                                {
+                                    worksheet.Cells[row, 23].Value = upcs.Upc;
+                                }
+
+                                // Set Image
+                                worksheet.Cells[row, 24].Value = fixPictureHTML(item.Value.image);
+
+                                // Set Tags
+                                worksheet.Cells[row, 26].Value = item.Value.tags;
+
+                                // Set Collection
+                                worksheet.Cells[row, 27].Value = item.Value.collection;
+
+                                // Prices  
+
+                                if (price != 0.0)
+                                {
+                                    // Set Price
+                                    worksheet.Cells[row, 19].Value = getSellingPrice(price);
+                                    // Set Variant Inventory Qty
+                                    worksheet.Cells[row, 16].Value = profile.items;
+                                }
+                                else
+                                {
+                                    // Set Price
+                                    worksheet.Cells[row, 19].Value = 100.0;
+                                    // Set Variant Inventory Qty
+                                    worksheet.Cells[row, 16].Value = 0;
+                                }
+
+                                worksheet.Cells[row, 28].Value = price;
+
+                                row++;
                             }
-                            
-                            // Set Handle
-                            worksheet.Cells[row, 1].Value = item.title;
-
-                            // Logic for the title
-                            title = BuildTitle(dicTitle, item.handle, item.collection);
-                            worksheet.Cells[row, 2].Value = title;
-
-                            //Logic for the HTML Body
-                            worksheet.Cells[row, 3].Value = BuildHTML(title, row, profile.html, item.image
-                                , description);
-
-                            // Set Vendor
-                            worksheet.Cells[row, 4].Value = item.vendor;
-
-                            // Set Type
-                            worksheet.Cells[row, 5].Value = item.type;
-
-                            // Set Publish
-                            worksheet.Cells[row, 6].Value = "TRUE";
-
-                            // Option1 Name
-                            worksheet.Cells[row, 7].Value = item.option1Name;
-
-                            // Option1 Value
-                            worksheet.Cells[row, 8].Value = item.option1Value;
-
-                            // Set SKU
-                            worksheet.Cells[row, 13].Value = item.sku;
-
-                            // Set Variant
-                            worksheet.Cells[row, 14].Value = 400;
-
-                            // Set Variant Inventory Tracker
-                            worksheet.Cells[row, 15].Value = "shopify";
-
-                            // Set Variant Inventory Policy
-                            worksheet.Cells[row, 17].Value = "deny";
-
-                            // Set Variant Fulfillment Service
-                            worksheet.Cells[row, 18].Value = "manual";
-
-                            // Set Variant Compare At Price
-                            if (item.comparePrice != 0)
-                            {
-                                worksheet.Cells[row, 20].Value = item.comparePrice;
-                            }
-
-                            // Set Variant Requires Shipping
-                            worksheet.Cells[row, 21].Value = "TRUE";
-
-                            // Set Variant Taxable
-                            worksheet.Cells[row, 22].Value = "FALSE";
-
-                            // UPC creator
-
-                            UPC upcs = new UPC();
-
-                            upc.TryGetValue(Convert.ToInt32(itemID), out upcs);
-
-                            if (upcs != null)
-                            {
-                                worksheet.Cells[row, 23].Value = upcs.Upc;
-                            }
-
-                            // Set Image
-                            worksheet.Cells[row, 24].Value = fixPictureHTML(item.image);
-
-                            // Set Tags
-                            worksheet.Cells[row, 26].Value = item.tags;
-
-                            // Set Collection
-                            worksheet.Cells[row, 27].Value = item.collection;
-
-                            // Prices  
-
-                            if (price != 0.0)
-                            {
-                                // Set Price
-                                worksheet.Cells[row, 19].Value = getSellingPrice(price);
-                                // Set Variant Inventory Qty
-                                worksheet.Cells[row, 16].Value = profile.items;
-                            }
-                            else
-                            {
-                                // Set Price
-                                worksheet.Cells[row, 19].Value = 100.0;
-                                // Set Variant Inventory Qty
-                                worksheet.Cells[row, 16].Value = 0;
-                            }
-
-                            worksheet.Cells[row, 28].Value = price;
-
-                            row++;
                         }
                     }
                     catch (Exception e)
@@ -188,15 +232,6 @@ namespace ExcelModifier
                     }
 
                     package.Save();
-
-                    try
-                    {
-                        TableExecutor();
-                    }
-                    catch (Exception e)
-                    {
-                        throw e;
-                    }
                 }
             }
             catch (Exception ex)
@@ -204,28 +239,49 @@ namespace ExcelModifier
                 throw ex;
             }
         }
-        
+
+        public void tableExecutor()
+        {
+            try
+            {
+                TableExecutor();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
         private void setTitleDic()
         {
             string valueTitle = string.Empty;
             string keyTitle = string.Empty;
 
-            foreach (var item in shopifyProfile.Where(y => y.userID == profile.ProfileUser)
-                        .OrderBy(x => x.handle)
-                        .OrderBy(x => x.option1Value))
+            foreach (var item in shopifyProfile
+                        .OrderBy(x => x.Value.handle)
+                        .OrderBy(x => x.Value.option1Value))
             {
-                if (!dicTitle.ContainsKey(item.handle))
+                if (shopifyUser.ContainsKey(item.Value.sku + "_" + profile.ProfileUser))
                 {
-                    keyTitle = item.handle;
-                    valueTitle = valueTitle + getSize(item.option1Value);
-                    dicTitle.Add(keyTitle, valueTitle);
+                    if (!dicTitle.ContainsKey(item.Value.handle))
+                    {
+                        keyTitle = item.Value.handle;
+                        if (!string.IsNullOrEmpty(item.Value.option1Value))
+                        {
+                            valueTitle = valueTitle + getSize(item.Value.option1Value);
+                        }
+                        dicTitle.Add(keyTitle, valueTitle);
+                    }
+                    else
+                    {
+                        dicTitle.TryGetValue(item.Value.handle, out valueTitle);
+                        if (string.IsNullOrEmpty(item.Value.option1Value))
+                        {
+                            dicTitle[item.Value.handle] = valueTitle + profile.sizeDivider + " " + getSize(item.Value.option1Value);
+                        }
+                    }
+                    valueTitle = string.Empty;
                 }
-                else
-                {
-                    dicTitle.TryGetValue(item.handle, out valueTitle);
-                    dicTitle[item.handle] = valueTitle + profile.sizeDivider + getSize(item.option1Value);
-                }
-                valueTitle = string.Empty;
             }
         }
 
@@ -447,57 +503,37 @@ namespace ExcelModifier
                     if (row != 1)
                     {
                         exception++;
-                        var item = shopifyProfile
-                            .Where(
-                                x => x.sku == worksheet.Cells[row, 13].Value.ToString() && 
-                                x.userID == profile.ProfileUser).FirstOrDefault();
-
-                        if(item == null)
+                        
+                        // Remove testers and unboxed items
+                        string title = worksheet.Cells[row, 1].Value.ToString();
+                        if (!title.ToLower().Contains("tester") && !title.ToLower().Contains("unboxed")
+                        && !title.ToLower().Contains("sample") && !title.ToLower().Contains("jivago")
+                        && !title.ToLower().Contains("damaged box") && !title.ToLower().Contains("scratched box")
+                        && !title.ToLower().Contains("damaged packaging"))
                         {
-                            // Remove testers and unboxed items
-                            string title = worksheet.Cells[row, 1].Value.ToString();
-                            if (!title.ToLower().Contains("tester") && !title.ToLower().Contains("unboxed")
-                            && !title.ToLower().Contains("sample") && !title.ToLower().Contains("jivago")
-                            && !title.ToLower().Contains("damaged box") && !title.ToLower().Contains("scratched box")
-                            && !title.ToLower().Contains("damaged packaging"))
+                            shopifyUser.TryAdd(worksheet.Cells[row, 13].Value?.ToString() + "_" + profile.ProfileUser, profile.ProfileUser);
+
+                            if (!shopifyProfile.ContainsKey(worksheet.Cells[row, 13].Value.ToString()))
                             {
                                 ShopifyUser user = new ShopifyUser();
 
                                 user.sku = worksheet.Cells[row, 13].Value?.ToString();
                                 user.handle = worksheet.Cells[row, 1].Value?.ToString();
                                 user.title = worksheet.Cells[row, 2].Value?.ToString();
-                                user.body = worksheet.Cells[row, 3].Value?.ToString();
                                 user.vendor = worksheet.Cells[row, 4].Value?.ToString();
                                 user.type = worksheet.Cells[row, 5].Value?.ToString();
-                                user.option1Name = worksheet.Cells[row, 7].Value?.ToString();
                                 user.option1Value = worksheet.Cells[row, 8].Value?.ToString();
-                                user.price = Convert.ToDouble(worksheet.Cells[row, 19].Value?.ToString());
-                                if (worksheet.Cells[row, 20].Value != null)
-                                {
-                                    user.comparePrice = Convert.ToDouble(worksheet.Cells[row, 20].Value?.ToString());
-                                }
                                 user.image = fixPictureHTML(worksheet.Cells[row, 24].Value?.ToString());
                                 user.tags = worksheet.Cells[row, 26].Value?.ToString();
                                 user.collection = worksheet.Cells[row, 27].Value?.ToString();
-                                // UPC creator
-
-                                UPC upcs = new UPC();
-
-                                upc.TryGetValue(Convert.ToInt32(worksheet.Cells[row, 13].Value), out upcs);
-
-                                if(upcs != null)
-                                {
-                                    user.upc = upcs.Upc;
-                                }
                                 
-                                user.userID = profile.ProfileUser;
-                                
-                                shopifyProfile.Add(user);
+                                shopifyProfile.Add(user.sku, user);
                             }
                         }
                     }
                 }
-            }catch(Exception e)
+            }
+            catch(Exception e)
             {
                 throw e;
             }
@@ -508,21 +544,21 @@ namespace ExcelModifier
             DataTable shopifyUserTable = new DataTable("Amazon");
 
             ColumnMaker(shopifyUserTable, "ItemID", "System.Int32");
-            ColumnMaker(shopifyUserTable, "body", "System.String");
+            //ColumnMaker(shopifyUserTable, "body", "System.String");
             ColumnMaker(shopifyUserTable, "collection", "System.String");
-            ColumnMaker(shopifyUserTable, "comparePrice", "System.Double");
+            //ColumnMaker(shopifyUserTable, "comparePrice", "System.Double");
             ColumnMaker(shopifyUserTable, "handle", "System.String");
             ColumnMaker(shopifyUserTable, "image", "System.String");
-            ColumnMaker(shopifyUserTable, "option1Name", "System.String");
+            //ColumnMaker(shopifyUserTable, "option1Name", "System.String");
             ColumnMaker(shopifyUserTable, "option1Value", "System.String");
-            ColumnMaker(shopifyUserTable, "price", "System.Double");
+            //ColumnMaker(shopifyUserTable, "price", "System.Double");
             ColumnMaker(shopifyUserTable, "sku", "System.String");
             ColumnMaker(shopifyUserTable, "tags", "System.String");
             ColumnMaker(shopifyUserTable, "title", "System.String");
             ColumnMaker(shopifyUserTable, "type", "System.String");
-            ColumnMaker(shopifyUserTable, "upc", "System.Int64");
+            //ColumnMaker(shopifyUserTable, "upc", "System.Int64");
             ColumnMaker(shopifyUserTable, "vendor", "System.String");
-            ColumnMaker(shopifyUserTable, "user", "System.String");
+            //ColumnMaker(shopifyUserTable, "user", "System.String");
 
             return shopifyUserTable;
         }
@@ -538,24 +574,24 @@ namespace ExcelModifier
                     DataRow insideRow = uploadShopifyUser.NewRow();
 
                     insideRow["ItemID"] = bulkSize + 1;
-                    insideRow["sku"] = profile.sku;
-                    insideRow["handle"] = profile.handle;
-                    insideRow["title"] = profile.title;
-                    insideRow["body"] = profile.body;
-                    insideRow["vendor"] = profile.vendor;
-                    insideRow["type"] = profile.type;
-                    insideRow["option1Name"] = profile.option1Name;
-                    insideRow["option1Value"] = profile.option1Value;
-                    insideRow["price"] = profile.price;
-                    insideRow["comparePrice"] = profile.comparePrice;
-                    insideRow["image"] = profile.image;
-                    insideRow["tags"] = profile.tags;
-                    insideRow["collection"] = profile.collection;
-                    if(profile.upc != null)
-                    {
-                        insideRow["upc"] = profile.upc;
-                    }
-                    insideRow["user"] = profile.userID;
+                    insideRow["sku"] = profile.Value.sku;
+                    insideRow["handle"] = profile.Value.handle;
+                    insideRow["title"] = profile.Value.title;
+                    //insideRow["body"] = profile.Value.body;
+                    insideRow["vendor"] = profile.Value.vendor;
+                    insideRow["type"] = profile.Value.type;
+                    //insideRow["option1Name"] = profile.Value.option1Name;
+                    insideRow["option1Value"] = profile.Value.option1Value;
+                    //insideRow["price"] = profile.Value.price;
+                    //insideRow["comparePrice"] = profile.Value.comparePrice;
+                    insideRow["image"] = profile.Value.image;
+                    insideRow["tags"] = profile.Value.tags;
+                    insideRow["collection"] = profile.Value.collection;
+                    //if(profile.Value.upc != null)
+                    //{
+                    //    insideRow["upc"] = profile.Value.upc;
+                    //}
+                    //insideRow["user"] = profile.Value.userID;
 
                     uploadShopifyUser.Rows.Add(insideRow);
                     uploadShopifyUser.AcceptChanges();
@@ -569,6 +605,7 @@ namespace ExcelModifier
                 throw e;
             }   
         }
+
         
     }
 }

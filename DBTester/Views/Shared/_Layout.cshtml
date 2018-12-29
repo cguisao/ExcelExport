@@ -76,7 +76,13 @@
                                         <li><a asp-area="" asp-controller="Amazon" asp-action="BlackList">Black List</a></li>
                                     </ul>
                                 </li>
-                                <li><a asp-area="" asp-controller="Shopify" asp-action="Index">Shopify</a></li>
+                                <li class="has-submenu">
+                                    <a href="#">Shopify</a>
+                                    <ul class="submenu">
+                                        <li><a asp-area="" asp-controller="Shopify" asp-action="Index">Download Report</a></li>
+                                        <li><a asp-area="" asp-controller="Shopify" asp-action="Upload">Update DB</a></li>
+                                    </ul>
+                                </li>
                                 <li><a asp-area="" asp-controller="FrogInk" asp-action="Index">Frog Ink</a></li>
                             </ul>
                         </li>
@@ -89,6 +95,10 @@
                                 <li><a asp-area="" asp-controller="Profile" asp-action="Title">eBay Title Creator</a></li>
                             </ul>
                         </li>
+
+                        @*<li class="has-submenu">
+                            <a asp-controller="Home" asp-action="tic_tac_toe"><i class="mdi mdi-airplay"></i>Tic Tac Toe</a>
+                        </li>*@
 
                         <li class="has-submenu"></li>
                     </ul>

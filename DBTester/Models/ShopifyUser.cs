@@ -15,17 +15,17 @@ namespace DBTester.Models
         public string sku { get; set; }
         public string handle { get; set; }
         public string title { get; set; }
-        public string body { get; set; }
+        //public string body { get; set; }
         public string vendor { get; set; }
         public string type { get; set; }
-        public string option1Name { get; set; }
+        //public string option1Name { get; set; }
         public string option1Value { get; set; }
-        public double price { get; set; }
-        public double comparePrice { get; set; }
+        //public double price { get; set; }
+        //public double comparePrice { get; set; }
         public string image { get; set; }
         public string tags { get; set; }
         public string collection { get; set; }
-        public long? upc { get; set; }
-        public string userID { get; set; }
+        //public long? upc { get; set; }
+        //public string userID { get; set; }
     }
 }

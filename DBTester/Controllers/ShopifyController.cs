@@ -20,6 +20,8 @@ using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using ExcelModifier;
 using DatabaseModifier;
+using System.Collections.Concurrent;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DBTester.Controllers
 {
@@ -33,6 +35,7 @@ namespace DBTester.Controllers
         {
             _context = context;
             _hostingEnvironment = hostingEnvironment;
+            test = string.Empty;
         }
 
         public IActionResult Index()
@@ -52,8 +55,29 @@ namespace DBTester.Controllers
             Guid guid = Guid.NewGuid();
 
             ViewBag.ExcelGuid = guid.ToString();
-
+            
             var profile = new Profile();
+
+            return View(_context.UsersList.Distinct().ToList());
+        }
+
+        public IActionResult Upload()
+        {
+            ViewBag.TimeStamp = _context.ServiceTimeStamp
+               .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+               .LastOrDefault().TimeStamp.ToShortDateString();
+
+            ViewBag.type = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .LastOrDefault().type;
+
+            ViewBag.Wholesalers = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .LastOrDefault().Wholesalers;
+
+            Guid guid = Guid.NewGuid();
+
+            ViewBag.ExcelGuid = guid.ToString();
 
             return View(_context.Profile.ToList());
         }
@@ -134,21 +158,82 @@ namespace DBTester.Controllers
             return returnFile;
         }
 
-        /*
-            This function is the http post from the index. 
-        */
+
+        [HttpPost]
+        public IActionResult Upload(string file, string User, Profile profile2)
+        {
+            var path = Path.Combine(
+                        Directory.GetCurrentDirectory(), "wwwroot",
+                        file + ".xlsx");
+
+            Profile profile = _context.Profile.AsNoTracking().Where<Profile>(x => x.ProfileUser == User).FirstOrDefault();
+
+            var shopifyProfile = _context.ShopifyUser.ToDictionary(x => x.sku, x => x);
+            var shopifyUsers = _context.UsersList.Where(x => x.userID == profile.ProfileUser)
+                .ToDictionary(x => x.sku, y => y.userID);
+
+            ConcurrentDictionary<string, string> shopifyUsersConcurrent =
+                new ConcurrentDictionary<string, string>(shopifyUsers);
+
+            ShopifyExcelCreator shopifyModifier =
+                new ShopifyExcelCreator(profile, shopifyProfile, shopifyUsersConcurrent, path);
+
+            try
+            {
+                shopifyModifier.ExcelGenerator();
+            }
+            catch (Exception e)
+            {
+                System.IO.File.Delete(path);
+                return null;
+            }
+
+            var builder = new ConfigurationBuilder()
+                                 .SetBasePath(Directory.GetCurrentDirectory())
+                                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                                 .AddEnvironmentVariables();
+
+            IConfiguration Configuration;
+            builder.AddEnvironmentVariables();
+            Configuration = builder.Build();
+
+            string connectionstring = Configuration.GetConnectionString("BloggingDatabase");
+
+            using (SqlConnection sourceConnection = new SqlConnection(connectionstring))
+            {
+                sourceConnection.Open();
+                try
+                {
+                    DBModifierShopifyUserList user =
+                        new DBModifierShopifyUserList(shopifyModifier.shopifyUser, profile);
+                    user.TableExecutor();
+                    // Execute raw query
+                    
+                    var command = sourceConnection.CreateCommand();
+                    command.CommandText = "exec MergeUsersList;";
+                    command.Connection = sourceConnection;
+                    command.ExecuteNonQuery();
+                    sourceConnection.Close();
+                
+                }
+                catch (Exception e)
+                {
+                    sourceConnection.Close();
+                    System.IO.File.Delete(path);
+                    return null;
+                }
+            }
+
+            return RedirectToAction("Index");
+        }
+
         [HttpPost]
         public async Task<IActionResult> ExportToExcel(string file, string shipping
             , string fee, string profit, string promoting, string markdown, int items, int min
             , int max, string User)
         {
-
             var path = Path.Combine(
-                        Directory.GetCurrentDirectory(), "wwwroot",
-                        file + ".xlsx");
-
-            // Update the database once a day
-            updateFragrancex();
+                       Directory.GetCurrentDirectory(), @"wwwroot\Excel_Source\Shopify_Upload.xlsx");
 
             Match shippingMatch = Regex.Match(shipping, @"[\d]+");
 
@@ -164,7 +249,7 @@ namespace DBTester.Controllers
             {
                 shipping = Double.Parse(shippingMatch.Value),
 
-                fee = Double.Parse(amazonFee.Value),
+                fee = Double.Parse(shippingMatch.Value),
 
                 profit = Double.Parse(profitMatch.Value),
 
@@ -198,23 +283,28 @@ namespace DBTester.Controllers
                 profile.markdown = Double.Parse(markdownMatch.Value);
             }
             
-            var shopifyProfile = _context.ShopifyUser.ToList();
+            var shopifyProfile = _context.ShopifyUser.ToDictionary(x => x.sku, x => x);
             var fragrancex = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y);
             var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y);
+            var shopifyUsers = _context.UsersList.Where(x => x.userID == profile.ProfileUser)
+                .ToDictionary(x => x.sku, y => y.userID);
+
+            ConcurrentDictionary<string, string> shopifyUsersConcurrent = 
+                new ConcurrentDictionary<string, string>(shopifyUsers);
 
             ShopifyExcelCreator shopifyModifier = 
-                new ShopifyExcelCreator(profile, shopifyProfile, fragrancex, upc, path);
+                new ShopifyExcelCreator(profile, shopifyProfile, fragrancex, shopifyUsersConcurrent, upc, path);
             
             try
             {
-                shopifyModifier.ExcelGenerator();
+                shopifyModifier.saveExcel();
             }
             catch (Exception e)
             {
                 System.IO.File.Delete(path);
                 return null;
             }
-            
+
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))
             {
@@ -231,8 +321,6 @@ namespace DBTester.Controllers
             _context.Profile.Update(profile);
 
             _context.SaveChanges();
-
-            System.IO.File.Delete(path);
 
             return returnFile;
         }
@@ -352,6 +440,8 @@ namespace DBTester.Controllers
             return RedirectToAction("UpdateExcel");
         }
 
+        private string test { get; set; }
+
         private void updateFragrancex()
         {
             ServiceTimeStamp service = new ServiceTimeStamp();
@@ -405,7 +495,7 @@ namespace DBTester.Controllers
 
                 _context.SaveChanges();
             }
-            catch(Exception e)
+            catch (Exception)
             {
 
             }
