@@ -1,0 +1,63 @@
+﻿@model IEnumerable<DBTester.Models.Profile>
+@{
+    ViewBag.Title = "Upload";
+}
+
+<div class="text-center m-t-15">
+    <h2>Shopify Upload</h2>
+</div> 
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+        <div class="card m-b-30">
+             <div class="card-body">
+                <div class="text-center m-t-15">
+                    <h3></h3>
+                </div>
+                <p>
+                    This application is intended to upload an excel to refresh the database for a particular user.
+                </p>
+                <div id="dropzone">
+                    <form asp-controller="Home" asp-action="DropzoneFileUpload" asp-antiforgery="false"
+                          class="dropzone" id="myAwesomeDropzone" enctype="multipart/form-data">
+                        <div class="text-center m-t-15 invisible">
+                            <input type="text" class="form-control" name="fileName" value="@ViewBag.ExcelGuid">
+                        </div>
+                        <div class="fallback">
+                            Drop files here or click to upload.<br>
+                            <input name="file" type="file" />
+                        </div>
+                    </form>
+                </div>
+                <br />
+                <form asp-controller="Shopify" asp-action="Upload" method="post"
+                      enctype="multipart/form-data" style="width: 100%">
+
+                    <div class="form-row">
+                        <div class="form-group text-center col-md-6">
+                            <label for="inputUser">User</label>
+                            @Html.DropDownList("User",
+                                    Model.Select(m => new SelectListItem() { Text = m.ProfileUser }).ToList()
+                                    , "", new { @class = "form-control", required = "required" })
+                        </div>
+                        <div class="text-center m-t-15 invisible">
+                            <input type="text" class="form-control" name="file" value="@ViewBag.ExcelGuid">
+                        </div>
+                        <div class="text-center m-t-15 invisible">
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="text-center m-t-15">
+                        <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                    </div>
+                </form>
+                <p>
+                    Last @ViewBag.Wholesalers database update <b>@ViewBag.TimeStamp Updated via  @ViewBag.type</b> <br />
+                </p>
+             </div>
+        </div>
+    </div> 
+    <div class="col-md-1">
+    </div>
+</div>
