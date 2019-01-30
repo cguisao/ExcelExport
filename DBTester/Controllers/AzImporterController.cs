@@ -60,7 +60,14 @@ namespace GTI_Solutions.Controllers
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
 
-            DBModifierAzImporterExcel AzImporter = new DBModifierAzImporterExcel(path);
+            var azImportItems = _context.AzImporter.ToDictionary(x => x.Sku, y => y);
+
+            foreach(var az in azImportItems)
+            {
+                az.Value.Quantity = 0;
+            }
+
+            DBModifierAzImporterExcel AzImporter = new DBModifierAzImporterExcel(path, azImportItems);
 
             AzImporter.TableExecutor();
 

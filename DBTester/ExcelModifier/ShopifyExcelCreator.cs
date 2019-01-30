@@ -35,7 +35,10 @@ namespace ExcelModifier
             shopifyProfile = _shopifyProfile;
             path = _path;
             dicTitle = new Dictionary<string, string>();
+            shopifyUserTemp = new ConcurrentDictionary<string, string>();
         }
+
+        public ConcurrentDictionary<string, string> shopifyUserTemp { get; set; }
 
         private Dictionary<string, ShopifyUser> shopifyProfile { get; set; }
 
@@ -511,7 +514,10 @@ namespace ExcelModifier
                         && !title.ToLower().Contains("damaged box") && !title.ToLower().Contains("scratched box")
                         && !title.ToLower().Contains("damaged packaging"))
                         {
-                            shopifyUser.TryAdd(worksheet.Cells[row, 13].Value?.ToString() + "_" + profile.ProfileUser, profile.ProfileUser);
+                            if(shopifyUser.TryAdd(worksheet.Cells[row, 13].Value?.ToString() + "_" + profile.ProfileUser, profile.ProfileUser))
+                            {
+                                shopifyUserTemp.TryAdd(worksheet.Cells[row, 13].Value?.ToString() + "_" + profile.ProfileUser, profile.ProfileUser);
+                            }
 
                             if (!shopifyProfile.ContainsKey(worksheet.Cells[row, 13].Value.ToString()))
                             {

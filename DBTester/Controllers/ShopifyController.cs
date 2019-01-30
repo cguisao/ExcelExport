@@ -205,7 +205,7 @@ namespace DBTester.Controllers
                 try
                 {
                     DBModifierShopifyUserList user =
-                        new DBModifierShopifyUserList(shopifyModifier.shopifyUser, profile);
+                        new DBModifierShopifyUserList(shopifyModifier.shopifyUserTemp, profile);
                     user.TableExecutor();
                     // Execute raw query
                     
