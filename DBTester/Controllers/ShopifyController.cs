@@ -100,6 +100,11 @@ namespace DBTester.Controllers
                 .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
         }
 
+        public IActionResult Delete()
+        {
+            return View(_context.UsersList.Distinct().ToList());
+        }
+
         [HttpPost]
         public async Task<IActionResult> ProductExport(IFormFile file)
         {
@@ -438,6 +443,15 @@ namespace DBTester.Controllers
             System.IO.File.Delete(path);
 
             return RedirectToAction("UpdateExcel");
+        }
+
+        [HttpPost]
+        public IActionResult DeleteUser(string user)
+        {
+            var users = _context.UsersList.Where(x => x.userID == user).ToList();
+            _context.UsersList.RemoveRange(users);
+            _context.SaveChanges();
+            return RedirectToAction("Delete");
         }
 
         private string test { get; set; }

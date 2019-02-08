@@ -1,0 +1,86 @@
+﻿@model IEnumerable<DBTester.Models.UsersList>
+@{
+    ViewBag.Title = "Delete";
+}
+
+<div class="text-center m-t-15">
+    <h2>Shopify Delete</h2>
+</div> 
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+        <div class="card m-b-30">
+             <div class="card-body">
+                <div class="text-center m-t-15">
+                    <h3></h3>
+                </div>
+                <p>
+                    This application is intended to delete the information from any data from any shopify user.
+                </p>
+                <br />
+                <form asp-controller="Shopify" asp-action="DeleteUser" method="post"
+                      enctype="multipart/form-data" style="width: 100%">
+
+                    <div class="form-row">
+                        <div class="form-group text-center col-md-6">
+                            <label for="inputUser">User</label>
+                            @Html.DropDownList("User",
+                   Model.GroupBy(x => x.userID).Select(m => new SelectListItem() { Text = m.Key }).ToList()
+                   , "", new { @class = "form-control", required = "required" })
+                        </div>
+                        <div class="text-center m-t-15 invisible">
+                            <input type="text" class="form-control" name="file" value="@ViewBag.ExcelGuid">
+                        </div>
+                        <div class="text-center m-t-15 invisible">
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="text-center m-t-15">
+                        <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                    </div>
+                </form>
+             </div>
+        </div>
+    </div> 
+    <div class="col-md-1">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-xl-10">
+        <div class="card ">
+            <div class="card-body">
+                <div class="form-group col-md-12">
+                    <h2>Shopify Users</h2>
+                    <div class="table-responsive">
+                        <table id="datatable2" class="table border-0 dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                            
+                                <tr>
+                                    <th>User</th>
+                                    <th># of Items</th>
+                                </tr>
+                            
+                                @foreach (var product in Model.GroupBy(x => x.userID).Select(x => x.FirstOrDefault()))
+                                {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => product.userID)
+                                    </td>
+                                    <td>
+                                        @Model.Where(x => x.userID == product.userID).Count()
+                                    </td>
+                                </tr>
+                                }
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1">
+        
+    </div>
+</div>
