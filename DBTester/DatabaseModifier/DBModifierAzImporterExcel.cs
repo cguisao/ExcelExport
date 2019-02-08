@@ -91,7 +91,7 @@ namespace DatabaseModifier
 
                             if(!azImportItems.TryAdd(az.Sku, az))
                             {
-                                azImportItems[az.Sku] = az;
+                                azImportItems[az.Sku].Quantity = az.Quantity;
                             }
                             else
                             {
